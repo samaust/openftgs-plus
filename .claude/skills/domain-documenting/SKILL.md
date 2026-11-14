@@ -50,7 +50,7 @@ Commit messages cite the spec items the new or changed entries reference.
 
 ## Guidelines
 
-Follow [docs/agents/guidelines.md](../../../docs/agents/guidelines.md). A term the spec defines keeps the spec's name. Where the glossary, a module doc or the owner disagrees with the spec, the spec wins and the disagreement goes to the owner; never edit the spec to match.
+Follow [docs/agents/guidelines.md](../../../docs/agents/guidelines.md). A term the spec defines keeps the spec's name. Where the glossary, a module doc or the owner disagrees with the spec, the spec wins and the disagreement goes to the owner. Don't edit the spec to match: a spec edit needs the owner's approval ("Editing the spec" in `docs/agents/guidelines.md`).
 
 ## During the session
 
