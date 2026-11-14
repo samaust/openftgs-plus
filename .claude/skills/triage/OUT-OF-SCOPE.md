@@ -36,7 +36,7 @@ During triage (step 1, Gather context), list the record with `gh issue list --la
 
 The owner may:
 
-- **Confirm**: close the new issue with `gh issue close <n> --duplicate-of <canonical> --comment "..."` (GitHub marks it a duplicate and links the two; the comment starts with the triage disclaimer), and add it to the canonical issue's Prior requests list by editing the decision comment ("Edit a comment" in `docs/agents/issue-tracker.md`).
+- **Confirm**: close the new issue with `gh issue close <n> --duplicate-of <canonical>` (GitHub marks it a duplicate and links the two; no comment, so nothing hides the duplicate marker, as `SKILL.md` says), and add it to the canonical issue's Prior requests list by editing the decision comment ("Edit a comment" in `docs/agents/issue-tracker.md`).
 - **Reconsider**: reopen the canonical issue, remove its `out-of-scope` label, and let the new request proceed through normal triage, or become a spec change.
 - **Disagree**: the requests are related but distinct; proceed with normal triage.
 

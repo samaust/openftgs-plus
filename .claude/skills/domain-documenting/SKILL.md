@@ -40,11 +40,11 @@ One file per subject, named after the subject in glossary vocabulary (`density/r
 
 ## Where the edits go
 
-Never leave edits to `docs/GLOSSARY.md` or `docs/modules/` uncommitted on `main`: CLAUDE.md forbids committing on `main` directly, and uncommitted changes stop the next implement run at its clean-tree check.
+Never leave edits to `docs/GLOSSARY.md` or `docs/modules/` uncommitted on `main`: CLAUDE.md "Commits" has all work on a branch in its own worktree, never on `main`, and uncommitted changes stop the next implement run at its clean-tree check.
 
-- **Already on a branch** (an integration branch during a build): edit there and commit with the work.
+- **Already on a branch** (an integration branch's worktree during a build): edit there and commit with the work.
 - **In plan mode**: write nothing and create no branch. List the entries and module-doc changes in the plan under **Glossary and module docs**, as `grilling` says; the implement run applies them.
-- **On `main`** (planning, grilling, triage, outside plan mode): before the first edit, check that the working tree is clean (if `git status --porcelain` lists anything, ask the owner before going on), then create a short branch `docs-<slug>` from `main`. Make every edit of the session there, committing as terms are resolved. When the glossary and module-doc work of the current task is done (the end of a grilling or triage round, say), ask the owner to approve merging it into `main` with `git merge --no-ff`. Once approved, merge, delete the branch (`git branch -d`) and return to `main`. If they don't approve, return to `main` and report the unmerged branch.
+- **On `main`** (planning, grilling, triage, outside plan mode): before the first edit, check that the working tree is clean (if `git status --porcelain` lists anything, ask the owner before going on), then create a short branch `docs-<slug>` from `main` in its own worktree, `git worktree add -b docs-<slug> .claude/worktrees/docs-<slug> main` ("Branches live in worktrees" in `docs/agents/guidelines.md`). Make every edit of the session in that worktree, committing as terms are resolved. When the glossary and module-doc work of the current task is done (the end of a grilling or triage round, say), ask the owner to approve merging it into `main` with `git merge --no-ff`. Once approved, merge it in the main checkout, which stays on `main`, check the merge (`git merge-base --is-ancestor docs-<slug> main`), then remove the worktree (`git worktree remove .claude/worktrees/docs-<slug>`) and delete the branch (`git branch -d`). If they don't approve, leave the worktree in place and report the unmerged branch.
 
 Commit messages cite the spec items the new or changed entries reference.
 
