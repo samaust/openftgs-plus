@@ -10,6 +10,10 @@ The documentation is at [openftgs-plus.readthedocs.io](https://openftgs-plus.rea
 
 **Status: alpha, version 0.1.0.** The first release, at the end of the plan's milestones M0 to M18: the library and its command line are complete, the differential harness checks them, and the method is validated on openftgs-synth, the owner's CC0-1.0 rendered dataset, rather than on the paper's datasets, so no result is compared with the paper's tables. The [changelog](https://github.com/samaust/openftgs-plus/blob/main/docs/changelog.md) lists what the release contains and its known limitations.
 
+## Direction
+
+openftgs implements FreeTimeGS as the paper describes it, and stays that way. openftgs-plus starts from the same code, but will diverge from a pure FreeTimeGS implementation: it will combine other methods from the Gaussian-splatting literature with FreeTimeGS to try to improve on it. Each departure from the paper is made in the specification, as a revision the owner approves, and where possible behind a configuration option, so that the paper's method stays available for comparison. Until such changes land, the package is the same FreeTimeGS implementation as openftgs.
+
 ## Provenance
 
 openftgs was written from the paper (arXiv 2506.05348 v2) and from the owner's specification, which was itself written from the paper alone, under a clean-room process. openftgs-plus continues from that code under looser rules: the web may be searched, but no code, notebook, checkpoint or issue thread from any other implementation of the method, including the authors' own, is consulted. Third-party software is read only within its license: source code only under permissive licenses that allow commercial use, documentation only for everything else, and anything added must have a license compatible with Apache-2.0 that allows commercial use. Every source consulted is logged. The renderer the paper's project page links was read for a documentation-only survey ([openftgs #352](https://github.com/samaust/openftgs/issues/352)), and nothing from it is in the package.
