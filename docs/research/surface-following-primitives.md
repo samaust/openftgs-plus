@@ -327,6 +327,206 @@ Every command after the first also set `OPENBLAS_NUM_THREADS=4`.
 
 *Ticket #5's section.* On private scene A's checkpoints, the notes' three measures (the share of opacity farther than 5 cm from every init point, the share of primitives whose duration is under two frames, the distribution of base opacity) and the fixed sheet of novel views from the side, with its render request; on openftgs-synth's M17 checkpoints, the geometry residual and the error of expected depth from `scripts/gt_depth.py` (Q-226 to Q-231).
 
+These are the figures a later training test is compared with (section 1, "No camera is ground truth"). All were measured on 2026-11-14 with the integration branch's code at 841f1bc, whose `src/` and `scripts/` are `main`'s at 93eb58e: Python 3.14, torch 2.15.0+cu132, gsplat 1.5.3, SciPy 1.18.1, NumPy 2.5.4, four CPU threads, one RTX 4090. "The commands", at the section's end, lists every run. No image of private scene A was opened, and no render or sheet of it was looked at: scripts read tensors and JSON, and wrote numbers and files. `<notes>` below is the folder of the owner's notes on private scene A, which holds their runs; like `<private-scene-A>`, it is written nowhere.
+
+**The notes' three measures** (rows 513, 514). The notes' scorer reads two files per run: the exchange model `ftgs export` writes from the checkpoint (§2.2 `ftgs-if`: `position` is μx, `opacity` is E3's base opacity σ, `duration` is E4's duration s in seconds), and the init points file the run trained from.
+
+- **The far-5 cm share.** A primitive is far when its position is more than 0.05 world units, which the notes read as 5 cm, from every init point of that file, all init frames taken together. The measure is the share of the summed base opacity that the far primitives hold. The scorer also keeps the share of primitives that are far.
+- **The under-two-frames share.** The share of primitives whose duration is under 2/24 s, two frame intervals at the scene's 24 fps. The duration is the standard deviation of E4's Gaussian in time, not a length of life: a primitive at that bound still has σt ≥ 0.61 over four frame intervals.
+- **The distribution of base opacity.** Its mean, and the shares of primitives under 0.05 and over 0.5. This section adds the quartiles and the share under 0.005, D-14's dead threshold.
+
+Every checkpoint of the scene has the spatial scale S = 0.416 (D-27), and the nine cameras are 1.05 from the point where their optical axes meet (rows 515, 517). So 5 cm is 0.12·S, six times the δ = 0.02·S that the geometry residual uses on openftgs-synth (Q-229).
+
+A scratch script computes the three as the scorer does, without the exported file: `load_checkpoint`, the model on the CPU, `FreeTimeGaussians.to_exchange()`, `read_init_points`, an exact nearest-neighbour search (SciPy's `cKDTree`, k = 1), then the scorer's expressions, written anew (row 517).
+
+**The checkpoints the owner still has: 45**, all from 30,000-iteration runs of openftgs 0.1.0 (row 513).
+
+- The final checkpoint of each of the notes' 37 scored runs: 30 keep the centre camera as the test view, and 7 the camera left of it. The notes' three failed or stopped runs left none.
+- Five periodic checkpoints, at iterations 5,000 to 25,000, of one of those runs.
+- The three models the notes trained on all nine cameras.
+
+A fourth nine-camera model, the default configuration from a stride-1 init, which the notes cite for the artifacts between cameras, is not among them. It is a link from `<notes>` to a place this ticket was not given, so it was not opened ("What is open", below).
+
+**Against the notes' own figures.** The 42 checkpoints of the runs that keep one camera as the test view can be checked, and all 42 agree. The eight figures the scorer writes per checkpoint (N, the two far-5 cm shares, the under-two-frames share, the median duration and the three opacity figures) equal the notes' score files in every digit, though those were written with torch 2.14.1 and these with torch 2.15.0. The 37 rows of the notes' table of all runs are the same figures, rounded. The three nine-camera models have no figure in the notes, so they cannot be checked that way; they are measured by the same code, against the init points file the note beside them names.
+
+**The measures, per checkpoint.** A run is named as the notes name it. "Init points" says how `ftgs init roma` was run (D-21's stride; 1,000 points per init frame, 120,000 in all, unless the cell says otherwise) and how the notes then edited the file, which keeps its positions. The two far-5 cm shares are taken against that file. "Differs" lists what the run's training configuration changes from the default. σ is the base opacity, and its quartiles are the 25th, 50th and 75th percentiles.
+
+| Checkpoint | Test view | Init points | Differs | N | Far-5 cm share of opacity | Far-5 cm share of primitives | Under-two-frames share | Median duration, frames | Mean σ | σ < 0.05 | σ > 0.5 | σ quartiles | σ < 0.005 | Equal to the notes' figures |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| `stride4` | none | stride 4 | nothing | 3,000,000 | 0.209 | 0.225 | 0.456 | 2.25 | 0.337 | 0.327 | 0.294 | 0.030 / 0.133 / 0.686 | 0.103 | no figure in the notes |
+| `stride4_zero_velocity` | none | stride 4, velocities zeroed | nothing | 3,000,000 | 0.213 | 0.225 | 0.453 | 2.26 | 0.330 | 0.327 | 0.285 | 0.030 / 0.130 / 0.646 | 0.100 | no figure in the notes |
+| `stride4_zero_velocity_reg0.1` | none | stride 4, velocities zeroed | `loss.lambda_reg` 0.1 | 3,000,000 | 0.154 | 0.183 | 0.378 | 2.64 | 0.115 | 0.540 | 0.058 | 0.012 / 0.043 / 0.116 | 0.171 | no figure in the notes |
+| `A_default_s0` | centre | stride 1 | nothing | 3,000,000 | 0.259 | 0.273 | 0.517 | 1.92 | 0.360 | 0.285 | 0.315 | 0.040 / 0.160 / 0.755 | 0.074 | yes |
+| `A_default_s1` | centre | stride 1 | seed 1 | 3,000,000 | 0.257 | 0.274 | 0.519 | 1.91 | 0.358 | 0.286 | 0.313 | 0.040 / 0.159 / 0.751 | 0.074 | yes |
+| `c3_s4` | centre | stride 4 | nothing | 3,000,000 | 0.213 | 0.226 | 0.447 | 2.29 | 0.360 | 0.301 | 0.317 | 0.035 / 0.154 / 0.783 | 0.092 | yes |
+| `c3_s4_reg0.1` | centre | stride 4 | `loss.lambda_reg` 0.1 | 3,000,000 | 0.161 | 0.186 | 0.376 | 2.65 | 0.123 | 0.515 | 0.065 | 0.014 / 0.047 / 0.126 | 0.156 | yes |
+| `c3_s4v0` | centre | stride 4, velocities zeroed | nothing | 3,000,000 | 0.230 | 0.241 | 0.452 | 2.27 | 0.353 | 0.301 | 0.309 | 0.036 / 0.151 / 0.745 | 0.090 | yes |
+| `c3_s4v0_reg0.1` | centre | stride 4, velocities zeroed | `loss.lambda_reg` 0.1 | 3,000,000 | 0.164 | 0.192 | 0.379 | 2.63 | 0.124 | 0.513 | 0.065 | 0.014 / 0.048 / 0.126 | 0.153 | yes |
+| `sh0` | centre | stride 1 | `sh_degree` 0 | 3,000,000 | 0.264 | 0.268 | 0.508 | 1.96 | 0.326 | 0.315 | 0.278 | 0.034 / 0.129 / 0.616 | 0.086 | yes |
+| `sh1` | centre | stride 1 | `sh_degree` 1 | 3,000,000 | 0.266 | 0.272 | 0.509 | 1.95 | 0.337 | 0.310 | 0.291 | 0.035 / 0.136 / 0.671 | 0.084 | yes |
+| `B_usercfg_s0` | centre | stride 1 | `growth.n_max` 1,500,000; `reloc.dead_opacity` 0.01; `growth.grad_threshold` 0.0004, growth from 100 to 30,000 | 1,500,000 | 0.229 | 0.255 | 0.480 | 2.10 | 0.414 | 0.199 | 0.366 | 0.068 / 0.244 / 0.868 | 0.030 | yes |
+| `B_usercfg_s1` | centre | stride 1 | `growth.n_max` 1,500,000; `reloc.dead_opacity` 0.01; `growth.grad_threshold` 0.0004, growth from 100 to 30,000; seed 1 | 1,500,000 | 0.228 | 0.254 | 0.483 | 2.08 | 0.412 | 0.201 | 0.365 | 0.068 / 0.242 / 0.863 | 0.030 | yes |
+| `b15_dead0.05` | centre | stride 1 | `growth.n_max` 1,500,000; `reloc.dead_opacity` 0.05 | 1,500,000 | 0.304 | 0.324 | 0.158 | 5.81 | 0.225 | 0.377 | 0.164 | 0.021 / 0.095 / 0.298 | 0.112 | yes |
+| `b15_durlr0.2` | centre | stride 1 | `growth.n_max` 1,500,000; `optim.log_durations_lr` 0.001 | 1,500,000 | 0.368 | 0.366 | 0.798 | 1.45 | 0.500 | 0.185 | 0.467 | 0.081 / 0.405 / 0.992 | 0.039 | yes |
+| `b15_durlr4` | centre | stride 1 | `growth.n_max` 1,500,000; `optim.log_durations_lr` 0.02 | 1,500,000 | 0.154 | 0.164 | 0.649 | 1.19 | 0.346 | 0.304 | 0.303 | 0.034 / 0.154 / 0.689 | 0.096 | yes |
+| `b15_init3k` | centre | stride 1, 3,000 points per frame | `growth.n_max` 1,500,000 | 1,500,000 | 0.179 | 0.199 | 0.496 | 2.01 | 0.371 | 0.246 | 0.322 | 0.051 / 0.188 / 0.747 | 0.055 | yes |
+| `b15_init_d4` | centre | stride 1, durations × 4 | `growth.n_max` 1,500,000 | 1,500,000 | 0.191 | 0.219 | 0.380 | 2.65 | 0.368 | 0.258 | 0.320 | 0.048 / 0.179 / 0.757 | 0.067 | yes |
+| `b15_init_s4` | centre | stride 4 | `growth.n_max` 1,500,000 | 1,500,000 | 0.203 | 0.219 | 0.388 | 2.64 | 0.380 | 0.242 | 0.331 | 0.052 / 0.194 / 0.792 | 0.061 | yes |
+| `b15_init_s8` | centre | stride 8 | `growth.n_max` 1,500,000 | 1,500,000 | 0.204 | 0.219 | 0.351 | 2.89 | 0.388 | 0.249 | 0.341 | 0.050 / 0.196 / 0.842 | 0.069 | yes |
+| `b15_init_v0` | centre | stride 1, velocities zeroed | `growth.n_max` 1,500,000 | 1,500,000 | 0.241 | 0.264 | 0.463 | 2.18 | 0.387 | 0.224 | 0.337 | 0.058 / 0.205 / 0.799 | 0.045 | yes |
+| `b15_noreloc` | centre | stride 1 | `growth.n_max` 1,500,000; relocation off, `reloc.prune_opacity` 0.005 | 1,258,673 | 0.233 | 0.293 | 0.390 | 2.74 | 0.178 | 0.674 | 0.160 | 0.000 / 0.000 / 0.147 | 0.605 | yes |
+| `b15_reg0.1` | centre | stride 1 | `growth.n_max` 1,500,000; `loss.lambda_reg` 0.1 | 1,500,000 | 0.174 | 0.211 | 0.395 | 2.49 | 0.164 | 0.416 | 0.098 | 0.024 / 0.068 / 0.182 | 0.106 | yes |
+| `b15_reg0.3` | centre | stride 1 | `growth.n_max` 1,500,000; `loss.lambda_reg` 0.3 | 1,500,000 | 0.167 | 0.203 | 0.253 | 3.39 | 0.058 | 0.693 | 0.014 | 0.003 / 0.023 / 0.063 | 0.305 | yes |
+| `b15_scale3` | centre | stride 1 | `growth.n_max` 1,500,000; `scene_scale_factor` 3.3 | 1,500,000 | 0.276 | 0.297 | 0.488 | 2.06 | 0.321 | 0.316 | 0.274 | 0.033 / 0.134 / 0.584 | 0.080 | yes |
+| `b15_vgg` | centre | stride 1 | `growth.n_max` 1,500,000; `loss.perc_net` `vgg16_oxford` | 1,500,000 | 0.189 | 0.213 | 0.526 | 1.88 | 0.336 | 0.246 | 0.280 | 0.051 / 0.169 / 0.589 | 0.063 | yes |
+| `f_s4_reg0.1` | centre | stride 4 | `growth.n_max` 1,500,000; `loss.lambda_reg` 0.1 | 1,500,000 | 0.151 | 0.182 | 0.329 | 2.92 | 0.146 | 0.449 | 0.080 | 0.020 / 0.060 / 0.156 | 0.121 | yes |
+| `f_s4_reg0.3` | centre | stride 4 | `growth.n_max` 1,500,000; `loss.lambda_reg` 0.3 | 1,500,000 | 0.196 | 0.259 | 0.108 | 5.30 | 0.036 | 0.822 | 0.009 | 0.000 / 0.004 / 0.033 | 0.509 | yes |
+| `f_s4v0` | centre | stride 4, velocities zeroed | `growth.n_max` 1,500,000 | 1,500,000 | 0.198 | 0.216 | 0.384 | 2.66 | 0.378 | 0.241 | 0.329 | 0.053 / 0.193 / 0.785 | 0.060 | yes |
+| `f_s4v0_reg0.1` | centre | stride 4, velocities zeroed | `growth.n_max` 1,500,000; `loss.lambda_reg` 0.1 | 1,500,000 | 0.156 | 0.188 | 0.338 | 2.88 | 0.148 | 0.444 | 0.083 | 0.021 / 0.061 / 0.159 | 0.118 | yes |
+| `f_v0_reg0.1` | centre | stride 1, velocities zeroed | `growth.n_max` 1,500,000; `loss.lambda_reg` 0.1 | 1,500,000 | 0.181 | 0.221 | 0.396 | 2.50 | 0.167 | 0.410 | 0.100 | 0.025 / 0.069 / 0.184 | 0.100 | yes |
+| `n1500k` | centre | stride 1 | `growth.n_max` 1,500,000 | 1,500,000 | 0.235 | 0.257 | 0.477 | 2.10 | 0.381 | 0.235 | 0.332 | 0.055 / 0.197 / 0.785 | 0.050 | yes |
+| `n750k` | centre | stride 1 | `growth.n_max` 750,000 | 750,000 | 0.208 | 0.241 | 0.437 | 2.26 | 0.406 | 0.197 | 0.356 | 0.069 / 0.240 / 0.830 | 0.037 | yes |
+| `c3_s4v0_reg0.1`, iteration 5,000 | centre | stride 4, velocities zeroed | `loss.lambda_reg` 0.1 | 1,357,226 | 0.275 | 0.242 | 0.200 | 4.05 | 0.185 | 0.457 | 0.130 | 0.020 / 0.060 / 0.211 | 0.000 | yes |
+| `c3_s4v0_reg0.1`, iteration 10,000 | centre | stride 4, velocities zeroed | `loss.lambda_reg` 0.1 | 2,730,872 | 0.231 | 0.227 | 0.340 | 2.92 | 0.137 | 0.511 | 0.078 | 0.017 / 0.048 / 0.145 | 0.000 | yes |
+| `c3_s4v0_reg0.1`, iteration 15,000 | centre | stride 4, velocities zeroed | `loss.lambda_reg` 0.1 | 3,000,000 | 0.181 | 0.196 | 0.379 | 2.59 | 0.112 | 0.523 | 0.048 | 0.017 / 0.046 / 0.122 | 0.000 | yes |
+| `c3_s4v0_reg0.1`, iteration 20,000 | centre | stride 4, velocities zeroed | `loss.lambda_reg` 0.1 | 3,000,000 | 0.173 | 0.191 | 0.376 | 2.61 | 0.114 | 0.489 | 0.047 | 0.021 / 0.052 / 0.126 | 0.000 | yes |
+| `c3_s4v0_reg0.1`, iteration 25,000 | centre | stride 4, velocities zeroed | `loss.lambda_reg` 0.1 | 3,000,000 | 0.168 | 0.192 | 0.375 | 2.64 | 0.119 | 0.466 | 0.050 | 0.023 / 0.056 / 0.131 | 0.000 | yes |
+| `h1_base` | left of centre | stride 1 | `growth.n_max` 1,500,000 | 1,500,000 | 0.237 | 0.260 | 0.482 | 2.08 | 0.378 | 0.240 | 0.329 | 0.053 / 0.192 / 0.778 | 0.051 | yes |
+| `h1_init_s4` | left of centre | stride 4 | `growth.n_max` 1,500,000 | 1,500,000 | 0.208 | 0.222 | 0.379 | 2.68 | 0.374 | 0.250 | 0.325 | 0.050 / 0.186 / 0.772 | 0.065 | yes |
+| `h1_init_s4_seed1` | left of centre | stride 4 | `growth.n_max` 1,500,000; seed 1 | 1,500,000 | 0.207 | 0.222 | 0.383 | 2.67 | 0.370 | 0.250 | 0.321 | 0.050 / 0.184 / 0.757 | 0.063 | yes |
+| `h1_s4_reg0.1` | left of centre | stride 4 | `growth.n_max` 1,500,000; `loss.lambda_reg` 0.1 | 1,500,000 | 0.156 | 0.187 | 0.331 | 2.92 | 0.145 | 0.452 | 0.080 | 0.020 / 0.059 / 0.154 | 0.123 | yes |
+| `h1_s4v0` | left of centre | stride 4, velocities zeroed | `growth.n_max` 1,500,000 | 1,500,000 | 0.208 | 0.223 | 0.388 | 2.64 | 0.371 | 0.247 | 0.322 | 0.051 / 0.186 / 0.759 | 0.062 | yes |
+| `h1_s4v0_reg0.1` | left of centre | stride 4, velocities zeroed | `growth.n_max` 1,500,000; `loss.lambda_reg` 0.1 | 1,500,000 | 0.156 | 0.187 | 0.337 | 2.87 | 0.145 | 0.451 | 0.081 | 0.020 / 0.060 / 0.155 | 0.122 | yes |
+| `h1_s4v0_seed1` | left of centre | stride 4, velocities zeroed | `growth.n_max` 1,500,000; seed 1 | 1,500,000 | 0.199 | 0.217 | 0.385 | 2.65 | 0.369 | 0.248 | 0.319 | 0.051 / 0.183 / 0.749 | 0.061 | yes |
+
+**What the measures contain.** This ticket's reading, on seven of the checkpoints (`<surface-runs>/ticket-5/shell_supplement.json`); the notes make none of these splits. The init points fall into two groups by depth along the centre camera's axis: in each of the five files checked, 52 to 58 % lie nearer than 2.0, about 1 % between 1.5 and 2.3, and the rest farther, to 14. The person is taken to be in the nearer group, at 0.7 to 1.5: that is where the init points that project inside the notes' crop of the centre camera lie, and no image was seen to confirm it. "The near side" below is the primitives whose position is nearer than 2.0, and "the far side", or the background, the others. The four init points files named in the header are those of the runs with the centre camera as the test view, and the nine-camera models' file.
+
+| Checkpoint | Far-5 cm share against its own init | Against the stride-1 file | Against the stride-4 file | Against the nine-camera stride-4 file | Against the file with 3,000 points per frame | Share of the opacity on the near side | Far-5 cm share within the near side | Far-5 cm share within the far side | The far-5 cm share's parts: near side + far side |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| `A_default_s0` | 0.259 | 0.259 | 0.269 | 0.264 | 0.231 | 0.749 | 0.128 | 0.649 | 0.096 + 0.163 |
+| `A_default_s1` | 0.257 | 0.257 | 0.265 | 0.256 | 0.228 | 0.755 | 0.131 | 0.647 | 0.099 + 0.159 |
+| `n1500k` | 0.235 | 0.235 | 0.243 | 0.236 | 0.209 | 0.763 | 0.097 | 0.677 | 0.074 + 0.161 |
+| `c3_s4` | 0.213 | 0.200 | 0.213 | 0.206 | 0.176 | 0.785 | 0.124 | 0.538 | 0.097 + 0.116 |
+| `b15_init_s4` | 0.203 | 0.185 | 0.203 | 0.194 | 0.160 | 0.784 | 0.105 | 0.557 | 0.082 + 0.120 |
+| `c3_s4_reg0.1` | 0.161 | 0.150 | 0.161 | 0.155 | 0.129 | 0.861 | 0.083 | 0.647 | 0.071 + 0.090 |
+| `stride4` | 0.209 | 0.200 | 0.220 | 0.209 | 0.174 | 0.784 | 0.122 | 0.528 | 0.095 + 0.114 |
+
+- **The far-5 cm share depends on the init points it is taken against.** Against another 120,000-point file of the scene it moves by up to 0.02, and against the file with three times the points it is 0.03 to 0.04 lower: it is a share against a sample of the surface, and it falls as the sample grows. The gain the notes found for a stride-4 init holds against any one file: from `n1500k` to `b15_init_s4` the share goes from 0.235 to 0.203 against each run's own init, from 0.235 to 0.185 against the stride-1 file, and from 0.243 to 0.203 against the stride-4 file.
+- **More than half of it is the background.** The far side holds 14 to 25 % of the opacity, and 53 to 68 % of that opacity is far from every init point, against 8 to 13 % on the near side. So 54 to 68 % of the far-5 cm share comes from the far side, where the init points are thin, and the rest from the side the person is on. The near side's own share is 0.128 for the default configuration (0.131 with seed 1), 0.124 with the stride-4 init (`c3_s4`) and 0.122 for the nine-camera model `stride4`.
+- **Pooling the init frames was checked once, without a clear answer.** The person comes about 0.5 nearer over the clip, so the init points of all frames together fill the volume the surface sweeps, and a primitive off the surface at its own time can lie within 5 cm of a point from another time. Comparing each primitive only with the init points within 6 frames of its time centre raises the near side's share of the default checkpoint from 0.128 to 0.189. Against the file with three times the points the same window gives 0.161, so much of the rise is the thinner sample, and the check does not separate the two (`<surface-runs>/ticket-5/shell_windowed.json`).
+
+On the near side, the primitives far from every init point against those within 5 cm of one:
+
+| Checkpoint | Far from init: share of the near side's primitives | Their distance to the nearest init point, quartiles, cm | Share of their opacity within 25 cm | Median duration (quartiles), frames: far from init | Median duration (quartiles), frames: near init | Under two frames: far from init | Under two frames: near init | Median σ: far from init | Median σ: near init | Under two frames, on the far side |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| `A_default_s0` | 0.140 | 7.4 / 17.0 / 37.6 | 0.64 | 3.90 (1.43 to 11.47) | 1.43 (0.91 to 2.22) | 0.332 | 0.698 | 0.122 | 0.177 | 0.162 |
+| `A_default_s1` | 0.144 | 6.9 / 14.8 / 33.8 | 0.67 | 3.62 (1.39 to 11.02) | 1.42 (0.91 to 2.21) | 0.346 | 0.699 | 0.121 | 0.177 | 0.155 |
+| `n1500k` | 0.110 | 6.8 / 14.9 / 34.0 | 0.68 | 4.41 (1.75 to 13.83) | 1.62 (1.06 to 2.47) | 0.286 | 0.633 | 0.148 | 0.223 | 0.147 |
+| `c3_s4` | 0.127 | 6.7 / 13.4 / 36.7 | 0.65 | 5.24 (1.41 to 17.27) | 1.63 (1.01 to 2.59) | 0.316 | 0.618 | 0.135 | 0.174 | 0.055 |
+| `b15_init_s4` | 0.107 | 6.3 / 9.1 / 28.6 | 0.78 | 5.04 (1.44 to 19.14) | 1.89 (1.22 to 3.00) | 0.329 | 0.534 | 0.185 | 0.225 | 0.037 |
+| `c3_s4_reg0.1` | 0.087 | 6.2 / 8.9 / 21.4 | 0.84 | 4.82 (1.39 to 30.18) | 2.08 (1.33 to 3.31) | 0.335 | 0.478 | 0.047 | 0.049 | 0.006 |
+| `stride4` | 0.130 | 6.7 / 10.8 / 27.2 | 0.75 | 4.21 (1.03 to 16.17) | 1.61 (1.00 to 2.59) | 0.379 | 0.622 | 0.104 | 0.148 | 0.048 |
+
+- **The far primitives are not the short-lived ones.** On the near side of the default checkpoint, the primitives far from every init point have a median duration of 3.9 frames, and 33 % of them are under two frames; those within 5 cm of an init point have 1.4 frames and 70 %. Their base opacities differ less (medians 0.12 and 0.18). So the two shares count different primitives. The far-5 cm share counts longer-lived primitives away from the triangulated points, more than half of them by opacity in the background. The under-two-frames share counts short-lived primitives close to the triangulated points, on the near side: 65 % of the near side's primitives are under two frames, against 16 % of the far side's. Across the 30 runs with the centre camera as the test view, the rank correlation of the two shares is 0.44.
+- **The notes' two medians are the whole model's.** The notes give the shell a median opacity of 0.16 and a median lifetime of two frames (section 2.1). Those are the medians over all 3,000,000 primitives of the default checkpoints: 0.160 and 1.92 frames, and 0.159 and 1.91 with seed 1. Over the primitives far from every init point they are 0.135 and 6.2 frames. The script behind the notes' sentence is not among the kept tools (row 514), so the population it took cannot be checked. The far primitives' distances to the nearest init point have quartiles of 8.5, 18 and 37 cm, wider than the notes' 5 to 25 cm.
+- **Between seeds.** Four pairs of runs differ only by seed. The far-5 cm share differs by 0.001 to 0.002 in three pairs and by 0.010 in the fourth, the under-two-frames share by 0.002 to 0.004, and the mean base opacity by 0.001 to 0.003.
+- **Against the notes' test-view scores.** Across the 30 runs with the centre camera as the test view, a lower far-5 cm share goes with a higher PSNR on that camera's crop (Spearman's ρ = −0.72) and a lower ꟻLIP (ρ = 0.65), and so does a lower under-two-frames share (−0.60 and 0.69). Neither goes with the notes' sharpness ratio (0.07 and 0.13). Each far-5 cm share is against its run's own init, and the runs differ by configuration, not by seed: the measures moved with the scores under the notes' changes, which is less than saying that lowering them raises a score.
+- **Over training.** In the run with periodic checkpoints (`loss.lambda_reg` 0.1), the far-5 cm share falls from 0.275 at iteration 5,000 to 0.164 at 30,000. The under-two-frames share rises from 0.200 to 0.340 at iteration 10,000, and stays near 0.38 from 15,000 on.
+- **Dead primitives at the end.** At iteration 30,000, 7 % of the default checkpoints' primitives are under D-14's dead threshold of 0.005; 9 to 10 % for the stride-4 runs at the default cap, and 15 to 17 % for those that also set `loss.lambda_reg` 0.1. At the periodic checkpoints up to iteration 25,000 the share is at most 0.02 %, and that run's final checkpoint has 15 %. Relocation stops at iteration 25,000 (`reloc.stop`), and the primitives that fall under the threshold after it stay where they are.
+
+**The sheet** (row 517). One render request, `<surface-runs>/ticket-5/side_request.json` (39 items; SHA-256 `1b88fd859d64028c9ff40a4624a6bce76edb0be95b8f4129ccfbdc5933d98821`), fixes the cameras and the times. It holds cameras and timestamps and no path, and since the scene manifest and its two copies with a test view share cameras and timestamps, it serves every checkpoint of the scene: `ftgs render CHECKPOINT --request <surface-runs>/ticket-5/side_request.json --out RENDERS.safetensors`.
+
+- **The times:** frames 0, 60 and 119 of the 120 (0 s, 2.5 s and 4.958 s), the three the notes' novel views use.
+- **The side poses,** by a rule that reads the scene manifest alone (row 515). P is the point nearest to the nine optical axes, which pass it within 2·10⁻⁷; seen from P, the four cameras beside, above and below the centre camera are 15° from it and the four corner cameras 21.1°. The centre camera is turned rigidly about the axis through P that is parallel to its image's vertical axis, by a yaw of −90°, −60°, −45°, −30°, 0°, 30°, 45°, 60° and 90°, negative toward the left. It keeps its distance to P, its K and its image size, and looks at P. Yaw 0° is the centre camera itself, and yaw ∓15° gives the cameras left and right of it to 10⁻⁷, so 30° is twice as far round as they are. The ids are `sL90`, `sL60`, `sL45`, `sL30`, `sC00`, `sR30`, `sR45`, `sR60` and `sR90`, followed by the frame.
+- **The notes' four poses between cameras,** kept so that the sheet joins on to the notes' own pictures: halfway from the centre camera to the camera left of it, to the one above it and to a corner one, and 40 % beyond the camera right of it, with the centre interpolated linearly and the rotation along the shortest arc. Their items are copied from the notes' request (ids `nm01`, `nm03`, `nm05`, `nx02`), after a check against that rule to 10⁻⁹.
+- **The rest of the request:** a black background and the model's full SH degree, as in the notes' requests.
+- **The sheet's layout:** one JPEG per checkpoint. The 13 poses are the columns, in the request's order, and the three frames the rows. A tile is the render clamped to [0, 1] and scaled by 0.4, with its id; a strip above the tiles carries the checkpoint's name.
+
+Seven checkpoints have a sheet, `<surface-runs>/ticket-5/sheets/side_<name>.jpg`:
+
+- the three nine-camera models, `stride4`, `stride4_zero_velocity` and `stride4_zero_velocity_reg0.1` (files `side_nine-<name>.jpg`), where every pose but `sC00` is a novel view;
+- `A_default_s0` and `A_default_s1`, the default configuration at two seeds, which show how much two seeds differ to the eye;
+- `c3_s4`, the notes' recommended configuration with the centre camera as the test view, where `sC00` is the test view;
+- `h1_init_s4`, the same init with the camera left of the centre as the test view, at a cap of 1,500,000.
+
+Any other kept checkpoint is one `ftgs render` away. What could be checked without looking:
+
+- The request parses with `read_render_request`.
+- The model `stride4`'s near-side primitives, weighted by σ_eff at the item's time (E3, E4) and moved by E1, were projected into each item's camera. Their median lands between 0.23 and 0.75 of the frame's width and between 0.58 and 0.65 of its height in every side pose, and 61 to 89 % of their weight falls inside the frame, against 62 to 81 % in the centre camera's own pose, where the frame's lower edge already cuts the person (`<surface-runs>/ticket-5/side_request_framing.json`).
+- Every rendered value is finite. The share of a tile's pixels with alpha ≥ 0.5 is 0.96 to 1.00 in the poses between cameras, 1.00 in the centre pose, and 0.88 to 1.00, 0.69 to 0.96, 0.52 to 1.00 and 0.37 to 0.95 at yaw ±30°, ±45°, ±60° and ±90° (`side_<name>.coverage.json` beside each sheet).
+- One model stands out in those numbers. In `stride4`, the tiles at yaw +60° are fully covered at 2.5 s and 4.958 s, and the last is nearly black (mean of the clamped render 0.09, against 0.16 to 0.40 in every other tile of the seven sheets); its tile at yaw −90° and 2.5 s is 95 % covered, against 50 to 64 % in the other six. Something opaque stands between those poses and the person in that model; the other six sheets' numbers show nothing like it.
+
+The sheets are for the owner to look at; this ticket reports no judgement of them.
+
+**On openftgs-synth: the geometry residual and the error of expected depth** (rows 516, 518), from `scripts/gt_depth.py` on the gsplat backend, over every test frame of the scene's test view, with δ = 0.02·S (Q-226 to Q-231). The checkpoints measured, and why:
+
+- **`default-395` of each scene** (steps 35 to 37 of `docs/prd/validation-runs.md`): the default training configuration at spec revision 549o, with ꟻLIP as the perceptual network. It is what a later test's run "with the field off" repeats, and none of the three had a `GT_DEPTH.json`.
+- **`default` of each scene** (steps 2, 12 and 16, trained before 549o with LPIPS): openftgs issue 328 left their figures beside the runs on 2026-10-22. Run again here, each file equals the stored one byte for byte, so the script at this commit reproduces that record.
+- **The other trainings of the default configuration before 549o:** kitchen's `seed1` (step 5; issue 328's stored file, not run again) and `default-326` (step 20), studio's `default-325` and `default-341` (steps 23 and 27). They give the spread between trainings of one configuration.
+- **Not measured:** `tau4e-4`, `reg15k` and their periodic checkpoints, which are other configurations; issue 328's files for them stay beside the runs.
+
+The geometry residual r is a primitive's camera-space depth minus the ground-truth depth at the pixel its centre projects to, over the primitives the render reports visible with σ_eff ≥ 1/255, weighted by σ_eff (Q-230). A share "in front" is the weight with r < −kδ, and "behind" with r > kδ.
+
+| Scene | Checkpoint | Figures from | δ, m | In front at ½δ / δ / 2δ | Behind at ½δ / δ / 2δ | Static pixels at δ: in front / behind | Dynamic pixels at δ: in front / behind | Weighted median / 90th percentile of the absolute residual, m | Weighted median of the absolute residual, static / dynamic, m |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| `kitchen` | `default-395` (step 35) | this ticket | 0.0319 | 0.067 / 0.040 / 0.022 | 0.362 / 0.294 / 0.227 | 0.043 / 0.257 | 0.016 / 0.619 | 0.0097 / 0.386 | 0.0078 / 0.0764 |
+| `kitchen` | `default` (step 2) | this ticket; equal to issue 328's stored file | 0.0319 | 0.080 / 0.050 / 0.028 | 0.367 / 0.298 / 0.228 | 0.054 / 0.261 | 0.018 / 0.570 | 0.0112 / 0.402 | 0.0091 / 0.0548 |
+| `kitchen` | `seed1` (step 5) | issue 328's stored file | 0.0319 | 0.080 / 0.050 / 0.028 | 0.370 / 0.300 / 0.229 | 0.054 / 0.263 | 0.017 / 0.568 | 0.0115 / 0.405 | 0.0092 / 0.0534 |
+| `kitchen` | `default-326` (step 20) | this ticket | 0.0319 | 0.080 / 0.050 / 0.028 | 0.369 / 0.298 / 0.228 | 0.054 / 0.262 | 0.017 / 0.565 | 0.0114 / 0.407 | 0.0092 / 0.0529 |
+| `courtyard` | `default-395` (step 36) | this ticket | 0.1269 | 0.030 / 0.015 / 0.007 | 0.221 / 0.161 / 0.117 | 0.017 / 0.125 | 0.002 / 0.436 | 0.0127 / 0.396 | 0.0103 / 0.0857 |
+| `courtyard` | `default` (step 12) | this ticket; equal to issue 328's stored file | 0.1269 | 0.036 / 0.018 / 0.009 | 0.234 / 0.170 / 0.124 | 0.021 / 0.135 | 0.002 / 0.385 | 0.0144 / 0.461 | 0.0112 / 0.0643 |
+| `studio` | `default-395` (step 37) | this ticket | 0.0933 | 0.023 / 0.013 / 0.007 | 0.466 / 0.412 / 0.366 | 0.019 / 0.174 | 0.007 / 0.648 | 0.0411 / 6.719 | 0.0052 / 0.5121 |
+| `studio` | `default` (step 16) | this ticket; equal to issue 328's stored file | 0.0933 | 0.022 / 0.013 / 0.008 | 0.478 / 0.422 / 0.372 | 0.023 / 0.213 | 0.003 / 0.616 | 0.0469 / 5.810 | 0.0066 / 0.3439 |
+| `studio` | `default-325` (step 23) | this ticket | 0.0933 | 0.023 / 0.013 / 0.008 | 0.483 / 0.426 / 0.375 | 0.024 / 0.224 | 0.003 / 0.611 | 0.0496 / 5.922 | 0.0070 / 0.3310 |
+| `studio` | `default-341` (step 27) | this ticket | 0.0933 | 0.022 / 0.013 / 0.007 | 0.481 / 0.426 / 0.375 | 0.023 / 0.225 | 0.003 / 0.611 | 0.0483 / 5.965 | 0.0067 / 0.3278 |
+
+The error of expected depth is expected depth minus ground-truth depth, negative in front of the surface, over the surface pixels with alpha ≥ 0.5 (Q-227) away from depth edges (Q-228). Each cell gives the median absolute error, the mean absolute error, the root mean square error and the mean error, in metres.
+
+| Scene | Checkpoint | Test frames | Share of the surface pixels kept | All pixels | Static pixels | Dynamic pixels |
+| --- | --- | --- | --- | --- | --- | --- |
+| `kitchen` | `default-395` | 300 | 0.9827 | 0.214 / 0.278 / 0.377 / −0.269 | 0.222 / 0.286 / 0.383 / −0.277 | 0.045 / 0.078 / 0.114 / −0.063 |
+| `kitchen` | `default` | 300 | 0.9826 | 0.207 / 0.313 / 0.442 / −0.287 | 0.216 / 0.320 / 0.449 / −0.293 | 0.112 / 0.127 / 0.157 / −0.119 |
+| `kitchen` | `seed1` | 300 | 0.9821 | 0.219 / 0.308 / 0.425 / −0.268 | 0.227 / 0.314 / 0.431 / −0.272 | 0.154 / 0.158 / 0.184 / −0.153 |
+| `kitchen` | `default-326` | 300 | 0.9831 | 0.295 / 0.414 / 0.551 / −0.396 | 0.302 / 0.421 / 0.560 / −0.403 | 0.203 / 0.215 / 0.241 / −0.212 |
+| `courtyard` | `default-395` | 300 | 0.9859 | 0.897 / 0.990 / 1.146 / −0.975 | 0.924 / 1.005 / 1.162 / −0.991 | 0.679 / 0.658 / 0.730 / −0.625 |
+| `courtyard` | `default` | 300 | 0.9857 | 0.692 / 0.722 / 0.842 / −0.678 | 0.722 / 0.739 / 0.856 / −0.695 | 0.323 / 0.344 / 0.422 / −0.300 |
+| `studio` | `default-395` | 60 | 0.9853 | 0.137 / 0.305 / 0.537 / −0.188 | 0.199 / 0.382 / 0.615 / −0.236 | 0.084 / 0.097 / 0.205 / −0.058 |
+| `studio` | `default` | 60 | 0.9852 | 0.115 / 0.229 / 0.420 / −0.065 | 0.184 / 0.287 / 0.474 / −0.082 | 0.048 / 0.074 / 0.215 / −0.021 |
+| `studio` | `default-325` | 60 | 0.9852 | 0.162 / 0.410 / 0.644 / −0.313 | 0.309 / 0.532 / 0.744 / −0.412 | 0.064 / 0.082 / 0.195 / −0.043 |
+| `studio` | `default-341` | 60 | 0.9852 | 0.111 / 0.223 / 0.419 / −0.050 | 0.181 / 0.281 / 0.475 / −0.060 | 0.045 / 0.069 / 0.204 / −0.023 |
+
+- **The residual's shares are steady between trainings, the error of expected depth is not.** Over the three trainings of the default configuration before 549o, the six shares differ by at most 0.003 on kitchen and 0.004 on studio. The median absolute error of expected depth runs from 0.207 to 0.295 m on kitchen and from 0.111 to 0.162 m on studio, up to 47 % above its lowest value, and by more within a region: from 0.112 to 0.203 m on kitchen's dynamic pixels, and from 0.181 to 0.309 m on studio's static pixels.
+- **At 549o the shares are lower than before it,** by up to 0.017, which is more than the earlier trainings differ by: in front on kitchen (0.040 against 0.050 at δ) and courtyard (0.015 against 0.018), behind on studio (0.412 against 0.422 to 0.426) and courtyard (0.161 against 0.170). The error of expected depth is inside the earlier runs' range on kitchen and on studio's pixels as a whole, below it on kitchen's dynamic pixels (0.045 m), above it on studio's dynamic pixels (0.084 m), and higher on courtyard (0.897 m against 0.692 m). Each scene has one training at 549o, so the spread there is not known.
+- **Most of the weight off the surface is behind it,** not in front. In the 549o runs, at δ, 29 % of the weight is behind on kitchen, 16 % on courtyard and 41 % on studio, against 1 to 4 % in front; on dynamic pixels 44 to 65 % is behind. The residual counts a primitive whether or not something hides it. Expected depth, in which a hidden primitive weighs little, errs toward the camera on every scene (mean error −0.19 to −0.98 m).
+
+**What a later test compares with.**
+
+- **On private scene A:** the row of the first table with its test view, its cap and its init, or a baseline it trains itself. The far-5 cm share compares only against the same init points file, and it says more with its near-side part beside it. A difference under 0.01 in the far-5 cm share, or under 0.004 in the under-two-frames share, is within what a second seed gave. The sheet is rendered from the same request.
+- **On openftgs-synth:** the `default-395` rows. On the residual's shares a difference above 0.005 is more than the earlier trainings differed by. On the error of expected depth one run per arm cannot show "no worse": the earlier trainings of one configuration differ by up to 47 %.
+
+**What is open.**
+
+- **The fourth nine-camera model.** The notes' scorer gave it a far-5 cm share of 0.234 and an under-two-frames share of 0.518, in the score file beside the link, against an init points file that file does not name. Measuring it here, and rendering its sheet, needs the owner's word that the link's target may be opened.
+- **The sheets** have not been seen by anyone yet.
+
+**The commands.** Each ran in the ticket's worktree with `OMP_NUM_THREADS=4 MKL_NUM_THREADS=4 PYTHONPATH=<worktree>/src:<worktree>/harness/src` and the shared `.venv`'s Python; the CPU runs also had `CUDA_VISIBLE_DEVICES=` empty. The scripts under `<scratch>/ticket-5/` are not committed. `$T` is `<scratch>/ticket-5`, `$O` is `<surface-runs>/ticket-5`, `$G` is `$OPENFTGS_DATASETS/synth/ground_truth`.
+
+| Command | Where | Time | Note |
+| --- | --- | --- | --- |
+| `python $T/shell_measures.py <notes> <private-scene-A>/scene.json <manifest-centre> <manifest-left> --out $O/shell_measures.json --nine <model>=<init>`, with one `--nine` per nine-camera model | CPU | 2 min 15 s | The three measures on the 45 checkpoints. `<manifest-centre>` and `<manifest-left>` are the notes' two copies of the scene manifest that keep a test view, and `<init>` the init points file a nine-camera model trained from; a run's own init is read from the notes' results. Each checkpoint is assigned to its scene manifest by the SHA-256 its manifest records. 42 equal the notes' score files. Two of the 45 came from a first run of the same command with `--only` |
+| `python $T/supplement.py <notes> <private-scene-A>/scene.json $O/shell_measures.json --out $O/shell_supplement.json` | CPU | 41 s | What the measures contain, on seven checkpoints; the share under 0.005 on all 45; the rank correlations with the notes' scores |
+| `python $T/windowed.py <notes> <private-scene-A>/scene.json --out $O/shell_windowed.json` | CPU | 59 s | The far-5 cm share against the init points within 2, 6 and 12 frames of each primitive's time centre, on four checkpoints |
+| `python $T/make_side_request.py <private-scene-A>/scene.json $O/side_request.json --between <notes-request>` | CPU | under 1 s | The sheet's render request. `<notes-request>` is the notes' render request for its poses between cameras. The rule gives the cameras beside the centre one at yaw ∓15° to 10⁻⁷ |
+| `python $T/framing_check.py <checkpoint> $O/side_request.json <private-scene-A>/scene.json --out $O/side_request_framing.json` | CPU | 4 s | Where the near-side primitives of the nine-camera model `stride4`, whose checkpoint `<checkpoint>` is, land in each of the 39 cameras |
+| `python scripts/gt_depth.py <m17-runs>/kitchen/<run>/checkpoint <m15-runs>/kitchen/scene.json $G/kitchen --out $O/gt_depth/kitchen-<run>.json`, for `default-395`, `default` and `default-326` | GPU | 64 s, 61 s, 71 s | 300 test frames each; `default` equals issue 328's stored file |
+| `python scripts/gt_depth.py <m17-runs>/courtyard/<run>/checkpoint <m17-runs>/courtyard/scene/scene.json $G/courtyard --out $O/gt_depth/courtyard-<run>.json`, for `default-395` and `default` | GPU | 83 s, 83 s | 300 test frames each; `default` equals issue 328's stored file |
+| `python scripts/gt_depth.py <m17-runs>/studio/<run>/checkpoint <m17-runs>/studio/scene/scene.json $G/studio --out $O/gt_depth/studio-<run>.json`, for `default-395`, `default`, `default-325` and `default-341` | GPU | 25 s, 31 s, 23 s, 24 s | 60 test frames each; `default` equals issue 328's stored file |
+| `ftgs render <checkpoint> --request $O/side_request.json --out $O/renders/<name>.safetensors`, for the seven checkpoints of the sheet | GPU | 5.8 to 7.0 s each | 39 renders per checkpoint; the renders file is deleted once its sheet is made |
+| `python $T/side_sheet.py $O/renders/<name>.safetensors $O/side_request.json $O/sheets/side_<name>.jpg --label <name> --stats $O/sheets/side_<name>.coverage.json`, after each render | CPU | about 1 s each | The sheet and its coverage numbers |
+| `python $T/tables.py …` | CPU | under 1 s | The rows of this section's tables, from the files above |
+
+The GPU commands ran one at a time, from `$T/run_gpu.sh`, between 01:44:29 and 01:53:05; the card's memory peaked at 5,422 MiB during `gt_depth.py` and 7,737 MiB during `ftgs render`, about 1,400 MiB of it in use before they started. The private scene's folders were read and never written.
+
 ### 2.7 Probe: agreement of prior maps between cameras
 
 *Ticket #12's section.* One estimator of depth that clears the bar, cited from section 3.3: its depth lifted to 3D with the scene manifest's cameras, against the ground-truth depth on `kitchen`, which gives the estimator's own error, and between the cameras of each camera pair on private scene A's person; how scale and shift are set, the same way on both scenes; what the figures mean for H2's premise.
