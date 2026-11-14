@@ -1,6 +1,6 @@
 # Loss terms and their paths in `openftgs.losses`
 
-How `openftgs.losses` meets its §2.1 row for E7, E8 and E9: the three terms of the rendering loss L_render, the perceptual networks of D-89, the 4D regularization L_reg and the total loss L. The input layout, the API details §2.1 leaves open and the SSIM paths are the owner's answers recorded in `docs/clean-room/questions.md` (Q-41, Q-42); the networks' input checks are Q-261's and, for the Caffe trunks, Q-263's and, for the DINO networks, Q-265's, and λ_perc = None is Q-249's. The signature of `total_loss` (D-77) and U-11's reading of the stop-gradient (D-78) entered the spec in revision 549c, and the perceptual networks (D-89) in revision 549o.
+How `openftgs.losses` meets its §2.1 row for E7, E8 and E9: the three terms of the rendering loss L_render, the perceptual networks of D-89, the 4D regularization L_reg and the total loss L. The input layout, the API details §2.1 leaves open and the SSIM paths are the owner's answers recorded in `docs/prd/questions.md` (Q-41, Q-42); the networks' input checks are Q-261's and, for the Caffe trunks, Q-263's and, for the DINO networks, Q-265's, and λ_perc = None is Q-249's. The signature of `total_loss` (D-77) and U-11's reading of the stop-gradient (D-78) entered the spec in revision 549c, and the perceptual networks (D-89) in revision 549o.
 
 ## Input layout
 

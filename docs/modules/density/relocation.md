@@ -1,6 +1,6 @@
 # Gradient statistics and relocation in `openftgs.density`
 
-How `openftgs.density` meets its §2.1 row for E10 and E11: the gradient statistics that §1.3 step 5 accumulates, the sampling score, the relocation move and the relocation procedure. The public names beyond §2.1 and the semantics §2.1 leaves open are provisional decisions recorded in `docs/clean-room/questions.md` (Q-48 to Q-51, Q-55); who resets the statistics and the measure of U-14's position draws are the owner's answers (Q-51, Q-54).
+How `openftgs.density` meets its §2.1 row for E10 and E11: the gradient statistics that §1.3 step 5 accumulates, the sampling score, the relocation move and the relocation procedure. The public names beyond §2.1 and the semantics §2.1 leaves open are provisional decisions recorded in `docs/prd/questions.md` (Q-48 to Q-51, Q-55); who resets the statistics and the measure of U-14's position draws are the owner's answers (Q-51, Q-54).
 
 ## Gradient statistics
 

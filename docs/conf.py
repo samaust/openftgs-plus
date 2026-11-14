@@ -6,7 +6,7 @@ Build it from the repository root, with network access for the intersphinx inven
     sphinx-build -W --keep-going -b html docs docs/_build/html
 
 Only the pages of the site are sources. Everything else already under ``docs/`` (the spec, the
-clean-room records, the agent and module docs, the research notes, the glossary) stays where it is,
+prd records, the agent and module docs, the research notes, the glossary) stays where it is,
 outside the build, and the site links it on GitHub.
 """
 
@@ -28,7 +28,7 @@ sys.path.insert(0, str(_DOCS.parent / "src"))
 
 # -- Project: read from the installed package's metadata (no __version__, which would be public
 # API; D-62's names).
-_META = metadata("openftgs")
+_META = metadata("openftgs-plus")
 project = _META["Name"]
 author = _META["Author"]
 release = _META["Version"]
@@ -36,7 +36,7 @@ version = ".".join(release.split(".")[:2])
 copyright = f"2026, {author}"  # as NOTICE states it
 
 # -- Repository links: the tag Read the Docs is building, and main everywhere else.
-_REPOSITORY = "https://github.com/samaust/openftgs"
+_REPOSITORY = "https://github.com/samaust/openftgs-plus"
 _REF = (
     os.environ.get("READTHEDOCS_GIT_IDENTIFIER", "main")
     if os.environ.get("READTHEDOCS_VERSION_TYPE") == "tag"
@@ -62,7 +62,7 @@ exclude_patterns = [
     "_build",
     "_templates",
     "agents",
-    "clean-room",
+    "prd",
     "modules",
     "paper",
     "research",

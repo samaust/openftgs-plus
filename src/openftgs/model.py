@@ -198,7 +198,7 @@ def _canonical_sign(quats: Tensor) -> Tensor:
 
 def _producer() -> str:
     try:
-        return f"openftgs {importlib.metadata.version('openftgs')}"
+        return f"openftgs {importlib.metadata.version('openftgs-plus')}"
     except importlib.metadata.PackageNotFoundError:
         return "openftgs"
 

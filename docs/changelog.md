@@ -1,12 +1,12 @@
 # Changelog
 
-Every release of openftgs, newest first. Versions follow the package's metadata; each release is
+Every release of openftgs-plus and of openftgs before the fork, newest first. Versions follow the package's metadata; each release is
 tagged `v<version>` in the repository.
 
 ## 0.1.0
 
-The first release of openftgs, an independent clean-room implementation of FreeTimeGS (Wang et
-al., CVPR 2025), not affiliated with its authors. It implements revision 549o of the owner's
+The first release of openftgs, an independent implementation of FreeTimeGS (Wang et
+al., CVPR 2025), written under a clean-room process, not affiliated with its authors. It implements revision 549o of the owner's
 specification, milestones M0 to M18 of its plan. Its development status is alpha.
 
 ### What the release contains
@@ -57,7 +57,7 @@ users who hold the paper's datasets. Therefore:
 - No result is compared with the paper's tables.
 
 The validation runs, with their commands and figures, are recorded in
-{repo}`docs/clean-room/validation-runs.md`. On `kitchen`, the default training took 14 min 22 s
+{repo}`docs/prd/validation-runs.md`. On `kitchen`, the default training took 14 min 22 s
 on one RTX 4090, its test-view evaluation included, and scored a PSNR of 28.32 dB and a ꟻLIP of
 0.0900 on its test camera, `cam00`.
 
@@ -89,7 +89,7 @@ openftgs includes no pretrained weights and never redistributes them: each is do
 time from its publisher, into torch.hub's cache, only when a feature needs it. ꟻLIP and HaarPSI
 have no weights, so the default configuration downloads nothing for its perceptual network. The
 terms below are each publisher's own statement, as the release checklist,
-{repo}`docs/clean-room/release-checklist.md`, records them.
+{repo}`docs/prd/release-checklist.md`, records them.
 
 | Weight | Fetched when | Terms |
 | --- | --- | --- |

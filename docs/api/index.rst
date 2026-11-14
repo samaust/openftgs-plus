@@ -28,7 +28,7 @@ U-n, S-n, C-n, G-n, B-n
    synthetic-dataset checks on openftgs-synth and performance benchmarks.
 Q-n
    A provisional decision of the implementation where the spec is silent or ambiguous, with the
-   same columns as a D-n, in :repo:`docs/clean-room/questions.md`.
+   same columns as a D-n, in :repo:`docs/prd/questions.md`.
 [P], [P→3DGS], [L: …]
    The provenance tags of spec §0: stated in the paper; the paper's "same settings as 3DGS",
    taken from 3DGS or gsplat; standard Gaussian-splatting practice from an allowed source.

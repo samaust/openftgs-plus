@@ -8,7 +8,7 @@ gsplat. S-4 instead starts from init points sampled on its moving spheres, with 
 none (Q-119). The setup choices §3.2 leaves open are Q-77, Q-79 and Q-119, the measures Q-80;
 S-1 departs from §3.2's row where the owner decided (Q-81), and S-6 runs on D-87's clusters.
 Every test records its measured values with `record_property`, for the Calibration data table of
-docs/clean-room/questions.md; no criterion is loosened there.
+docs/prd/questions.md; no criterion is loosened there.
 """
 
 import dataclasses

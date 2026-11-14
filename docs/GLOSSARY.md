@@ -1,6 +1,6 @@
 # openftgs
 
-openftgs is a clean-room Python implementation of FreeTimeGS (Wang et al., CVPR 2025), written from the paper and from the owner's spec in `docs/spec/openftgs-spec.md`. This glossary fixes the words used in the spec, the milestones, the questions file and commit messages. It says what each thing is; shapes, units, equations and file layouts belong to the spec, and the entry's closing reference points there.
+openftgs-plus, a fork of openftgs, is a Python implementation of FreeTimeGS (Wang et al., CVPR 2025), written from the paper and from the owner's spec in `docs/spec/openftgs-spec.md`. This glossary fixes the words used in the spec, the milestones, the questions file and commit messages. It says what each thing is; shapes, units, equations and file layouts belong to the spec, and the entry's closing reference points there.
 
 Conventions: the spec's symbols (μx, μt, s, v, σ, σt, ρ, g, τ, t, u, S, Δt_f) and its normative tensor names (`means`, `times`, `log_durations`, `velocities`, `log_scales`, `quats`, `opacity_logits`, `sh0`, `shN`) are canonical. Identifiers fixed by the public API of spec §2.1 (`FreeTimeGaussians`, `num_gaussians`, `gaussian_ids`, `means2d`, `frame_dt`, `scene_scale_factor`, `test_camera`) keep their spelling in code even where this glossary avoids the word in prose. Where the spec and the paper name one thing differently, the spec's name is canonical and the paper's is listed under _Avoid_.
 
@@ -612,14 +612,14 @@ _Avoid_: skipped, unsupported, ignored
 In L3, the A–A′ distances from a second independent seed set A′ of implementation A, against which the A–B distances are tested. §3.3 L3
 _Avoid_: control run, baseline (reserved for a benchmark's stored result)
 
-### Clean-room process
+### Spec process
 
 **Owner**:
-The person who wrote the spec, runs the sessions, sets the clean-room rules and decides every open question. §0, CLAUDE.md
+The person who wrote the spec, runs the sessions, sets the guidelines rules and decides every open question. §0, CLAUDE.md
 _Avoid_: author (ambiguous with the paper's authors), maintainer, user, PI
 
 **Implementer**:
-The agent or person writing openftgs from the spec under the clean-room rules, in sessions the owner runs. CLAUDE.md
+The agent or person writing openftgs from the spec under the guidelines rules, in sessions the owner runs. CLAUDE.md
 _Avoid_: developer, Claude, assistant, contributor
 
 **Spec revision**:
@@ -651,11 +651,11 @@ A numbered design decision in the spec's Appendix B filling a gap the paper leav
 _Avoid_: ambiguity-log row, assumption, choice
 
 **Question Q-n**:
-A numbered row in `docs/clean-room/questions.md` recording a provisional decision the implementer made where the spec is silent or ambiguous and the choice affects numbers, outputs or the public API; marked `# Q-n` in code and raised with the owner, who may turn it into a D-n. CLAUDE.md
+A numbered row in `docs/prd/questions.md` recording a provisional decision the implementer made where the spec is silent or ambiguous and the choice affects numbers, outputs or the public API; marked `# Q-n` in code and raised with the owner, who may turn it into a D-n. CLAUDE.md
 _Avoid_: issue (the GitHub channel that carries it), TODO, open point, assumption
 
 **Q-n candidate**:
-A gap found before a build, recorded on the tracker with the columns of `questions.md` but no number, in a PRD, an agent brief or a Q-n issue; an implement run turns it into a numbered Q-n row. docs/agents/clean-room.md
+A gap found before a build, recorded on the tracker with the columns of `questions.md` but no number, in a PRD, an agent brief or a Q-n issue; an implement run turns it into a numbered Q-n row. docs/agents/guidelines.md
 _Avoid_: draft Q-n, Q-n row (one that has a number), open question (the PRD section that lists candidates)
 
 **Q-n issue**:
@@ -671,19 +671,15 @@ Anything from another FreeTimeGS implementation (the authors' code included) or 
 _Avoid_: blacklist, upstream, the official repo
 
 **Source log**:
-The table of every source consulted and what was taken from it: Appendix A for the spec, `docs/clean-room/source-log.md` for the implementation. §0, CLAUDE.md
+The table of every source consulted and what was taken from it: Appendix A for the spec, `docs/prd/source-log.md` for the implementation. §0, CLAUDE.md
 _Avoid_: references, bibliography, provenance log
 
 **Incident**:
 A source-log row recording that a forbidden source was met, that reading stopped and that nothing was taken, reported to the owner before any other work. CLAUDE.md
 _Avoid_: violation, leak, contamination
 
-**Clean-room guard**:
-The PreToolUse hook `.claude/hooks/clean_room_guard.py` that blocks tool calls naming FreeTimeGS or EasyVolcap in searches, downloads, URLs and paths; a tripwire, not a permission. CLAUDE.md
-_Avoid_: firewall, filter, the hook (unqualified)
-
 **Milestone M-n**:
-One of the nineteen bottom-up build steps M0 to M18 in `docs/clean-room/milestones.md`, each with its spec items, its tests and a review in a fresh session; the order is the spec author's suggestion, not part of the spec. milestones.md
+One of the nineteen bottom-up build steps M0 to M18 in `docs/prd/milestones.md`, each with its spec items, its tests and a review in a fresh session; the order is the spec author's suggestion, not part of the spec. milestones.md
 _Avoid_: phase, sprint, epic, stage
 
 **Unit test U-n**:
@@ -765,5 +761,5 @@ The closed GitHub issues labelled `out-of-scope`, one canonical issue per reject
 _Avoid_: out-of-scope folder, `.out-of-scope/`, rejection log, wontfix list
 
 **Release checklist**:
-M18's record of the release-time checks that §2.3's notes and D-79 call for: the license scan and its sign-offs, the libraries bundled in dependency wheels, the vendored license files, the pretrained weights' terms, the absence of dataset material, and the source-log audit. docs/clean-room/milestones.md (M18)
+M18's record of the release-time checks that §2.3's notes and D-79 call for: the license scan and its sign-offs, the libraries bundled in dependency wheels, the vendored license files, the pretrained weights' terms, the absence of dataset material, and the source-log audit. docs/prd/milestones.md (M18)
 _Avoid_: release notes (the user-facing summary on the changelog page), audit (one of its checks), release log

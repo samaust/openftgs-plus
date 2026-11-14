@@ -1,6 +1,6 @@
 # Growth and the count-control modes in `openftgs.density`
 
-How `openftgs.density` meets its §2.1 row for E17 and §1.3's growth and count-control modes, including the pruning and opacity reset of the "w/o periodic relocation" ablation. The orders, boundaries and score-mode details §1.3 leaves open are provisional decisions recorded in `docs/clean-room/questions.md` (Q-52, Q-53); the placement of the ablation's functions, the moments at the opacity reset and the measure of U-25's offsets are the owner's answers (Q-48, Q-53, Q-54).
+How `openftgs.density` meets its §2.1 row for E17 and §1.3's growth and count-control modes, including the pruning and opacity reset of the "w/o periodic relocation" ablation. The orders, boundaries and score-mode details §1.3 leaves open are provisional decisions recorded in `docs/prd/questions.md` (Q-52, Q-53); the placement of the ablation's functions, the moments at the opacity reset and the measure of U-25's offsets are the owner's answers (Q-48, Q-53, Q-54).
 
 ## Growth in the "gradient" mode
 

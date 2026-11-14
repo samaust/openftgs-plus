@@ -486,7 +486,7 @@ def temporal_slice(
         raise NotImplementedError(
             "the CUDA temporal slice is not built (D-50): B-1 measured the temporal slice at "
             "1.2 % of a training iteration at most, under D-50's 10 % (§3.4 B-1 in the "
-            "Calibration data of docs/clean-room/questions.md, #226); use impl='compiled' or "
+            "Calibration data of docs/prd/questions.md, #226); use impl='compiled' or "
             "'eager'"
         )
     args = (means, times, log_durations, velocities, log_scales, quats, opacity_logits)

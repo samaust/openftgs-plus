@@ -1,6 +1,6 @@
 # Validation runs on openftgs-synth
 
-M17's training and evaluation runs on openftgs-synth's `kitchen`, `courtyard` and `studio` (§1.4 "Validation data", D-79; PRD #317). Each run is listed here with its command, commit, the configuration's differences from the default, its wall time, its files and its headline metrics. The measured values themselves are rows of the Calibration data table of `docs/clean-room/questions.md`, which carry the owner's decisions; this page points to them. No result is compared with the paper's tables (D-79).
+M17's training and evaluation runs on openftgs-synth's `kitchen`, `courtyard` and `studio` (§1.4 "Validation data", D-79; PRD #317). Each run is listed here with its command, commit, the configuration's differences from the default, its wall time, its files and its headline metrics. The measured values themselves are rows of the Calibration data table of `docs/prd/questions.md`, which carry the owner's decisions; this page points to them. No result is compared with the paper's tables (D-79).
 
 Steps 35 to 38 are PRD #380's reruns after spec revision 549o (#395): the three default trainings and B-1 on the trained kitchen model, with ꟻLIP (LDR) at its calibrated weight as the perceptual network and as the reported perceptual metric (D-9, D-89). The steps before them trained and scored with LPIPS.
 

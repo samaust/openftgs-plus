@@ -14,7 +14,7 @@
     "license": "UNKNOWN",
     "actual": "None: a meta-package with no files besides its metadata, whose extras pull in the NVIDIA runtime wheels",
     "reason": "Installed by torch's Linux CUDA 13.0 wheel, not by openftgs; installed by the user and never redistributed (Q-4).",
-    "source": "Its metadata (\"CUDA Toolkit meta-package\"; no license notice); the owner's sign-off of 2026-10-23 (#366, docs/clean-room/release-checklist.md)",
+    "source": "Its metadata (\"CUDA Toolkit meta-package\"; no license notice); the owner's sign-off of 2026-10-23 (#366, docs/prd/release-checklist.md)",
     "date": "2026-10-23"
   },
   {
@@ -23,7 +23,7 @@
     "license": "LicenseRef-NVIDIA-Proprietary",
     "actual": "CUDA Toolkit End User License Agreement (NVIDIA, proprietary)",
     "reason": "Installed by torch's Linux CUDA 13.0 wheel, not by openftgs; installed by the user and never redistributed (Q-4).",
-    "source": "The wheel's own license notice, source-log row 331; the owner's sign-off of 2026-10-23 (#366, docs/clean-room/release-checklist.md)",
+    "source": "The wheel's own license notice, source-log row 331; the owner's sign-off of 2026-10-23 (#366, docs/prd/release-checklist.md)",
     "date": "2026-10-23"
   },
   {
@@ -32,7 +32,7 @@
     "license": "Other/Proprietary License",
     "actual": "CUDA Toolkit End User License Agreement (NVIDIA, proprietary)",
     "reason": "Installed by torch's Linux CUDA 13.0 wheel, not by openftgs; installed by the user and never redistributed (Q-4).",
-    "source": "The wheel's own license notice, source-log row 331; the owner's sign-off of 2026-10-23 (#366, docs/clean-room/release-checklist.md)",
+    "source": "The wheel's own license notice, source-log row 331; the owner's sign-off of 2026-10-23 (#366, docs/prd/release-checklist.md)",
     "date": "2026-10-23"
   },
   {
@@ -41,7 +41,7 @@
     "license": "Other/Proprietary License",
     "actual": "CUDA Toolkit End User License Agreement (NVIDIA, proprietary)",
     "reason": "Installed by torch's Linux CUDA 13.0 wheel, not by openftgs; installed by the user and never redistributed (Q-4).",
-    "source": "The wheel's own license notice, source-log row 331; the owner's sign-off of 2026-10-23 (#366, docs/clean-room/release-checklist.md)",
+    "source": "The wheel's own license notice, source-log row 331; the owner's sign-off of 2026-10-23 (#366, docs/prd/release-checklist.md)",
     "date": "2026-10-23"
   },
   {
@@ -50,7 +50,7 @@
     "license": "LicenseRef-NVIDIA-Proprietary",
     "actual": "CUDA Toolkit End User License Agreement (NVIDIA, proprietary)",
     "reason": "Installed by torch's Linux CUDA 13.0 wheel, not by openftgs; installed by the user and never redistributed (Q-4).",
-    "source": "The wheel's own license notice, source-log row 331; the owner's sign-off of 2026-10-23 (#366, docs/clean-room/release-checklist.md)",
+    "source": "The wheel's own license notice, source-log row 331; the owner's sign-off of 2026-10-23 (#366, docs/prd/release-checklist.md)",
     "date": "2026-10-23"
   },
   {
@@ -59,7 +59,7 @@
     "license": "Other/Proprietary License",
     "actual": "CUDA Toolkit End User License Agreement (NVIDIA, proprietary)",
     "reason": "Installed by torch's Linux CUDA 13.0 wheel, not by openftgs; installed by the user and never redistributed (Q-4).",
-    "source": "The wheel's own license notice, source-log row 331; the owner's sign-off of 2026-10-23 (#366, docs/clean-room/release-checklist.md)",
+    "source": "The wheel's own license notice, source-log row 331; the owner's sign-off of 2026-10-23 (#366, docs/prd/release-checklist.md)",
     "date": "2026-10-23"
   },
   {
@@ -68,7 +68,7 @@
     "license": "Other/Proprietary License",
     "actual": "CUDA Toolkit End User License Agreement (NVIDIA, proprietary)",
     "reason": "Installed by torch's Linux CUDA 13.0 wheel, not by openftgs; installed by the user and never redistributed (Q-4).",
-    "source": "The wheel's own license notice, source-log row 331; the owner's sign-off of 2026-10-23 (#366, docs/clean-room/release-checklist.md)",
+    "source": "The wheel's own license notice, source-log row 331; the owner's sign-off of 2026-10-23 (#366, docs/prd/release-checklist.md)",
     "date": "2026-10-23"
   },
   {
@@ -77,7 +77,7 @@
     "license": "Other/Proprietary License",
     "actual": "CUDA Toolkit End User License Agreement (NVIDIA, proprietary)",
     "reason": "Installed by torch's Linux CUDA 13.0 wheel, not by openftgs; installed by the user and never redistributed (Q-4).",
-    "source": "The wheel's own license notice, source-log row 331; the owner's sign-off of 2026-10-23 (#366, docs/clean-room/release-checklist.md)",
+    "source": "The wheel's own license notice, source-log row 331; the owner's sign-off of 2026-10-23 (#366, docs/prd/release-checklist.md)",
     "date": "2026-10-23"
   },
   {
@@ -86,7 +86,7 @@
     "license": "Other/Proprietary License",
     "actual": "CUDA Toolkit End User License Agreement (NVIDIA, proprietary)",
     "reason": "Installed by torch's Linux CUDA 13.0 wheel, not by openftgs; installed by the user and never redistributed (Q-4).",
-    "source": "The wheel's own license notice, source-log row 331; the owner's sign-off of 2026-10-23 (#366, docs/clean-room/release-checklist.md)",
+    "source": "The wheel's own license notice, source-log row 331; the owner's sign-off of 2026-10-23 (#366, docs/prd/release-checklist.md)",
     "date": "2026-10-23"
   },
   {
@@ -95,7 +95,7 @@
     "license": "Other/Proprietary License",
     "actual": "CUDA Toolkit End User License Agreement (NVIDIA, proprietary)",
     "reason": "Installed by torch's Linux CUDA 13.0 wheel, not by openftgs; installed by the user and never redistributed (Q-4).",
-    "source": "The wheel's own license notice, source-log row 331; the owner's sign-off of 2026-10-23 (#366, docs/clean-room/release-checklist.md)",
+    "source": "The wheel's own license notice, source-log row 331; the owner's sign-off of 2026-10-23 (#366, docs/prd/release-checklist.md)",
     "date": "2026-10-23"
   },
   {
@@ -104,7 +104,7 @@
     "license": "LicenseRef-NVIDIA-Proprietary",
     "actual": "CUDA Toolkit End User License Agreement (NVIDIA, proprietary)",
     "reason": "Installed by torch's Linux CUDA 13.0 wheel, not by openftgs; installed by the user and never redistributed (Q-4).",
-    "source": "The wheel's own license notice, source-log row 331; the owner's sign-off of 2026-10-23 (#366, docs/clean-room/release-checklist.md)",
+    "source": "The wheel's own license notice, source-log row 331; the owner's sign-off of 2026-10-23 (#366, docs/prd/release-checklist.md)",
     "date": "2026-10-23"
   },
   {
@@ -113,7 +113,7 @@
     "license": "Other/Proprietary License",
     "actual": "Apache-2.0 (the wheel's notice)",
     "reason": "Installed by torch's Linux CUDA 13.0 wheel, not by openftgs; installed by the user and never redistributed (Q-4).",
-    "source": "The wheel's own license notice, source-log row 331; the owner's sign-off of 2026-10-23 (#366, docs/clean-room/release-checklist.md)",
+    "source": "The wheel's own license notice, source-log row 331; the owner's sign-off of 2026-10-23 (#366, docs/prd/release-checklist.md)",
     "date": "2026-10-23"
   },
   {
@@ -122,7 +122,7 @@
     "license": "LicenseRef-NVIDIA-Proprietary",
     "actual": "NVIDIA's license agreement for software development kits (proprietary)",
     "reason": "Installed by torch's Linux CUDA 13.0 wheel, not by openftgs; installed by the user and never redistributed (Q-4).",
-    "source": "The wheel's own license notice, source-log row 331; the owner's sign-off of 2026-10-23 (#366, docs/clean-room/release-checklist.md)",
+    "source": "The wheel's own license notice, source-log row 331; the owner's sign-off of 2026-10-23 (#366, docs/prd/release-checklist.md)",
     "date": "2026-10-23"
   },
   {
@@ -131,7 +131,7 @@
     "license": "NVIDIA Proprietary Software",
     "actual": "NVIDIA's license agreement for software development kits (proprietary)",
     "reason": "Installed by torch's Linux CUDA 13.0 wheel, not by openftgs; installed by the user and never redistributed (Q-4).",
-    "source": "The wheel's own license notice, source-log row 331; the owner's sign-off of 2026-10-23 (#366, docs/clean-room/release-checklist.md)",
+    "source": "The wheel's own license notice, source-log row 331; the owner's sign-off of 2026-10-23 (#366, docs/prd/release-checklist.md)",
     "date": "2026-10-23"
   },
   {
@@ -140,7 +140,7 @@
     "license": "LicenseRef-NVIDIA-Proprietary",
     "actual": "BSD-3-Clause, NVIDIA (the wheel's notice)",
     "reason": "Installed by torch's Linux CUDA 13.0 wheel, not by openftgs; installed by the user and never redistributed (Q-4).",
-    "source": "The wheel's own license notice, source-log row 331; the owner's sign-off of 2026-10-23 (#366, docs/clean-room/release-checklist.md)",
+    "source": "The wheel's own license notice, source-log row 331; the owner's sign-off of 2026-10-23 (#366, docs/prd/release-checklist.md)",
     "date": "2026-10-23"
   },
   {
@@ -149,7 +149,7 @@
     "license": "LicenseRef-NVIDIA-Proprietary",
     "actual": "CUDA Toolkit End User License Agreement (NVIDIA, proprietary)",
     "reason": "Installed by torch's Linux CUDA 13.0 wheel, not by openftgs; installed by the user and never redistributed (Q-4).",
-    "source": "The wheel's own license notice, source-log row 331; the owner's sign-off of 2026-10-23 (#366, docs/clean-room/release-checklist.md)",
+    "source": "The wheel's own license notice, source-log row 331; the owner's sign-off of 2026-10-23 (#366, docs/prd/release-checklist.md)",
     "date": "2026-10-23"
   },
   {
@@ -158,7 +158,7 @@
     "license": "UNKNOWN",
     "actual": "None: a meta-package with no files besides its metadata, whose extras pull in the NVIDIA runtime wheels",
     "reason": "Installed by torch's Linux CUDA 13.2 wheel, not by openftgs; installed by the user and never redistributed (Q-4).",
-    "source": "Its metadata (\"CUDA Toolkit meta-package\"; no license notice), source-log row 483; the owner's sign-off of 2026-10-28, batch A: \"Yes, sign off all 12\" (#370, docs/clean-room/release-checklist.md)",
+    "source": "Its metadata (\"CUDA Toolkit meta-package\"; no license notice), source-log row 483; the owner's sign-off of 2026-10-28, batch A: \"Yes, sign off all 12\" (#370, docs/prd/release-checklist.md)",
     "date": "2026-10-28"
   },
   {
@@ -167,7 +167,7 @@
     "license": "LicenseRef-NVIDIA-Proprietary",
     "actual": "NVIDIA CUDA Toolkit End User License Agreement (License.txt, byte-identical to the text signed off on 2026-10-23)",
     "reason": "Installed by torch's Linux CUDA 13.2 wheel, not by openftgs; installed by the user and never redistributed (Q-4).",
-    "source": "Its wheel's notice, source-log row 484; the owner's sign-off of 2026-10-28, batch A: \"Yes, sign off all 12\" (#370, docs/clean-room/release-checklist.md)",
+    "source": "Its wheel's notice, source-log row 484; the owner's sign-off of 2026-10-28, batch A: \"Yes, sign off all 12\" (#370, docs/prd/release-checklist.md)",
     "date": "2026-10-28"
   },
   {
@@ -176,7 +176,7 @@
     "license": "LicenseRef-NVIDIA-Proprietary",
     "actual": "NVIDIA CUDA Toolkit End User License Agreement (License.txt, byte-identical to the text signed off on 2026-10-23)",
     "reason": "Installed by torch's Linux CUDA 13.2 wheel, not by openftgs; installed by the user and never redistributed (Q-4).",
-    "source": "Its wheel's notice, source-log row 484; the owner's sign-off of 2026-10-28, batch A: \"Yes, sign off all 12\" (#370, docs/clean-room/release-checklist.md)",
+    "source": "Its wheel's notice, source-log row 484; the owner's sign-off of 2026-10-28, batch A: \"Yes, sign off all 12\" (#370, docs/prd/release-checklist.md)",
     "date": "2026-10-28"
   },
   {
@@ -185,7 +185,7 @@
     "license": "LicenseRef-NVIDIA-Proprietary",
     "actual": "NVIDIA CUDA Toolkit End User License Agreement (License.txt, byte-identical to the text signed off on 2026-10-23)",
     "reason": "Installed by torch's Linux CUDA 13.2 wheel, not by openftgs; installed by the user and never redistributed (Q-4).",
-    "source": "Its wheel's notice, source-log row 484; the owner's sign-off of 2026-10-28, batch A: \"Yes, sign off all 12\" (#370, docs/clean-room/release-checklist.md)",
+    "source": "Its wheel's notice, source-log row 484; the owner's sign-off of 2026-10-28, batch A: \"Yes, sign off all 12\" (#370, docs/prd/release-checklist.md)",
     "date": "2026-10-28"
   },
   {
@@ -194,7 +194,7 @@
     "license": "LicenseRef-NVIDIA-Proprietary",
     "actual": "NVIDIA CUDA Toolkit End User License Agreement (License.txt, byte-identical to the text signed off on 2026-10-23)",
     "reason": "Installed by torch's Linux CUDA 13.2 wheel, not by openftgs; installed by the user and never redistributed (Q-4).",
-    "source": "Its wheel's notice, source-log row 484; the owner's sign-off of 2026-10-28, batch A: \"Yes, sign off all 12\" (#370, docs/clean-room/release-checklist.md)",
+    "source": "Its wheel's notice, source-log row 484; the owner's sign-off of 2026-10-28, batch A: \"Yes, sign off all 12\" (#370, docs/prd/release-checklist.md)",
     "date": "2026-10-28"
   },
   {
@@ -203,7 +203,7 @@
     "license": "LicenseRef-NVIDIA-Proprietary",
     "actual": "NVIDIA's software license agreement for cuDNN (License.txt, byte-identical to the text signed off on 2026-10-23)",
     "reason": "Installed by torch's Linux CUDA 13.2 wheel, not by openftgs; installed by the user and never redistributed (Q-4).",
-    "source": "Its wheel's notice, source-log row 484; the owner's sign-off of 2026-10-28, batch A: \"Yes, sign off all 12\" (#370, docs/clean-room/release-checklist.md)",
+    "source": "Its wheel's notice, source-log row 484; the owner's sign-off of 2026-10-28, batch A: \"Yes, sign off all 12\" (#370, docs/prd/release-checklist.md)",
     "date": "2026-10-28"
   },
   {
@@ -212,7 +212,7 @@
     "license": "LicenseRef-NVIDIA-Proprietary",
     "actual": "NVIDIA CUDA Toolkit End User License Agreement (License.txt, byte-identical to the text signed off on 2026-10-23)",
     "reason": "Installed by torch's Linux CUDA 13.2 wheel, not by openftgs; installed by the user and never redistributed (Q-4).",
-    "source": "Its wheel's notice, source-log row 484; the owner's sign-off of 2026-10-28, batch A: \"Yes, sign off all 12\" (#370, docs/clean-room/release-checklist.md)",
+    "source": "Its wheel's notice, source-log row 484; the owner's sign-off of 2026-10-28, batch A: \"Yes, sign off all 12\" (#370, docs/prd/release-checklist.md)",
     "date": "2026-10-28"
   },
   {
@@ -221,7 +221,7 @@
     "license": "LicenseRef-NVIDIA-Proprietary",
     "actual": "NVIDIA CUDA Toolkit End User License Agreement (License.txt, byte-identical to the text signed off on 2026-10-23)",
     "reason": "Installed by torch's Linux CUDA 13.2 wheel, not by openftgs; installed by the user and never redistributed (Q-4).",
-    "source": "Its wheel's notice, source-log row 484; the owner's sign-off of 2026-10-28, batch A: \"Yes, sign off all 12\" (#370, docs/clean-room/release-checklist.md)",
+    "source": "Its wheel's notice, source-log row 484; the owner's sign-off of 2026-10-28, batch A: \"Yes, sign off all 12\" (#370, docs/prd/release-checklist.md)",
     "date": "2026-10-28"
   },
   {
@@ -230,7 +230,7 @@
     "license": "LicenseRef-NVIDIA-Proprietary",
     "actual": "NVIDIA CUDA Toolkit End User License Agreement (License.txt, byte-identical to the text signed off on 2026-10-23)",
     "reason": "Installed by torch's Linux CUDA 13.2 wheel, not by openftgs; installed by the user and never redistributed (Q-4).",
-    "source": "Its wheel's notice, source-log row 484; the owner's sign-off of 2026-10-28, batch A: \"Yes, sign off all 12\" (#370, docs/clean-room/release-checklist.md)",
+    "source": "Its wheel's notice, source-log row 484; the owner's sign-off of 2026-10-28, batch A: \"Yes, sign off all 12\" (#370, docs/prd/release-checklist.md)",
     "date": "2026-10-28"
   },
   {
@@ -239,7 +239,7 @@
     "license": "LicenseRef-NVIDIA-Proprietary",
     "actual": "NVIDIA CUDA Toolkit End User License Agreement (License.txt, byte-identical to the text signed off on 2026-10-23)",
     "reason": "Installed by torch's Linux CUDA 13.2 wheel, not by openftgs; installed by the user and never redistributed (Q-4).",
-    "source": "Its wheel's notice, source-log row 484; the owner's sign-off of 2026-10-28, batch A: \"Yes, sign off all 12\" (#370, docs/clean-room/release-checklist.md)",
+    "source": "Its wheel's notice, source-log row 484; the owner's sign-off of 2026-10-28, batch A: \"Yes, sign off all 12\" (#370, docs/prd/release-checklist.md)",
     "date": "2026-10-28"
   },
   {
@@ -248,7 +248,7 @@
     "license": "LicenseRef-NVIDIA-Proprietary",
     "actual": "NVIDIA CUDA Toolkit End User License Agreement (License.txt, byte-identical to the text signed off on 2026-10-23)",
     "reason": "Installed by torch's Linux CUDA 13.2 wheel, not by openftgs; installed by the user and never redistributed (Q-4).",
-    "source": "Its wheel's notice, source-log row 484; the owner's sign-off of 2026-10-28, batch A: \"Yes, sign off all 12\" (#370, docs/clean-room/release-checklist.md)",
+    "source": "Its wheel's notice, source-log row 484; the owner's sign-off of 2026-10-28, batch A: \"Yes, sign off all 12\" (#370, docs/prd/release-checklist.md)",
     "date": "2026-10-28"
   },
   {
@@ -257,7 +257,7 @@
     "license": "LicenseRef-NVIDIA-Proprietary",
     "actual": "Apache-2.0 (License.txt, byte-identical to the text signed off on 2026-10-23)",
     "reason": "Installed by torch's Linux CUDA 13.2 wheel, not by openftgs; installed by the user and never redistributed (Q-4).",
-    "source": "Its wheel's notice, source-log row 484; the owner's sign-off of 2026-10-28, batch A: \"Yes, sign off all 12\" (#370, docs/clean-room/release-checklist.md)",
+    "source": "Its wheel's notice, source-log row 484; the owner's sign-off of 2026-10-28, batch A: \"Yes, sign off all 12\" (#370, docs/prd/release-checklist.md)",
     "date": "2026-10-28"
   },
   {
@@ -266,7 +266,7 @@
     "license": "LicenseRef-NVIDIA-Proprietary",
     "actual": "The CUDA Toolkit EULA (License.txt) and nvidia/cu13/cccl/LICENSE: Thrust Apache-2.0, libcu++ Apache-2.0 WITH LLVM-exception, CUB BSD-3-Clause, with the legacy LLVM and FreeBSD notices for parts",
     "reason": "Installed by torch's Linux CUDA 13.2 wheel through nvidia-nvshmem-cu13, not by openftgs; installed by the user and never redistributed (Q-4).",
-    "source": "Its wheel's notices, source-log rows 484 and 485; the owner's sign-off of 2026-10-28, batch B: \"Yes, sign it off\" (#370, docs/clean-room/release-checklist.md)",
+    "source": "Its wheel's notices, source-log rows 484 and 485; the owner's sign-off of 2026-10-28, batch B: \"Yes, sign it off\" (#370, docs/prd/release-checklist.md)",
     "date": "2026-10-28"
   }
 ]

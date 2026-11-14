@@ -885,7 +885,7 @@ def save_checkpoint(state: TrainerState, directory: Path) -> Path:
             "scene_sha256": state.scene_sha256,
             "time_unit": state.time_unit,
             "versions": {
-                "openftgs": _package_version("openftgs"),
+                "openftgs": _package_version("openftgs-plus"),
                 "torch": torch.__version__,
                 "gsplat": _package_version("gsplat"),
                 "cuda": torch.version.cuda,

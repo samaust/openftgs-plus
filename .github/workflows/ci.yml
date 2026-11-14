@@ -69,7 +69,7 @@ jobs:
           python -m pip wheel . ./harness --no-deps -w dist
           python - <<'PY'
           import email, glob, hashlib, json, re, zipfile
-          wheel = zipfile.ZipFile(glob.glob("dist/openftgs-*.whl")[0])
+          wheel = zipfile.ZipFile(glob.glob("dist/openftgs_plus-*.whl")[0])
           names = wheel.namelist()
           for required in ("openftgs/py.typed", "licenses/LICENSE", "licenses/NOTICE"):
               assert any(n.endswith(required) for n in names), required

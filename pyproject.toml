@@ -4,10 +4,10 @@ requires = ["setuptools>=77"]
 build-backend = "setuptools.build_meta"
 
 [project]
-name = "openftgs"
+name = "openftgs-plus"
 # Q-244: the first release, tagged v0.1.0.
 version = "0.1.0"
-description = "An independent clean-room implementation of FreeTimeGS (Wang et al., CVPR 2025), not affiliated with its authors."
+description = "openftgs-plus, a fork of openftgs: an independent implementation of FreeTimeGS (Wang et al., CVPR 2025), not affiliated with its authors."
 readme = "README.md"
 license = "Apache-2.0"
 license-files = ["LICENSE", "NOTICE"]
@@ -62,11 +62,11 @@ ftgs-adapter = "openftgs.cli._adapter:main"
 # Q-241); the changelog is the site's page, read on GitHub, which shows it whatever version the
 # site serves.
 [project.urls]
-Homepage = "https://github.com/samaust/openftgs"
-Source = "https://github.com/samaust/openftgs"
-Documentation = "https://openftgs.readthedocs.io"
-Issues = "https://github.com/samaust/openftgs/issues"
-Changelog = "https://github.com/samaust/openftgs/blob/main/docs/changelog.md"
+Homepage = "https://github.com/samaust/openftgs-plus"
+Source = "https://github.com/samaust/openftgs-plus"
+Documentation = "https://openftgs-plus.readthedocs.io"
+Issues = "https://github.com/samaust/openftgs-plus/issues"
+Changelog = "https://github.com/samaust/openftgs-plus/blob/main/docs/changelog.md"
 
 [project.optional-dependencies]
 # §2.3: the vendored RoMa (D-65) needs torch >= 2.5.1. D-85: fused-local-corr, RoMa's optional
@@ -145,14 +145,14 @@ target-version = "py311"
 line-length = 100
 # Q-241: the documentation site's sources under docs/ (conf.py and the pages) are linted and
 # formatted. The records and notes beside them are not, since ruff would reformat the Python
-# blocks of their Markdown: the spec (never edited), the clean-room records, the agent and module
+# blocks of their Markdown: the spec (never edited), the prd records, the agent and module
 # docs, the research notes and the glossary. docs/_build/ is gitignored, which ruff respects.
 # D-65: the vendored RoMa and ꟻLIP, U-23's reference copy of ꟻLIP (Q-252) and the harness's
 # own copy (Q-254) stay as upstream wrote them.
 extend-exclude = [
     ".claude",
     "docs/agents",
-    "docs/clean-room",
+    "docs/prd",
     "docs/modules",
     "docs/research",
     "docs/spec",

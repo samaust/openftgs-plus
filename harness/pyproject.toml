@@ -13,7 +13,7 @@ license-files = ["LICENSE"]
 authors = [{ name = "Samuel Austin" }]
 # Q-1: Python floor.
 requires-python = ">=3.11"
-# Owner decision 2026-10-11 (docs/clean-room/milestones.md, M16): report plots use
+# Owner decision 2026-10-11 (docs/prd/milestones.md, M16): report plots use
 # matplotlib's Agg backend. Q-201: NumPy, SciPy and safetensors read the files and run the
 # statistics; Q-254, Q-260: the [torch] extra holds torch alone, with which L3 computes ꟻLIP
 # through the harness's own vendored copy (E16).

@@ -8,9 +8,9 @@ disable-model-invocation: true
 
 Break a PRD into a set of **tickets**, one per module or test group, each declaring the tickets that **block** it. The PRD must be an issue on the tracker, since the tickets become its sub-issues: if the work exists only as a plan or a conversation, stop and ask the owner to publish it with `/conversation-to-prd` first.
 
-## Clean room
+## Guidelines
 
-Follow [docs/agents/clean-room.md](../../../docs/agents/clean-room.md), including its Publishing to the tracker section. Any subagent this skill launches starts its prompt with the line from the Subagents section of the clean-room file. A ticket never settles what the spec leaves open. A gap found while drafting tickets becomes a Q-n candidate in the PRD's format, posted as a comment on the PRD (not written into `questions.md`, which would leave `main` with uncommitted changes); the tickets that depend on it cite it by its title.
+Follow [docs/agents/guidelines.md](../../../docs/agents/guidelines.md), including its Publishing to the tracker section. Any subagent this skill launches starts its prompt with the line from the Subagents section of the guidelines file. A ticket never settles what the spec leaves open. A gap found while drafting tickets becomes a Q-n candidate in the PRD's format, posted as a comment on the PRD (not written into `questions.md`, which would leave `main` with uncommitted changes); the tickets that depend on it cite it by its title.
 
 ## Labels
 
@@ -78,7 +78,7 @@ Publish the approved tickets to the issue tracker:
 
 - Publish one issue per ticket in dependency order (blockers first) so each ticket's blocking edges can reference real issues. Make each ticket a sub-issue of the PRD, and record each blocking edge as a native "blocked by" dependency, with the operations in "Parent issues and blocking" in `docs/agents/issue-tracker.md`. The relationships live there, not in the ticket body. Apply the labels from the Labels section: `skill:prd-to-tickets` always, and `ready-for-agent` unless instructed otherwise; the tickets are agent-grabbable by construction.
 
-Apart from adding the tickets as its sub-issues and posting Q-n candidates as comments (see Clean room), do NOT close or modify the PRD (including its labels).
+Apart from adding the tickets as its sub-issues and posting Q-n candidates as comments (see Guidelines), do NOT close or modify the PRD (including its labels).
 
 <issue-template>
 
@@ -88,7 +88,7 @@ The module, or the functions of it, and their behaviour at the §2.1 interface.
 
 ## Spec items
 
-The spec items this ticket implements (§n, E-n, D-n) and the Q-n rows it relies on, by identifier, or the PRD's Q-n candidates by title until they have numbers. Cite them; don't restate them. Once an implement run records a candidate, its number is in the row of `docs/clean-room/questions.md` marked `(from #<PRD>: <title>)`, and, after the merge, in the PRD's `Recorded:` comment.
+The spec items this ticket implements (§n, E-n, D-n) and the Q-n rows it relies on, by identifier, or the PRD's Q-n candidates by title until they have numbers. Cite them; don't restate them. Once an implement run records a candidate, its number is in the row of `docs/prd/questions.md` marked `(from #<PRD>: <title>)`, and, after the merge, in the PRD's `Recorded:` comment.
 
 ## Acceptance criteria
 

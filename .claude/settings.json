@@ -21,7 +21,7 @@
       "Bash(gh issue close *)",
       "Bash(gh issue reopen *)",
       "Bash(gh label list *)",
-      "Bash(gh api repos/samaust/openftgs/issues/*)",
+      "Bash(gh api repos/samaust/openftgs-plus/issues/*)",
       "Bash(gh label create *)",
       "Bash(.claude/skills/setup-skills/scripts/create-labels.sh)"
     ],
@@ -29,30 +29,6 @@
       "Bash(gh issue delete *)",
       "Bash(gh issue transfer *)",
       "Bash(gh gist *)"
-    ]
-  },
-  "hooks": {
-    "PreToolUse": [
-      {
-        "matcher": "WebFetch|WebSearch|Bash|Read|Grep|Glob|Write|Edit|MultiEdit|NotebookEdit",
-        "hooks": [
-          {
-            "type": "command",
-            "command": "python3 \"${CLAUDE_PROJECT_DIR}/.claude/hooks/clean_room_guard.py\"",
-            "timeout": 10
-          }
-        ]
-      },
-      {
-        "matcher": "^mcp__",
-        "hooks": [
-          {
-            "type": "command",
-            "command": "python3 \"${CLAUDE_PROJECT_DIR}/.claude/hooks/clean_room_guard.py\"",
-            "timeout": 10
-          }
-        ]
-      }
     ]
   }
 }

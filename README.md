@@ -1,29 +1,29 @@
-# openftgs
+# openftgs-plus
 
-[![CI](https://github.com/samaust/openftgs/actions/workflows/ci.yml/badge.svg)](https://github.com/samaust/openftgs/actions/workflows/ci.yml) [![Coverage](https://raw.githubusercontent.com/samaust/openftgs/main/docs/coverage.svg)](#tests) [![Documentation](https://app.readthedocs.org/projects/openftgs/badge/)](https://openftgs.readthedocs.io)
+[![CI](https://github.com/samaust/openftgs-plus/actions/workflows/ci.yml/badge.svg)](https://github.com/samaust/openftgs-plus/actions/workflows/ci.yml) [![Coverage](https://raw.githubusercontent.com/samaust/openftgs-plus/main/docs/coverage.svg)](#tests) [![Documentation](https://app.readthedocs.org/projects/openftgs-plus/badge/)](https://openftgs-plus.readthedocs.io)
 
-openftgs is an independent clean-room implementation of FreeTimeGS (Wang et al., CVPR 2025), not affiliated with its authors.
+openftgs-plus is a fork of [openftgs](https://github.com/samaust/openftgs), an independent implementation of FreeTimeGS (Wang et al., CVPR 2025). Neither is affiliated with the paper's authors.
 
-Python package `openftgs`, under the Apache-2.0 license, with the command-line tool `ftgs`.
+Python distribution `openftgs-plus` (import package `openftgs`), under the Apache-2.0 license, with the command-line tool `ftgs`.
 
-The documentation is at [openftgs.readthedocs.io](https://openftgs.readthedocs.io): installation, a quickstart, the datasets, the method, the command line and the API reference.
+The documentation is at [openftgs-plus.readthedocs.io](https://openftgs-plus.readthedocs.io): installation, a quickstart, the datasets, the method, the command line and the API reference.
 
-**Status: alpha, version 0.1.0.** The first release, at the end of the plan's milestones M0 to M18: the library and its command line are complete, the differential harness checks them, and the method is validated on openftgs-synth, the owner's CC0-1.0 rendered dataset, rather than on the paper's datasets, so no result is compared with the paper's tables. The [changelog](https://github.com/samaust/openftgs/blob/main/docs/changelog.md) lists what the release contains and its known limitations.
+**Status: alpha, version 0.1.0.** The first release, at the end of the plan's milestones M0 to M18: the library and its command line are complete, the differential harness checks them, and the method is validated on openftgs-synth, the owner's CC0-1.0 rendered dataset, rather than on the paper's datasets, so no result is compared with the paper's tables. The [changelog](https://github.com/samaust/openftgs-plus/blob/main/docs/changelog.md) lists what the release contains and its known limitations.
 
-## Clean-room process
+## Provenance
 
-The code is written from the paper (arXiv 2506.05348 v2) and from the owner's specification, which was itself written from the paper alone. No code, notebook, checkpoint or issue thread from any other implementation of the method, including the authors' own, is consulted. Third-party software is read only within its license: source code only under permissive licenses that allow commercial use, documentation only for everything else. Every source consulted is logged. The renderer the paper's project page links was read for a documentation-only survey ([#352](https://github.com/samaust/openftgs/issues/352)), and nothing from it is in the package.
+openftgs was written from the paper (arXiv 2506.05348 v2) and from the owner's specification, which was itself written from the paper alone, under a clean-room process. openftgs-plus continues from that code under looser rules: the web may be searched, but no code, notebook, checkpoint or issue thread from any other implementation of the method, including the authors' own, is consulted. Third-party software is read only within its license: source code only under permissive licenses that allow commercial use, documentation only for everything else, and anything added must have a license compatible with Apache-2.0 that allows commercial use. Every source consulted is logged. The renderer the paper's project page links was read for a documentation-only survey ([openftgs #352](https://github.com/samaust/openftgs/issues/352)), and nothing from it is in the package.
 
-- [`docs/spec/openftgs-spec.md`](https://github.com/samaust/openftgs/blob/main/docs/spec/openftgs-spec.md): the specification, the source of truth for the implementation.
-- [`docs/clean-room/source-log.md`](https://github.com/samaust/openftgs/blob/main/docs/clean-room/source-log.md): every source consulted during the implementation and what was taken from it.
-- [`docs/clean-room/questions.md`](https://github.com/samaust/openftgs/blob/main/docs/clean-room/questions.md): gaps found in the spec and the provisional decisions made for them. GitHub doesn't render a Markdown file of this size, so it may show only the source; the [raw file](https://github.com/samaust/openftgs/raw/main/docs/clean-room/questions.md) opens as plain text.
-- [`docs/clean-room/milestones.md`](https://github.com/samaust/openftgs/blob/main/docs/clean-room/milestones.md): the order in which the package was built.
-- [`docs/clean-room/release-checklist.md`](https://github.com/samaust/openftgs/blob/main/docs/clean-room/release-checklist.md): the release-time checks of this version: the license scan, the libraries bundled in dependency wheels, the vendored code's license files, the pretrained weights' terms, the absence of dataset material, and the source-log audit.
+- [`docs/spec/openftgs-spec.md`](https://github.com/samaust/openftgs-plus/blob/main/docs/spec/openftgs-spec.md): the specification, the source of truth for the implementation.
+- [`docs/prd/source-log.md`](https://github.com/samaust/openftgs-plus/blob/main/docs/prd/source-log.md): every source consulted during the implementation and what was taken from it.
+- [`docs/prd/questions.md`](https://github.com/samaust/openftgs-plus/blob/main/docs/prd/questions.md): gaps found in the spec and the provisional decisions made for them. GitHub doesn't render a Markdown file of this size, so it may show only the source; the [raw file](https://github.com/samaust/openftgs-plus/raw/main/docs/prd/questions.md) opens as plain text.
+- [`docs/prd/milestones.md`](https://github.com/samaust/openftgs-plus/blob/main/docs/prd/milestones.md): the order in which the package was built.
+- [`docs/prd/release-checklist.md`](https://github.com/samaust/openftgs-plus/blob/main/docs/prd/release-checklist.md): the release-time checks of this version: the license scan, the libraries bundled in dependency wheels, the vendored code's license files, the pretrained weights' terms, the absence of dataset material, and the source-log audit.
 
 ## Installation
 
 ```bash
-pip install openftgs
+pip install openftgs-plus
 ```
 
 openftgs needs Python 3.11 or later. Training needs a CUDA build of PyTorch. On Linux x86_64 the default `torch` wheel on PyPI already is one (torch 2.14.1 bundles the CUDA 13.0 libraries), so the command above installs it. For another CUDA version, or on Windows, install torch from the [PyTorch index](https://pytorch.org/get-started/locally/) before installing openftgs. A CPU build is enough for the tests on the reference backend; CI uses one because its runners have no GPU.
@@ -66,7 +66,7 @@ ftgs render model.safetensors --request request.json --out renders.safetensors
 ftgs eval RUN_DIR/checkpoint OUT/scene.json --split test --out METRICS.json
 ```
 
-`ftgs <command> --help` lists every option. A run directory holds `config.json`, `train_log.jsonl`, `checkpoint/` and, when the scene has a test split, `METRICS.json`; Ctrl-C saves the checkpoint before stopping. Exit code 0 is success, 2 an invalid input or environment, 3 a numerical failure. See [`docs/modules/cli/command-line.md`](https://github.com/samaust/openftgs/blob/main/docs/modules/cli/command-line.md).
+`ftgs <command> --help` lists every option. A run directory holds `config.json`, `train_log.jsonl`, `checkpoint/` and, when the scene has a test split, `METRICS.json`; Ctrl-C saves the checkpoint before stopping. Exit code 0 is success, 2 an invalid input or environment, 3 a numerical failure. See [`docs/modules/cli/command-line.md`](https://github.com/samaust/openftgs-plus/blob/main/docs/modules/cli/command-line.md).
 
 ## Tests
 
@@ -86,4 +86,4 @@ The license scan passes in CI's environment (CPU torch) and, for this release, i
 
 ## License
 
-Apache-2.0; see [LICENSE](https://github.com/samaust/openftgs/blob/main/LICENSE) and [NOTICE](https://github.com/samaust/openftgs/blob/main/NOTICE).
+Apache-2.0; see [LICENSE](https://github.com/samaust/openftgs-plus/blob/main/LICENSE) and [NOTICE](https://github.com/samaust/openftgs-plus/blob/main/NOTICE).

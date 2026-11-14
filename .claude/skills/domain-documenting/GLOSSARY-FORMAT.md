@@ -36,12 +36,12 @@ Never drop or rewrite the intro and the Conventions paragraph when adding terms:
 
 - **Term line.** `**Term**:`, with the spec's symbol after the name where it has one (`**Base opacity σ**:`).
 - **Definition.** One or two sentences, saying what the thing IS, not what it does or how it is computed. A semicolon-joined qualifying clause is allowed when it pins the boundary between this term and a neighbouring one ("the opacity that the sampling score and the dead test read").
-- **Reference.** End the definition with the spec items that define the term (`§1.1`, `E3`, `D-41`), separated from the text by a space. A process term with no spec item cites where it is defined instead (`CLAUDE.md`, `docs/clean-room/milestones.md`).
+- **Reference.** End the definition with the spec items that define the term (`§1.1`, `E3`, `D-41`), separated from the text by a space. A process term with no spec item cites where it is defined instead (`CLAUDE.md`, `docs/prd/milestones.md`).
 - **_Avoid_ line.** Always present. List the other words for the same concept, including the paper's name where the spec renamed it, and say in parentheses why one is reserved when it means something else here ("step (reserved for Adam's per-tensor step counter)").
 
 ## Rules
 
 - **Be opinionated.** When multiple words exist for the same concept, pick the best one and list the others under `_Avoid_`. A term the spec defines keeps the spec's name.
 - **Names, not implementations.** The spec's normative names (its symbols, its tensor names, the §2.1 identifiers) may appear in a definition, since the Conventions paragraph makes them canonical. Implementation choices may not: private function names, file layouts, algorithms the spec leaves open. Those belong in module docs.
-- **Only include terms specific to this project.** General programming concepts (timeouts, error types, utility patterns) don't belong even if the project uses them extensively. Before adding a term, ask: is this a concept unique to openftgs, its spec or its clean-room process, or a general programming concept? Only the former belongs.
-- **File it under its area.** Put each term under the `###` area it belongs to (Representation, Time, Training, Initialization, Rendering, Data, Files, Evaluation, Differential harness, Clean-room process, Workflow). Add a new area only when a cluster of terms fits none of them.
+- **Only include terms specific to this project.** General programming concepts (timeouts, error types, utility patterns) don't belong even if the project uses them extensively. Before adding a term, ask: is this a concept unique to openftgs, its spec or its spec process, or a general programming concept? Only the former belongs.
+- **File it under its area.** Put each term under the `###` area it belongs to (Representation, Time, Training, Initialization, Rendering, Data, Files, Evaluation, Differential harness, Spec process, Workflow). Add a new area only when a cluster of terms fits none of them.

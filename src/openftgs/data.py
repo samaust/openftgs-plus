@@ -1380,7 +1380,7 @@ def _discard(out: Path, created: bool) -> None:
 
 def _producer() -> str:
     try:
-        return f"openftgs {importlib.metadata.version('openftgs')}"
+        return f"openftgs {importlib.metadata.version('openftgs-plus')}"
     except importlib.metadata.PackageNotFoundError:
         return "openftgs"
 

@@ -11,7 +11,7 @@ A documentation-only survey, written 2026-10-22 on tracker issue #352, of how a 
 
 **Words.** Glossary terms are used as `docs/GLOSSARY.md` spells them: primitive, quantity, physical value, moved position μx(t), effective opacity σ_eff(t), raw timestamp τ, normalized time t, training time span T_τ, frame interval Δt_f, camera, exchange model, checkpoint, render request. A **player** is the external program that draws the animation; a **viewer** is an existing program that draws static Gaussian-splat scenes. Third-party programs' own feature names appear only as named features.
 
-**Clean-room record.** Every page, search, skipped search hit, screened-out candidate and general-knowledge claim about third-party software behind this document has a numbered row in `docs/clean-room/source-log.md`, from row 223 on (section 9).
+**Clean-room record.** Every page, search, skipped search hit, screened-out candidate and general-knowledge claim about third-party software behind this document has a numbered row in `docs/prd/source-log.md`, from row 223 on (section 9).
 
 ## 1. Purpose and scope
 
@@ -268,4 +268,4 @@ Owner decisions, listed against what exists; none is proposed here.
 
 ## 9. Sources
 
-Source-log rows 223 to 273 of `docs/clean-room/source-log.md`: two general-knowledge rows for the conventions of sections 2.4 and 3.1 (223, 224), the license files (225 to 237, 251, 252, and within 254 to 259), the five searches (238 to 242), the documentation passes (243 to 261, 263, 265 to 268), two general-knowledge rows for screening (264, 269), the project page's renderer, not opened at first (262), the owner's rule that opens it and the credits the owner relayed (270), the general-knowledge row that classifies the names in them (271), and the renderer itself, read under that rule (272, 273).
+Source-log rows 223 to 273 of `docs/prd/source-log.md`: two general-knowledge rows for the conventions of sections 2.4 and 3.1 (223, 224), the license files (225 to 237, 251, 252, and within 254 to 259), the five searches (238 to 242), the documentation passes (243 to 261, 263, 265 to 268), two general-knowledge rows for screening (264, 269), the project page's renderer, not opened at first (262), the owner's rule that opens it and the credits the owner relayed (270), the general-knowledge row that classifies the names in them (271), and the renderer itself, read under that rule (272, 273).

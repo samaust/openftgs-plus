@@ -6,7 +6,7 @@ libraries built from other projects. This script walks the installed distributio
 and sorts each one's shared libraries into its own extension modules, the libraries bundled
 into its wheel, and shared libraries in a layout it doesn't know. For each distribution that
 has any of the last two, it reports the version, the declared license and the license notices
-the wheel ships, which are then read by hand (docs/clean-room/release-checklist.md).
+the wheel ships, which are then read by hand (docs/prd/release-checklist.md).
 
 Run it with the interpreter of the environment to inventory:
 
