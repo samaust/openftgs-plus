@@ -12,7 +12,7 @@ Both axes run as **parallel sub-agents** so they don't pollute each other's cont
 
 ## Guidelines
 
-Follow [docs/agents/guidelines.md](../../../docs/agents/guidelines.md). Both sub-agent prompts start with the line from its Subagents section. The sub-agents don't write files: they list any source outside this repository and the spec under "Sources consulted", and you add those rows to the source log after aggregating, on the branch under review. When the review runs on `main`, list them in the report instead ("Where the prd files are written" in docs/agents/guidelines.md).
+Follow [docs/agents/guidelines.md](../../../docs/agents/guidelines.md). Both sub-agent prompts start with the line from its Subagents section. The sub-agents don't write files: they list any source outside this repository and the spec under "Sources consulted", and you add those rows to the source log after aggregating, on the branch under review. When the review runs on `main`, record them on the tracker instead, with any candidate Q-n rows the review reports: in the PRD or issue under review, or else in a new issue titled "Q-n candidates: <topic>" and labelled `q-n` ("Where the prd files are written" in `docs/agents/guidelines.md`).
 
 ## Process
 
@@ -33,7 +33,7 @@ Before going further, confirm the fixed point resolves (`git rev-parse <fixed-po
 
 The Spec axis checks two sources, in this order of authority:
 
-1. **The project spec**, `docs/spec/openftgs-spec.md`. Collect the spec items the commit messages cite (sections §n, equations E-n, decisions D-n, tests U-n, C-n, S-n, B-n, and Q-n rows in `docs/prd/questions.md`), plus any the owner passed as an argument. If the commits cite none, that is itself a Standards finding (CLAUDE.md, "Commits"): take the spec items from the "Spec items" section of the PRD, or of the agent brief for an issue implemented on its own, and ask the owner only if there is neither.
+1. **The project spec**, `docs/spec/openftgs-spec.md`. Collect the spec items the commit messages cite (sections §n, equations E-n, decisions D-n, tests U-n, C-n, S-n, B-n, and Q-n rows in `docs/prd/questions.md`), plus any the owner passed as an argument. If a commit cites none and doesn't say `Spec items: none`, that is itself a Standards finding (CLAUDE.md, "Commits"); if the commits cite none, take the spec items from the "Spec items" section of the PRD, or of the agent brief for an issue implemented on its own, and ask the owner only if there is neither.
 2. **The originating PRD**, if there is one: the issue labelled `skill:conversation-to-prd` that the commit messages reference (`#123`, `Closes #45`) or the owner passed, with any `skill:prd-to-tickets` tickets the commits reference (a referenced ticket's parent issue is its PRD), fetched as `docs/agents/issue-tracker.md` describes. For an issue implemented on its own, its latest agent brief comment takes the PRD's place.
 
 Where the PRD and the project spec disagree, the project spec wins, and the disagreement is itself a finding. If neither spec items nor a PRD can be identified, the **Spec** sub-agent will skip and report "no spec available".
