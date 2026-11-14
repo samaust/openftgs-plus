@@ -1,0 +1,389 @@
+# Primitives that follow the surface, with image-model priors: survey, probes and recommendation
+
+A research document, written from 2026-11-14 on PRD #1 of openftgs-plus and its tickets #2 to #15, ahead of the first spec revision that departs from the paper (README, "Direction"). On the owner's private scene the cameras' images disagree about the person at the centre, and training answers with a shell of faint, short-lived primitives off the body's surface (section 2.1). The document surveys techniques that make primitives lie on the surface they represent and turn with it, and the prior maps from pretrained image networks that guide them; it measures how far the private scene's cameras disagree; and it recommends which techniques to adopt, each as a field of the training configuration that defaults to off, or that none should be. It proposes no code and changes no spec item: adopting a technique is a spec change the owner makes, as the next lettered revision ("Editing the spec" in `docs/agents/guidelines.md`), followed by its own implementation issue.
+
+Sections 1 to 9 are the nine the PRD fixes ("The phases", phase 4). The probes are sections 2.4 to 2.7 and the survey's families sections 3.1 to 3.6. The opening and sections 1 to 2.3 were written first (ticket #2). Every later section opens with a line naming the ticket that writes it, and a section that holds only that line, and the empty tables under it, is not written yet. A ticket writes between its section's heading and the blank line before the next heading, and changes neither, so that sections written in parallel merge without conflict.
+
+**The owner's instructions and decisions** (PRD #1; the owner's comment on it of 2026-11-14, which replaces the body where they differ; two answers the owner gave in session on 2026-11-14, which that comment does not record and which reached ticket #2 through the orchestrating session). Each is marked **confirmed** (the owner accepted what the plan or the implementer proposed), **answered** (the owner's own instruction, or an answer that replaced a proposal) or **default** (proposed by the plan of 2026-11-13, which the owner published unchanged, and not confirmed in words; it holds until the owner says otherwise on the PRD).
+
+- Instructions given in session:
+  - 2026-11-13: the private dataset's name appears in no commit. **Answered.** The PRD applies the same to issues, branch and file names, source-log rows and search queries, and uses the alias "private scene A". **Default**, the PRD's extension; decision 5 confirms the alias for this document.
+  - 2026-11-14: every `gh` command names the repository, `-R samaust/openftgs-plus`. openftgs's issues are read with `-R samaust/openftgs` and never written (CLAUDE.md, "Issues"). **Answered.**
+  - 2026-11-14: the generator behind private scene A is named nowhere. It isn't relevant to the research. **Answered.**
+- The plan's decisions, by its numbers:
+  1. **Scope.** The core is primitives shaped and oriented to the surface, and prior maps from pretrained image networks. **Default**; the owner's comment names neither the core nor a change to it. Its three edges:
+     - Training that tolerates cameras whose images disagree is an adjacent family (family E). It may take up to half of the survey, not the quarter the plan proposed, since no camera of private scene A is trusted (decision 4). **Answered** (2026-11-14). Its cap is 120 abstracts and 24 full reads, twice another family's, which makes the overall cap 360 abstracts and 72 full reads and family E a third of it; the figures are the implementer's. **Confirmed** (2026-11-14, in session; the PRD's comment still says they await the owner's nod).
+     - The subject is a person, so depth and normal estimators made for people belong to the core. Body templates (a parametric body fitted to the person) are recorded if met, not searched for. **Default.**
+     - gsplat stays at 1.5.3. A technique that needs rasterization kernels gsplat 1.5.3 lacks is recorded but cannot be a finalist. **Default.**
+  2. **Depth of the work.** The survey, the probes and a test plan; training tests only after review 1. `RenderOutput` returns no depth or normals (Q-226), so a finalist that needs them can't be trained through the package as it is. How each finalist is tried is decided at review 1: a scratch script outside the package that builds on Q-226's device, a throwaway uncommitted worktree, or waiting for its spec revision and testing behind its field. Until then H1 rests on evidence from papers. **Confirmed** (2026-11-14).
+  3. **The bar for pretrained weights.** As openftgs issue 373 set it: the weights' own publisher states a permissive license that allows commercial use, checked per weights file. An estimator that fails is recorded and screened out. The survey also records whether a technique would work from prior maps the user supplies as files, which puts no estimator in the package. **Confirmed** (2026-11-14).
+  4. **The source video.** No camera of private scene A is a real video. The centre camera is the closest to the source video, but it was regenerated like the other eight and shares their artifacts, sharpness and colour temperature. It also carries severe magenta artifacts: magenta is the colour the generator was meant to replace. So no camera is ground truth, and none is trusted above the others. **Answered** (2026-11-14, in session).
+  5. **Private scene A's numbers** may appear in this document under the alias. Its name, paths and images never do. **Confirmed** (2026-11-14).
+  6. **Citation search** uses keyless routes unless the owner supplies a Semantic Scholar or SciX key in an environment variable. **Default.**
+- From the owner's comment of 2026-11-14 and the session:
+  - The ticket breakdown: 14 tickets, the PRD's sub-issues (#2 to #15). The training tests are ticketed after review 1, each blocking the last ticket, or become a PRD of their own. **Confirmed.**
+  - Temporary source-log IDs on a ticket's branch use the ticket's number, `T<ticket>.<k>`, as the implement skills do, not the PRD's. **Answered.**
+  - This work's run directories, prior maps and sheets go in a folder outside the repository, which the owner allowed the orchestrating session to create; this document writes it `<surface-runs>`. **Confirmed** (2026-11-14, in session).
+
+**Hypotheses.** The probes test H2's premise. H1 is tested only by training with a technique.
+
+- **H1 (the owner's).** Constraining primitives to lie on the surface and turn with it, with depth or normal prior maps as supervision, removes the shell and keeps the body's shape in novel views from the side.
+- **H2 (from the owner's notes).** The shell is how training reconciles cameras whose images disagree. A surface constraint alone would then trade the shell for blur, and depth estimated on each generated camera would inherit the disagreement. If H2 holds, the recommendation pairs a surface constraint with a way to absorb or down-weight the disagreement.
+
+**Words.** **Private scene A** is the owner's private scene; its name, its paths, its generator and its images appear nowhere in this document. The **shell** is the failure of section 2.1: the faint, short-lived primitives that training leaves 5 to 25 cm off the body's surface. A **prior map** is a per-image map (depth, normals, a point map, flow, a mask) predicted by a pretrained network, and an **estimator** is such a network. The **bar** is the license condition on an estimator's weights (decision 3). A **placeholder pixel** is a pixel of the colour the generator was meant to replace (magenta) and didn't. A **finalist** is a technique shortlisted for a test. A **review** is one of the two review points with the owner, review 1 after the survey and review 2 on the document; the word checkpoint keeps its glossary meaning. A **family** is one of the survey's five groups of techniques, A to E (section 3), and a **kind** is one of the eight kinds of prior map (section 3, "The estimators tables"). A **search seed** is a method name a family's search starts from; a seed, alone, is a training run's. Other words are the glossary's (`docs/GLOSSARY.md`).
+
+**Local paths** are written as placeholders: `$OPENFTGS_DATASETS` (openftgs-synth is at `$OPENFTGS_DATASETS/synth`); `<m17-runs>` and `<m15-runs>`, as `docs/prd/validation-runs.md` uses them; `<surface-runs>`, this work's folder outside the repository; `<scratch>`, the PRD's gitignored scratch directory, for scripts, environments and downloads ("Exploration notes" in `docs/agents/guidelines.md`); `<private-scene-A>`, private scene A's location, which is written nowhere. Prototype scripts are not committed: the section that used one records its commands, the versions and a one-line note on each run.
+
+**Clean-room record.** Ticket #15 completes this paragraph, with section 9. What holds from the start: the rules are CLAUDE.md's guidelines rules, which replace spec §0 on sources for this fork, and the PRD's "Clean room for the search" (section 3 summarizes it for the survey). The sources consulted while planning are rows 491 to 502 of `docs/prd/source-log.md`. Every ticket logs a source when it opens it, under a temporary ID `T<ticket>.<k>` on its branch, numbered at the merge, and the document cites a source by its row, as `(row 499)`. The opening and sections 1 to 2.3 rest on this repository, the spec and this repository's issues, which need no row, and on the owner's notes as the PRD's Notes report them (row 499); ticket #2 opened no other source and added no row.
+
+## 1. Scope and the owner's decisions
+
+**The problem.** Private scene A has nine cameras around one person. Every camera's images were generated from one monocular video, so each camera shows a slightly different pose and the cameras disagree about the person at the centre (decision 4). Training answers with the shell, and the body breaks up in novel views from the side. Changing the training configuration recovered little (section 2.1).
+
+**What the work does.** It surveys techniques that make primitives lie on the surface they represent and turn with it, and the prior maps (depth, normals, point maps, flow) that guide them. It measures how much private scene A's cameras disagree. It recommends which techniques to adopt, each as a field of the training configuration that defaults to off. It studies `openftgs.model`, `openftgs.render`, `openftgs.losses`, `openftgs.density`, `openftgs.init`, `openftgs.train` and `openftgs.data`, and changes none of them; section 2.2 lists the spec items studied. The deliverable is this document. No code or spec change lands from the PRD.
+
+**The scope** is decision 1's: the core, and the three edges. Two consequences run through the document. A technique that needs rasterization kernels gsplat 1.5.3 lacks gets its row in a screening table and cannot be a finalist. An estimator that fails the bar gets its row in an estimators table and is screened out, and the survey records, per technique, whether prior maps the user supplies as files would do in its place (decision 3).
+
+**No camera is ground truth** (decision 4). On private scene A a test-view score measures agreement with one generated camera, not accuracy. In the PRD's starting proposal for the training tests' criteria, which review 1 settles, scores there only guard against harm, and better means lower shell measures (section 2.6) and novel-view sheets the owner judges better. openftgs-synth, whose ground truth is exact (§1.4 "Validation data", D-79), is where a geometry residual and an error of expected depth can be measured (Q-226 to Q-231).
+
+**The questions the research answers**, and where:
+
+1. Which techniques make primitives follow a surface (scale, orientation, base opacity, depth), and what does each need from the primitive and from the render backends? Families A and B (sections 3.1 and 3.2) and the render-outputs probe (section 2.4).
+2. Which prior maps supervise or initialize them, with which losses, and which estimators clear the bar? Family C (sections 3.3 and 3.4) and the probe on the agreement of prior maps (section 2.7).
+3. How do dynamic-scene methods keep a surface coherent over time, and what would that ask of primitives whose orientation and scale are constant and whose motion is E1's? Family D (section 3.5).
+4. Adjacent: how do methods train on cameras whose images disagree, none of them trusted, and some of whose pixels are known to be wrong? Family E (section 3.6) and the probe on private scene A's images (section 2.5).
+5. For each shortlisted technique: can it be a field of the training configuration that defaults to off and leaves E1 to E17 and the §3 tests untouched? If not, what does the spec change? Column 3 of every screening table, then sections 4, 5 and 8.
+
+**The phases**, and where each lands:
+
+| Phase | What | Sections | Tickets |
+| --- | --- | --- | --- |
+| 0 | Setup and the probes; the render-outputs probe and the survey don't wait for the others | 2.4 to 2.7 | #3, #4, #5, #12 |
+| 1 | The survey, families A to E; review 1 follows | 3.1 to 3.6, then 4 | #6 to #11, then #13 |
+| 2 | Integration sketches and the test plan, written before anything trains | 5 | #14 |
+| 3 | Tests of the finalists the owner cleared, by the route chosen for each; a finalist left to its spec revision is tested later, behind its field | 6 | ticketed after review 1, or a PRD of their own; #15 writes their results up |
+| 4 | The recommendation, what adopting it would change, the sources; review 2 follows | 7 to 9 | #15 |
+
+**The reviews.** Review 1, after the survey, puts to the owner the screening table, two to four finalists (at least one of them only a loss on today's primitives), the proposed criteria for training tests, and the route and GPU hours for trying each finalist. Nothing trains before the owner confirms. Review 2 is on the document and its recommendation.
+
+**Machine and data.** The survey needs no GPU. Run directories, prior maps and sheets go outside the repository, in `<surface-runs>`. Anything a probe or a test needs goes into a scratch environment under `<scratch>`, never the shared `.venv`, after each package's and each weights file's license is read. The owner gives private scene A's location in session, to the tickets that measure it (#4, #5 and #12) and to no other; it is never written down, and nothing derived from the scene's images leaves the machine.
+
+**Q-n rows the work relies on.** Q-7 (tests that download weights run only with `OPENFTGS_ALLOW_DOWNLOADS=1`; the research downloads weights itself, outside the suite, and logs each file's terms). Q-106 (`roma_init`'s `matcher` port and the `DenseMatcher` protocol, a warp and a certainty per match, which the disagreement probe reads). Q-226 (no depth output; section 2.3 says how expected depth is read without one). Q-227 to Q-231 (which pixels have a meaningful expected depth, the edge rule, δ = 0.02·S, the sampling at a primitive's centre, the figures reported; `scripts/gt_depth.py`). Q-233 to Q-237 (flagged pixels and kept-pixel PSNR; `scripts/reference_flaws.py` warps with ground-truth depth, so it applies to openftgs-synth and not to private scene A). Q-220 (M17's run parameters on openftgs-synth, reused if a finalist trains there).
+
+**Out of scope.** Adopting a technique: the owner changes the spec as the next lettered revision, and an implementation issue then lands it behind its field. Any change to `src/`, `tests/`, the harness, §2.3's table or the package metadata. Changing the gsplat pin (§2.3's note). The paper's datasets (D-79). Recording the privacy rule in CLAUDE.md, which the owner may ask for on a `workflow-` branch.
+
+## 2. The failure and what the spec fixes
+
+### 2.1 The failure
+
+From the owner's notes on private scene A (openftgs 0.1.0, 2026-11-10 and 11; local, outside the repository), as the PRD's Notes report them (row 499). Ticket #2 read the PRD, not the notes or the scene.
+
+- **The scene.** Nine cameras around one person. Every camera's images were generated from a single monocular video by a general video generation model, so each camera shows a slightly different pose and none is a real video (decision 4). The centre camera, the closest to the source video, also carries severe magenta artifacts.
+- **The shell.** Nothing floats in free space. The shell sits 5 to 25 cm from the body: median base opacity 0.16, and durations of about two frames as the notes measure them. In novel views it shows as dark blobs on the face, smeared arms and several superimposed faces.
+- **The scores.** The centre camera's crop scores 28.1 dB PSNR when that camera trains and 24.1 dB when it is the test view. The best training configuration recovered about 0.3 dB of that gap. These scores measure agreement with a generated camera, not accuracy.
+- **Noise between seeds:** ±0.01 dB PSNR on the centre test view, about 0.2 dB on the second test view.
+
+**Already tried**, so the survey doesn't propose them again. A technique that only moves one of these values is recorded as tried, not screened (section 3.2).
+
+| What was changed | Spec item, default | Values tried | Outcome in the notes |
+| --- | --- | --- | --- |
+| `loss.lambda_reg` | E9, 10⁻² [P §3.3] | 0.1, 0.3, 1.0 | mixed at 0.1, softer at 0.3, collapses at 1.0 |
+| `reloc.dead_opacity` | D-14, 0.005 | 0.05, 0.1 | no gain at 0.05, collapses at 0.1 |
+| relocation off, with `reloc.prune_opacity` | §1.3 "Count-control modes", the "w/o periodic relocation" ablation | not in the PRD's Notes | worse |
+| `sh_degree` | D-3, 3 | 0, 1 | no gain, so the blobs are geometry, not colour |
+| `growth.n_max` | D-44, 3,000,000 | not in the PRD's Notes | trades sharpness on the training cameras against the test view |
+| `scene_scale_factor` | D-27, 1.1 | × 3 | no gain |
+| `loss.perc_net` | D-9 and D-89, `flip` | `vgg16_oxford` | no gain |
+| `optim.log_durations_lr` | D-20, 5·10⁻³ | × 0.2, × 4 | worse at × 0.2; + 0.17 dB but softer at × 4 |
+
+One change helped: `ftgs init roma --stride 4` (D-21's stride, default 1), by 0.2 to 0.6 dB, mostly through the longer initial duration.
+
+### 2.2 The spec items
+
+The items the PRD lists as studied, in its order. None changes. The spec is `docs/spec/openftgs-spec.md`, revision 549o; a row says what the item fixes and leaves the wording to the spec.
+
+| Item | What it fixes | Tag |
+| --- | --- | --- |
+| §1.1 | The eight quantities of a primitive, stored as nine tensors, and the per-time arrays derived from them (`means_t`, `opacities_t`, `quats_n`, `scales`, `sh`). Scale, orientation and SH do not change with time; only position and opacity do | [P §3.1]; each tensor's row carries its own tag |
+| D-5 | The activations and the initial values: sigmoid opacity from 0.1, exponential scales from the 3-NN distance, the identity rotation, which its rationale calls irrelevant while scales are isotropic | decision; the activations and the 3-NN are [L: 3DGS §5.1] |
+| D-25 | The neighbours of the 3-NN scale: the kept points of the same init frame, with the mean floored at 10⁻⁷ | decision |
+| E1 | Motion: the moved position is linear in t, for every t | [P §3.1, Eq. 1] |
+| E3 | Space–time opacity: the renderer receives σ_eff(t) = σt(t)·σ as the primitive's opacity | [P §3.1, Eq. 3] |
+| E4 | Temporal opacity: an unnormalized Gaussian in t around the time centre, whose standard deviation is the duration | [P §3.1, Eq. 4] |
+| E5 | The covariance R S Sᵀ Rᵀ, from the normalized quaternion and three positive scales | [P §3.1, text under Eq. 3; L: 3DGS Eq. 6; quaternion convention: gsplat docs] |
+| E6 | Splatting and compositing as gsplat 1.5.3's classic mode does them: the EWA projection, the constants (ε, α_max, the 1/255 skip, the transmittance stop), front to back by camera-space depth. The equation's output is the colour C(p) over the background | [P Fig. 2 and §3.2 ("similar to 3DGS"); L: 3DGS Eqs. 3 and 5; constants: gsplat 1.5.3, D-6, D-31] |
+| E7 | The rendering loss: L1, 1 − SSIM and the perceptual network, weighted 0.8, 0.2 and the network's calibrated weight, on the unclamped render against the training image | [P §3.2, Eq. 5; λ_img, λ_ssim P §3.3; the perceptual network and λ_perc D-9] |
+| E8 | The 4D regularization: the mean over all N primitives of σ·sg[σt(t)], whose only gradient reaches the opacity logits | [P §3.2, Eq. 6; weight P §3.3 and Table 5; "early stage": P §1] |
+| E9 | The total loss: L_render + λ_reg·L_reg(t), with λ_reg = 10⁻² at every iteration | [weights P §3.3; composition D-37; schedule D-10] |
+| D-10 | L_reg is on for the whole run at a constant weight; `LossConfig.reg_until` ends it earlier | decision (owner, 2026-10-06) |
+| §1.3 Growth | A growth event: the candidates (mean NDC gradient above τ_pos), the cap, clone or split at 0.01·S, the new rows' Adam moments and statistics; nothing is deleted and opacities are never reset | [D-18; L: 3DGS §5.2] |
+| D-18 | The count grows by 3DGS clone and split between iterations 500 and 15,000, with relocation instead of deletion and the cap N_max; the count-control modes | decision (owner, 2026-10-06) |
+| E17 | The split: two children drawn from the parent's Gaussian, with scales a/1.6 and the parent's other tensors | [L: 3DGS §5.2; adoption D-18, D-43] |
+| D-43 | The children of a split or a clone copy the time centre and the duration: the split is spatial only | decision |
+| §1.3 Relocation | A relocation event: the dead set (base opacity below 0.005, D-14) is moved onto live targets drawn in proportion to ρ; N is unchanged | [P §3.2, Eq. 7; §3.3] |
+| E10 | The sampling score ρ = λ_g·ĝ + λ_o·σ, from the normalized accumulated gradient and the base opacity | [P §3.2, Eq. 7; weights P §3.3; normalization D-12, D-13] |
+| E11 | The relocation move: the new opacity and scales of a target and its copies; the copies take the target's other tensors and positions drawn from its Gaussian | [L: 3DGS-MCMC Eq. 9; adoption D-15] |
+| §1.3 Initialization, steps 1 to 9 | From init frame slots to primitives: camera pairs and dense matches, triangulation, position and time centre, velocity, duration, the budget, scales, then opacity, rotation and colour | [P §3.2, "Initialization of our representation"]; each step carries its own tags |
+| D-21 | The stride (1) and the initial duration s₀ = stride·Δt_f | decision |
+| D-22 | The camera pairs (each training camera with the one whose optical axis is closest, each pair matched once) and the filters: 5,000 matches, certainty ≥ 0.5, DLT, positive depth, ≤ 2 px, ≥ 1° | decision |
+| D-58 | The dense matcher: roma_outdoor at RoMa's defaults, with the matches drawn by the package from the raw certainty | decision (owner, 2026-10-07) |
+| D-66 | Initialization reads training-split images only | decision |
+| E15 | The initial velocity, from a point's nearest neighbour in the next init frame | [P §3.2, "Initialization of our representation"; formula D-23] |
+| D-23 | 1-NN to the next init frame, backward on the last, no outlier filter | decision |
+| §2.1 `openftgs.render`: `render`, `RenderOutput` | `render()`'s signature, and the output's fields: `image` and `alpha`, with `means2d`, `visible` and `gaussian_ids` for the gradient statistics. No field holds depth or normals | signatures |
+| D-75 | The gsplat backend calls gsplat's stage functions (`fully_fused_projection`, `spherical_harmonics`, `isect_tiles`, `isect_offset_encode`, `rasterize_to_pixels`), not `rasterization()`, and returns `visible` in both layouts | decision (owner, 2026-10-12) |
+| D-76 | The gsplat backend's remaining semantics: the packed rows, CUDA float32 only, the empty render, the background composited outside the kernel, the camera centre without a matrix inverse | decision (owner, 2026-10-12) |
+| §2.1 `openftgs.losses`: `total_loss`, `reg4d_loss` | `total_loss(pred, gt, model, t, it, cfg, *, perceptual)`, which returns the loss and its terms as detached tensors (D-77), and `reg4d_loss(model, t)` | signatures |
+| `LossConfig` | The loss's fields: the four weights, `reg_until`, the SSIM settings and `perc_net` | signature; each field carries its tag ([P §3.3], D-8, D-9, D-10) |
+| §2.1 `openftgs.init`: `roma_init`, `RomaInitConfig` | `roma_init(dataset, cfg)`, which returns init points, and its settings: the matcher's model and resolutions, the matches per pair, the certainty threshold, the stride, the budget, the seed | signatures; the fields are D-21, D-22, D-24, D-56, D-58 |
+| `InitConfig` | `points_per_frame`, `init_opacity`, `scale_knn` and `scale_floor` | signature; D-24, D-5, [L: 3DGS §5.1], D-25 |
+| `GrowthConfig` | The mode, the window, τ_pos, the split scale, N_max and the score mode's rate | signature; D-18, D-44, [L: 3DGS §5.2], [L: 3DGS-MCMC §3.6] |
+| `RelocConfig` | The switch, the period and the window, λ_g and λ_o, the gradient quantile, the dead threshold, the moment reset, where the copies go, the ablation's pruning threshold | signature; [P §3.3], D-13 to D-17 |
+| §2.2 `ftgs-scene` v1 | The scene manifest: the cameras, and per image a camera, a timestamp, a path and a split. A test image may carry `mask`; nothing carries depth, normals or another prior map, and no training image a mask | file format; the mask is D-64's and D-67's |
+| §2.2 `ftgs-if` v1 | The exchange model: physical values in raw time units (position, time centre, duration, velocity, scale, rotation, opacity, SH) and the `render_conventions` block | file format |
+| D-73 | `render_conventions`, and the adapter's `info` reply, record the Jacobian clamp margin, the screen-extent rule and the rasterize mode | decision (owner, 2026-10-12) |
+| D-84 | An exchange model records the background it was trained against | decision (owner, 2026-10-16) |
+| §2.3 | gsplat ==1.5.3 and the note on the pin (moving it requires re-running U-7 and U-8); the note that pretrained weights are downloaded at run time and never redistributed, their terms recorded apart from the code licenses | table and notes |
+| "Add nothing outside that table without asking" | A dependency, vendored file, dataset or pretrained model outside §2.3's table needs the owner's approval. The PRD lists the sentence under §2.3; it is CLAUDE.md's ("Working from the spec"), about §2.3's table | owner rule (CLAUDE.md) |
+| §2.4 | The four rules of every hot path, among them that an approximate optimization is off by default and that an iteration makes no host–device synchronization beyond gsplat's own, and "Where the time goes", the stages of an iteration and their cost drivers | design; D-49 |
+| §3.4 B-1 | The method for per-iteration cost: time per stage from CUDA events, and peak memory, on openftgs-synth's `kitchen` | benchmark; D-79 |
+| U-7 | Render conformance: the two render backends agree within 10⁻⁴ in RGB and alpha on 50 random scenes, and on four fixed cases | test |
+| U-8 | Culling: the images are the same with and without the cull, and a culled primitive's render gradient is exactly zero | test; D-32 |
+| U-12 | Gradient agreement: per stored tensor, gsplat against the reference on 20 random scenes, cosine ≥ 0.999 and relative L2 error ≤ 10⁻³ | test |
+| §3.3's adapter contract | The adapter's six commands, with data crossing only in §2.2's formats and the two harness formats; a setting an adapter cannot honour is reported as not comparable | test design; D-73 for `info` |
+| §1.4 "Validation data" | The paper's three datasets are non-commercial, so the project validates on openftgs-synth, whose ground truth is exact: cameras, per-frame times, undistorted frames, depth, dynamic masks and background images | [D-79] |
+| D-79 | Which data validates the converters and the method: openftgs-synth, for the training runs and for B-1, B-7 and B-8 | decision (owner, 2026-10-15) |
+| D-72 | A D-n decision changes through a field of the training configuration where §2.1 defines one, otherwise by a logged change, and never silently | decision (owner, 2026-10-12) |
+| §0 | The clean-room rules, the provenance tags and who may change what. On sources, CLAUDE.md's guidelines rules replace §0 for this fork | owner rules (2026-10-07; CLAUDE.md, 2026-11-13) |
+
+What the tags mean for a technique. The constant orientation and scale of §1.1, E1, E3, E4, E8 and the form of E7 and E10 are [P]: the paper fixes them, so a technique that changes one departs from the paper, which is the owner's spec change (README, "Direction"), made behind a field where possible (D-72). §2.1's `RenderOutput`, `render` and `LossConfig` are listed signatures: changing one is a spec change too, not a Q-n gap (CLAUDE.md, "Working from the spec"). The [L] and [D-n] items (E11, E17, the growth rules, steps 8 and 9 of the initialization) are the spec's own choices, which §0 lets change with a logged reason or through a field; a technique this document recommends still reaches them through the owner's spec revision, since the PRD treats adopting one as a spec change. Section 8 says, per recommended technique, which of these it would touch.
+
+### 2.3 The code
+
+What the package does today where the failure touches it, read in `src/openftgs/` and `scripts/gt_depth.py` at the integration branch's base (`main` at 93eb58e).
+
+- **`openftgs.render.render`** returns a `RenderOutput` with `image` ([C, H, W, 3], composited over the background, not clamped to 1) and `alpha` ([C, H, W, 1], 1 − T_final). With `return_aux` it adds the 2D means, with their gradient retained for the gradient statistics, the visibility mask and, in packed mode, the row behind each 2D mean (D-75; Q-32, Q-36). It returns no depth, normal or distortion map, and takes no argument that asks for one. Both render backends hold each primitive's camera-space depth and use it only to order the primitives front to back: the gsplat backend passes the depths that `fully_fused_projection` returns to `isect_tiles`, and its `rasterize_to_pixels` call composites the three colour channels; the reference backend sorts by a detached depth and composites colours with the weights α·T (E6). Section 2.4 says what else those stage functions can composite.
+- **Expected depth is read without an API change (Q-226).** `scripts/gt_depth.py` copies the model with `shN` dropped and SH degree 0, sets `sh0 = (z − 0.5)/C₀` per primitive, z being its centre's camera-space depth at the frame's time, and renders the copy through `render()` over a black background; expected depth is image ÷ alpha. This works because E2 clamps colours only at 0 and the render isn't clamped above 1. As written, the copy's tensors are detached and the render runs under `torch.no_grad()`: the script reads values, for a diagnostic, and no gradient passes through it. It keeps pixels with alpha ≥ 0.5 (Q-227) away from depth edges (Q-228), and reports the geometry residual with δ = 0.02·S (Q-229 to Q-231). Whether the device keeps gradients to the stored tensors, and whether it carries normals, are the render-outputs probe's questions (section 2.4).
+- **`openftgs.losses.total_loss`** adds four terms: λ_img·L1, λ_ssim·(1 − SSIM), λ_perc·L_perc and λ_reg·L_reg(t) (E7, E9; Q-41, Q-249), each skipped when its weight is 0. The first three read only the render's `image` and the training image, over the whole image: `total_loss` takes no mask and no per-pixel weight, the trainer passes it no alpha, and the manifest reader refuses a `mask` on a training image (§2.2), so no pixel can be left out of the loss today. L_reg reads only the base opacities, the time centres and the durations (E8): its gradient, (1/N)·σt(t)·σ(1 − σ), reaches only the opacity logit, and lowers it the more the nearer the training image's time is to the primitive's time centre, whether or not the primitive is visible. No term reads depth, a normal, the scales or the orientation except through the rendered colours, and none compares two cameras: an iteration renders one training image (D-26), so the cameras meet only in the primitives they share.
+- **Growth** (`openftgs.density.grow`, mode "gradient", the default). The candidates are the primitives whose accumulated gradient g exceeds τ_pos, and a candidate is cloned or split by its largest scale (§1.3 Growth; Q-52). Neither the base opacity nor the duration is read. g is a mean over the iterations in which the primitive was visible (E10), so the iterations in which a short-lived primitive is not visible do not dilute it. A clone copies all nine tensors; a split's two children take scales a/1.6 and positions drawn from the parent's Gaussian (E17). Both keep the parent's opacity logit, time centre and duration (D-43), so a faint, short-lived candidate becomes two faint, short-lived primitives. Nothing is deleted for low opacity or large size (D-42). The "score" mode appends rows drawn from the live set in proportion to ρ, by E11; "none" adds nothing.
+- **Relocation** (`openftgs.density.relocate`). The dead set is the primitives whose stored opacity logit is below logit(`dead_opacity`), 0.005 by default (D-14; Q-50, Q-51). The test reads the base opacity alone: the duration and the effective opacity do not enter, so a primitive at the shell's median base opacity of 0.16 is live, under the default threshold and under both thresholds the notes tried. Each dead primitive takes a live target drawn in proportion to ρ = 0.5·ĝ + 0.5·σ (E10). E11 sets the new opacity and scales of the target and its copies; the moved copies take the target's time centre, duration and velocity, and positions drawn from its Gaussian (D-15). Relocation never removes a primitive. The ablation's `prune` (relocation off, `reloc.prune_opacity` set; Q-53) removes primitives below that base opacity and, after iteration 3,000, those larger than 0.1·S, with opacities reset to at most 0.01 every 3,000 iterations.
+- **Initialization.** `roma_init` matches each camera pair of D-22 with the dense matcher (D-58; the `DenseMatcher` protocol of Q-106 gives a warp and a certainty per match), keeps matches of certainty ≥ 0.5 and draws up to 5,000 of them, triangulates them and keeps the points that pass D-22's filters, and returns init points: positions, colours, timestamps, velocities (E15), durations (stride·Δt_f, D-21) and each point's init frame (Q-111). Init points hold no orientation, normal or scale, and `ftgs-init` v1 has no key for one (§2.2). The orientation and the scales are set afterwards, by `FreeTimeGaussians.from_init_points` in `openftgs.model`: one scale for the three axes, the mean distance to the `scale_knn` = 3 nearest kept points of the same init frame, floored at `scale_floor` (§1.3 step 8, D-25); the identity quaternion; and the opacity `init_opacity` = 0.1 (step 9, D-5). So every primitive starts as a sphere, with a duration of one frame interval at the default stride, and `log_scales`, `quats` and `log_durations` then train freely at constant rates (§1.3 "Optimizer and learning rates").
+
+What follows for the survey. Nothing in today's method refers to a surface: the loss reads colours, growth reads the 2D-mean gradient and the largest scale, relocation reads the base opacity and ρ, and the initial primitives are spheres with no orientation. The two rules that act on faint primitives, E8 and relocation, both act on the base opacity, and the notes' changes to their settings (`loss.lambda_reg`, `reloc.dead_opacity`) recovered little (section 2.1). A technique that needs a depth or a normal per pixel has no render output to read it from: Q-226's device is the one route without an API change, and section 2.4 says how far it goes. A technique that leaves pixels out of the loss, or weights them, needs an input `total_loss` does not take.
+
+### 2.4 Probe: the depth and normal outputs the render backends can supply
+
+*Ticket #3's section.* Which depth and normal outputs gsplat 1.5.3's stage functions (D-75) can composite, and what its `rasterization` and `rasterization_2dgs` add; whether Q-226's device keeps gradients to the stored tensors on both render backends, what the second render pass costs, and whether it carries normals; what the reference backend would need for parity (U-7, U-12).
+
+### 2.5 Probe: disagreement between cameras, and placeholder pixels
+
+*Ticket #4's section.* The epipolar residual of the dense matcher's matches with certainty ≥ 0.5, per camera pair and frame: on openftgs-synth's `kitchen`, which gives the measure's floor, and on private scene A, inside and outside the person's crop, with one camera read 1 and 2 frames earlier and later; the share of placeholder pixels per camera and where they lie; what the figures mean for H2's premise.
+
+### 2.6 Probe: the shell's measures
+
+*Ticket #5's section.* On private scene A's checkpoints, the notes' three measures (the share of opacity farther than 5 cm from every init point, the share of primitives whose duration is under two frames, the distribution of base opacity) and the fixed sheet of novel views from the side, with its render request; on openftgs-synth's M17 checkpoints, the geometry residual and the error of expected depth from `scripts/gt_depth.py` (Q-226 to Q-231).
+
+### 2.7 Probe: agreement of prior maps between cameras
+
+*Ticket #12's section.* One estimator of depth that clears the bar, cited from section 3.3: its depth lifted to 3D with the scene manifest's cameras, against the ground-truth depth on `kitchen`, which gives the estimator's own error, and between the cameras of each camera pair on private scene A's person; how scale and shift are set, the same way on both scenes; what the figures mean for H2's premise.
+
+## 3. The screening tables
+
+Six sections, one per ticket of the survey, with the same tables and the same columns throughout, so that section 4 can put them together. This introduction fixes the method, the columns and how a cell is written; it is the PRD's "The search map", "Method", "Screening columns" and "Clean room for the search", with what tickets #6 to #11 add to them, and the PRD and the tickets win where this differs.
+
+**The families and their search seeds.** Names not marked as the owner's seeds are search terms from the implementer's memory (row 502): none is a finding until a section reads it. Third-party method names are spelled as their authors spell them.
+
+| Family | Section | What to find | Search seeds |
+| --- | --- | --- | --- |
+| A. Surface-following primitives | 3.1 | Flat or planar primitives; the shortest axis as the normal; flattening and scale losses; consistency between depth and normals; depth distortion; geometric consistency between cameras; oriented initialization | 2D Gaussian Splatting, Gaussian Surfels, SuGaR, PGSR, RaDe-GS, Gaussian Opacity Fields |
+| B. Opacity and floater regularizers | 3.2 | Opacity entropy or binarization; opacity decay; anisotropy and rank constraints; other regularizers aimed at faint primitives off the surface | 4C4D (the owner's seed, arXiv 2604.04063, row 493); 3DGS-MCMC's regularizers |
+| C. Prior maps from image networks | 3.3 (the estimators), 3.4 (the techniques) | Monocular and video depth; normal estimators, including those made for people; feed-forward point maps; 4D geometry with scene flow; the losses that use them (scale-invariant, ranking, correlation); position and velocity initialized from them | MotionCrafter (the owner's seed, arXiv 2602.08961, row 491); DN-Splatter, DNGaussian, the DUSt3R and VGGT line |
+| D. Dynamic-scene surfaces | 3.5 | Dynamic surfels and meshes; local rigidity; shared motion; orientation that changes with time; training from few cameras; FreeTimeGS follow-ups | Split4D (DOI 10.1145/3763343, row 494) and the survey arXiv 2609.39960 with its list (rows 492, 495), the owner's seeds; Dynamic 3D Gaussians, SC-GS, 4D-Rotor GS, Vidu4D, MonoFusion |
+| E. Cameras whose images disagree (adjacent) | 3.6 | Reconstruction from generated images; robust and uncertainty-weighted losses; per-camera correction; weighting cameras or pixels by trust; leaving pixels known to be wrong out of the loss; feature-space losses | CAT4D, SpotLessSplats, WildGaussians |
+
+The list's table of Gaussian-splatting methods has columns for flow, normals, uncertainty and extra priors, but only two of its 60 rows tick normals (row 495), so families A to C are expected to come mostly from static-scene work and from citations.
+
+**Method.**
+
+- **Routes:** arXiv abstract pages and listings; web search; proceedings and project pages; Hugging Face paper pages; backward references through Crossref and the papers' own lists; forward citations through Semantic Scholar or SciX. Google Scholar has no API: it is reached through web search, or by the owner checking a paper's citing list by hand. On 2026-11-13 the keyless arXiv API, Semantic Scholar and OpenAlex returned rate-limit errors, and arXiv abstract pages and Crossref answered (rows 491 to 494, 500).
+- **Funnel:** title, then abstract, then a full read of the method, the experiments that isolate it and the limitations, then a row of the screening table.
+- **Stop rule, per family:** two consecutive search rounds that add no technique passing the abstract screen, or the cap of 60 abstracts and 12 full reads; 120 and 24 for family E; 360 and 72 overall (decision 1). The owner can move the caps. A search that failed or was rate-limited is not a round for the stop rule.
+- **Recency round:** one round per family restricted to 2025-10 onward, including the papers that cite FreeTimeGS.
+- **The estimators** (section 3.3) are screened by kind, not by this funnel: at most six estimators per kind, those the Gaussian-splatting literature of 2024 to 2026 uses most and the newest that pass the bar; a kind stops after two consecutive search rounds that add no estimator, or at six. Reading a paper's abstract to place an estimator is logged but doesn't count toward a family's cap.
+- **Hand-overs.** A technique that belongs to another family is named where it was met, with that family, and its row is left to that family's section. Losses that need a prior map go to section 3.4; flattening, and consistency between depth and normals, that need no prior map go to section 3.1; opacity regularizers go to section 3.2. 4C4D's row is section 3.2's, and section 3.5 names it for its training from few cameras. MotionCrafter the estimator is screened in section 3.3, and its point maps and scene flow as an initialization of position and velocity in section 3.4.
+- **Besides its tables,** a family's section says for each search seed where its row is or why it has none, records the recency round, lists the techniques handed to other families, and says how the family reached its stop rule.
+
+**Clean room for the search.** Searches may name FreeTimeGS, and papers that cite it are read. Code that implements or extends it is never opened, Split4D's included; a hit that looks like such code gets a "not opened" source-log row. EasyVolcap is never opened. Each project's license file is read before anything else of it; source code is read only under a permissive license that allows commercial use, and a repository under a copyleft, non-commercial or missing license is documentation only, its method taken from its paper. gsplat is read at the pinned 1.5.3 only; `gsplat/contrib/dynamic` and dynamic-scene code on newer branches stay unopened. Weights' terms come only from the weights' publisher: its README, model card, license file or release page. No repository-indexing tools. Third-party text is paraphrased, never pasted. Keys live in environment variables and are never committed. No request carries the owner's name or email, this project's name or anything about private scene A.
+
+**The screening columns**, tightest first. Every screening table has these ten columns, the technique and the PRD's nine, under these headers:
+
+| Header | What the cell holds |
+| --- | --- |
+| Technique | The technique's name, its paper and year |
+| 1. Weights' license | For each estimator the technique uses: its weights' license per weights file, from its publisher, with the training data recorded, and its verdict against the bar. The verdict is cited from the estimators table that holds it (section 3.3, or the family's own) |
+| 2. Code license | The code's license, and whether the code is readable or the technique is taken from its paper only |
+| 3. Integration class | One of five classes, in these words: a loss on today's primitives; a loss that needs new render outputs; a change to growth, relocation or split; a change to a quantity or to motion; new rasterization kernels. With it, whether the field's default leaves E1 to E17 and the §3 tests untouched |
+| 4. Render backends | What it needs from the render backends (which depth, normals, distortion), and whether gsplat 1.5.3's stage functions and the reference backend can supply it, cited from section 2.4 |
+| 5. Fit with the primitives | Its fit with constant orientation and scale, E1's linear motion, short durations, relocation (E10, E11) and split (E17) |
+| 6. Cameras that disagree | Whether it assumes cameras whose images agree and are right in every pixel, and any evidence with few cameras, inconsistent images or pixels known to be wrong |
+| 7. Prior maps | The prior maps to precompute (depth, normals, masks, flow, point maps), their cost, and whether maps the user supplies would do |
+| 8. Evidence | The data, the metric, and an experiment that isolates the technique |
+| 9. Training cost | Its training cost against the default training configuration, whose per-iteration cost by stage is B-1's (§3.4) |
+
+**The estimators tables.** Section 3.3 holds family C's estimators table. An estimator a technique names that section 3.3 lacks is screened in its family's own table, "Estimators first met in this family", with the same columns and the same bar. One row per weights file:
+
+| Header | What the cell holds |
+| --- | --- |
+| Kind | The kind of prior map: monocular depth; video depth; surface normals; depth and normals made for people; feed-forward point maps; 4D geometry with scene flow; optical flow and point tracks; masks (segmentation and matting) |
+| Estimator | The estimator's name, its paper and year |
+| Weights file | The file, or the release, the row's terms apply to |
+| Code license | The license of the estimator's code |
+| Weights: the publisher's statement, with its URL | What the weights' own publisher states about that file's license, and where |
+| Training data | The data the weights were trained on, recorded and not judged |
+| Bar | Pass or fail against the bar, with the reason |
+| Size; cost per frame | The parameters and the cost per frame, as the publisher states them |
+| Supplied maps | Whether prior maps the user supplies as files would do in the estimator's place |
+
+**The search-round logs.** One row per search round. In a family's log: the round's number, its date, its route, its query, the number of results seen, how many passed the title screen (their abstracts were read, and count toward the family's cap), how many passed the abstract screen (techniques new to the survey; a round that has none counts toward the stop rule), how many were read in full (they count toward the cap of full reads), how many rows of the screening table came of it, and a note: the recency round, a failed or rate-limited search, a hand-over. Section 3.3's log is by kind: the kind, the round, its date, its route, its query, the results seen, the estimators added and a note.
+
+**How a cell is written.**
+
+- Every cell is filled. Where a column doesn't apply the cell says "none" and why, as "none: no estimator"; where the source read doesn't say, "not stated".
+- Every fact in a cell carries its source-log row, as `(row 499)` or `(rows 492, 495)`. On a ticket's branch a new row is cited by its temporary ID in the same form, `T`, the ticket's number, a point and the row's counter, and written in no other way, so that the merge can replace every one with its number.
+- A verdict or an answer taken from this document is cited by its section: the bar's verdict from section 3.3 or the family's own estimators table, the render backends' answer from section 2.4.
+- A cell that is the ticket's own reading of the spec or of this repository's code (columns 3 and 5, and parts of 4 and 9) cites the spec item or the Q-n row it rests on, which need no source-log row, beside the row of the paper the technique's needs were read from.
+- Nothing is filled from memory. A claim with no source read is left out, or logged as "No source read: general knowledge" and marked so in the cell.
+- Third-party text is paraphrased, never pasted.
+
+### 3.1 Family A: surface-following primitives
+
+*Ticket #7's section.* The survey of family A, with the cap of 60 abstracts and 12 full reads.
+
+**Screening table.**
+
+| Technique | 1. Weights' license | 2. Code license | 3. Integration class | 4. Render backends | 5. Fit with the primitives | 6. Cameras that disagree | 7. Prior maps | 8. Evidence | 9. Training cost |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
+
+**Estimators first met in this family.**
+
+| Kind | Estimator | Weights file | Code license | Weights: the publisher's statement, with its URL | Training data | Bar | Size; cost per frame | Supplied maps |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- |
+
+**Search-round log.**
+
+| Round | Date | Route | Query | Results seen | Passed the title screen | Passed the abstract screen | Read in full | Rows added | Note |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
+
+### 3.2 Family B: opacity and floater regularizers
+
+*Ticket #8's section.* The survey of family B, with the cap of 60 abstracts and 12 full reads; a technique that only moves a value the notes already tried (section 2.1) is recorded as tried, not screened.
+
+**Screening table.**
+
+| Technique | 1. Weights' license | 2. Code license | 3. Integration class | 4. Render backends | 5. Fit with the primitives | 6. Cameras that disagree | 7. Prior maps | 8. Evidence | 9. Training cost |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
+
+**Estimators first met in this family.**
+
+| Kind | Estimator | Weights file | Code license | Weights: the publisher's statement, with its URL | Training data | Bar | Size; cost per frame | Supplied maps |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- |
+
+**Search-round log.**
+
+| Round | Date | Route | Query | Results seen | Passed the title screen | Passed the abstract screen | Read in full | Rows added | Note |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
+
+### 3.3 Family C, part 1: the estimators and the bar
+
+*Ticket #6's section.* Family C's estimators table: for each of the eight kinds of prior map, the estimators a technique could use, each judged against the bar before anything else of it is read. This section screens estimators, not techniques, so it has no screening table; family C's is in section 3.4.
+
+**Estimators table.**
+
+| Kind | Estimator | Weights file | Code license | Weights: the publisher's statement, with its URL | Training data | Bar | Size; cost per frame | Supplied maps |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- |
+
+**Search-round log.**
+
+| Kind | Round | Date | Route | Query | Results seen | Estimators added | Note |
+| --- | --- | --- | --- | --- | --- | --- | --- |
+
+### 3.4 Family C, part 2: techniques that use prior maps
+
+*Ticket #9's section.* The survey of family C's techniques: the losses that use prior maps, and positions, velocities and orientations initialized from them, with the cap of 60 abstracts and 12 full reads.
+
+**Screening table.**
+
+| Technique | 1. Weights' license | 2. Code license | 3. Integration class | 4. Render backends | 5. Fit with the primitives | 6. Cameras that disagree | 7. Prior maps | 8. Evidence | 9. Training cost |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
+
+**Estimators first met in this family.**
+
+| Kind | Estimator | Weights file | Code license | Weights: the publisher's statement, with its URL | Training data | Bar | Size; cost per frame | Supplied maps |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- |
+
+**Search-round log.**
+
+| Round | Date | Route | Query | Results seen | Passed the title screen | Passed the abstract screen | Read in full | Rows added | Note |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
+
+### 3.5 Family D: dynamic-scene surfaces
+
+*Ticket #10's section.* The survey of family D, with the cap of 60 abstracts and 12 full reads; the rows of the list of row 495 are search terms, and Split4D's paper is read, its code never.
+
+**Screening table.**
+
+| Technique | 1. Weights' license | 2. Code license | 3. Integration class | 4. Render backends | 5. Fit with the primitives | 6. Cameras that disagree | 7. Prior maps | 8. Evidence | 9. Training cost |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
+
+**Estimators first met in this family.**
+
+| Kind | Estimator | Weights file | Code license | Weights: the publisher's statement, with its URL | Training data | Bar | Size; cost per frame | Supplied maps |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- |
+
+**Search-round log.**
+
+| Round | Date | Route | Query | Results seen | Passed the title screen | Passed the abstract screen | Read in full | Rows added | Note |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
+
+### 3.6 Family E: cameras whose images disagree
+
+*Ticket #11's section.* The survey of the adjacent family E, with the cap of 120 abstracts and 24 full reads; the setting is decision 4's: no camera of private scene A is a real video or trusted above the others, and some of its pixels are placeholder pixels.
+
+**Screening table.**
+
+| Technique | 1. Weights' license | 2. Code license | 3. Integration class | 4. Render backends | 5. Fit with the primitives | 6. Cameras that disagree | 7. Prior maps | 8. Evidence | 9. Training cost |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
+
+**Estimators first met in this family.**
+
+| Kind | Estimator | Weights file | Code license | Weights: the publisher's statement, with its URL | Training data | Bar | Size; cost per frame | Supplied maps |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- |
+
+**Search-round log.**
+
+| Round | Date | Route | Query | Results seen | Passed the title screen | Passed the abstract screen | Read in full | Rows added | Note |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
+
+## 4. The finalists and review 1
+
+*Ticket #13's section.* One screening table and one estimators table, consolidated from sections 3.1 to 3.6; H2's premise, answered with the probes' figures (sections 2.5 to 2.7); two to four finalists, at least one of them only a loss on today's primitives, each with the reason it was chosen; the proposed criteria for training tests, starting from the PRD's proposal; per finalist, the route for trying it and its GPU hours; the owner's answers at review 1, with their date.
+
+## 5. The test plan
+
+*Ticket #14's section.* For each finalist the owner kept at review 1, before anything trains: the spec items it would touch, by identifier, and how; the fields of the training configuration it would add, with their defaults, and whether the default leaves E1 to E17 and the §3 tests untouched; the prior maps it needs and how they would reach training; the runs, with the criteria agreed at review 1. A sketched signature or field is a proposal for the owner's spec revision, not a Q-n candidate.
+
+## 6. The results
+
+*Ticket #15's section.* For every finalist review 1 cleared to train, its results against the agreed criteria; or the record that none was cleared, or that a finalist waits for its spec revision and is tested later behind its field.
+
+## 7. The recommendation
+
+*Ticket #15's section.* Which techniques to adopt, each as a field of the training configuration that defaults to off, or that none should be adopted.
+
+## 8. What adopting it would change
+
+*Ticket #15's section.* For each recommended technique, over the PRD's list: §1.1 and E5 to E6 if a quantity or the primitive's shape changes, and E1 to E4 if orientation varies with time; E7 and E9 for new loss terms; §1.3 Growth, E10, E11 and E17 for constrained primitives; §1.3 Initialization and E15 for initialization from prior maps; §2.1's `RenderOutput`, `render` and `LossConfig`; §2.2's `ftgs-scene` and `ftgs-if`; §2.3 for any estimator, weights or dependency; U-7, U-8 and U-12; §3.3's adapter contract; §2.4 for cost.
+
+## 9. The sources
+
+*Ticket #15's section.* The clean-room record in full, completing the opening's: the source-log rows of every ticket of the PRD, what was read only as documentation, what was not opened, and any incident.
