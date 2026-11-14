@@ -10,6 +10,15 @@ The method reconstructs a dynamic scene from multi-view video as Gaussian primit
 live at their own time and position, move with their own velocity and fade in and out with a
 temporal opacity; it renders the scene at any camera and any time. {doc}`method` restates it.
 
+## Direction
+
+openftgs implements FreeTimeGS as the paper describes it, and stays that way. openftgs-plus starts
+from the same code, but will diverge from a pure FreeTimeGS implementation: it will combine other
+methods from the Gaussian-splatting literature with FreeTimeGS to try to improve on it. Each
+departure from the paper is made in the specification, as a revision the owner approves, and where
+possible behind a configuration option, so that the paper's method stays available for comparison.
+Until such changes land, the package is the same FreeTimeGS implementation as openftgs.
+
 ## Provenance
 
 openftgs was written from the paper (arXiv 2506.05348 v2) and from the owner's specification, which
