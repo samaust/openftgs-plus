@@ -32,7 +32,7 @@ The reason is substantive and durable: not "we don't want this" but why, citing 
 
 ## When to check the record
 
-During triage (step 1, Gather context), list the record with `gh issue list --label out-of-scope --state closed --json number,title,body,comments`, and match the new request against it by concept, not keyword: "live preview" matches "Interactive viewer". (`gh issue list --search "…"` narrows the list; the clean-room guard blocks GitHub-wide searches.) If there's a match, surface it to the owner: "This is similar to #42 (Interactive viewer), rejected because [reason]. Do you still feel the same way?"
+During triage (step 1, Gather context), list the record with `gh issue list --label out-of-scope --state closed --json number,title,body,comments`, and match the new request against it by concept, not keyword: "live preview" matches "Interactive viewer". (`gh issue list --search "…"` narrows the list.) If there's a match, surface it to the owner: "This is similar to #42 (Interactive viewer), rejected because [reason]. Do you still feel the same way?"
 
 The owner may:
 

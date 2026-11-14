@@ -39,7 +39,7 @@ masks and background images. The project's validation runs used three scenes:
 
 `$SYNTH` is the dataset's root. `studio` is a 60-frame window of a longer sequence, and its
 `--masks` folder holds one mask per test image, made from the ground truth
-({repo}`docs/clean-room/validation-runs.md`).
+({repo}`docs/prd/validation-runs.md`).
 
 ## Neural3DV
 

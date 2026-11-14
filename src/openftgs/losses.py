@@ -398,7 +398,7 @@ def _vendored_dinov2(net: str) -> Any:
         return importlib.import_module("openftgs._vendor.romatch.models.transformer.dinov2")
     except ImportError as error:  # Q-248; Q-142: the CLI's exit 2
         raise ImportError(
-            f"PerceptualLoss({net!r}) needs the [init] extra (pip install 'openftgs[init]'), "
+            f"PerceptualLoss({net!r}) needs the [init] extra (pip install 'openftgs-plus[init]'), "
             f"whose packages the vendored DINOv2 layers import: {error}"
         ) from error
 

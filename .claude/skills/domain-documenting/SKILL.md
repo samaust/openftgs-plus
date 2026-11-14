@@ -48,9 +48,9 @@ Never leave edits to `docs/GLOSSARY.md` or `docs/modules/` uncommitted on `main`
 
 Commit messages cite the spec items the new or changed entries reference.
 
-## Clean room
+## Guidelines
 
-Follow [docs/agents/clean-room.md](../../../docs/agents/clean-room.md). A term the spec defines keeps the spec's name. Where the glossary, a module doc or the owner disagrees with the spec, the spec wins and the disagreement goes to the owner; never edit the spec to match.
+Follow [docs/agents/guidelines.md](../../../docs/agents/guidelines.md). A term the spec defines keeps the spec's name. Where the glossary, a module doc or the owner disagrees with the spec, the spec wins and the disagreement goes to the owner; never edit the spec to match.
 
 ## During the session
 

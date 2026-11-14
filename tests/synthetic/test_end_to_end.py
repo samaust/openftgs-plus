@@ -7,7 +7,7 @@ All train on the GPU: on the reference backend their 320 images at 128×96 would
 Q-119's 3-minute CPU target, as M11's retired S-5 did (Q-138).
 
 Each test records its measured values with `record_property`, for the Calibration data table of
-docs/clean-room/questions.md; the thresholds are §3.2's and never loosened there.
+docs/prd/questions.md; the thresholds are §3.2's and never loosened there.
 """
 
 import dataclasses

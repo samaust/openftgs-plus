@@ -6,7 +6,7 @@ with a CUDA build of PyTorch.
 ## The package
 
 ```bash
-pip install openftgs
+pip install openftgs-plus
 ```
 
 This installs the core dependencies of spec §2.3: PyTorch (≥ 2.1), gsplat 1.5.3, safetensors,
@@ -16,7 +16,7 @@ PyYAML, Pillow, SciPy and NumPy. The default perceptual network, ꟻLIP, is vend
 ### A CUDA build of PyTorch first
 
 Training needs a CUDA build of PyTorch (Q-3). On Linux x86_64 the default `torch` wheel on PyPI
-already is one (torch 2.14.1 bundles the CUDA 13.0 libraries), so `pip install openftgs` installs
+already is one (torch 2.14.1 bundles the CUDA 13.0 libraries), so `pip install openftgs-plus` installs
 it. For another CUDA version, or on Windows, install torch from the
 [PyTorch index](https://pytorch.org/get-started/locally/) first, then openftgs, which keeps the
 torch it finds. A CPU build is enough for the reference backend (`ftgs render --backend
@@ -27,7 +27,7 @@ reference`) and for the tests that use it.
 ### `[init]`: RoMa initialization and the DINO networks
 
 ```bash
-pip install "openftgs[init]"
+pip install "openftgs-plus[init]"
 ```
 
 `ftgs init roma` matches the training views with RoMa, whose inference code openftgs vendors as
@@ -94,7 +94,7 @@ hosts, into torch.hub's cache (spec §2.3):
 - RoMa's outdoor model and its DINOv2 ViT-L/14 backbone, at the first `ftgs init roma`.
 
 Each weight's terms are recorded apart from the code licenses, in the release checklist kept with
-the clean-room records.
+the prd records.
 
 ## Checking the installation
 

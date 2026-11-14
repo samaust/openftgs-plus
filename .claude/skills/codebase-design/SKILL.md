@@ -7,9 +7,9 @@ description: Shared vocabulary for designing deep modules. Use when the owner wa
 
 Design **deep modules**: a lot of behaviour behind a small interface, placed at a clean seam, testable through that interface. Use this language and these principles wherever code is being designed or restructured. The aim is leverage for callers, locality for maintainers, and testability for everyone.
 
-## Clean room
+## Guidelines
 
-Follow [docs/agents/clean-room.md](../../../docs/agents/clean-room.md). In this repository spec §2.1 gives the module layout, the public signatures and the import bands, and the public API is those signatures plus the additions recorded as Q-n rows (CLAUDE.md, "Working from the spec"). Design here works inside them: internal seams, private helpers, the layout inside a module. A design that would change a §2.1 signature or the module layout isn't decided here: it goes to the owner as the spec looking wrong. One that adds a public signature the spec omits, or changes any number or output, becomes a Q-n row for the owner during a build, or a Q-n candidate on the tracker before one ("Where the clean-room files are written" in `docs/agents/clean-room.md`). The sub-agents of [DESIGN-IT-TWICE.md](DESIGN-IT-TWICE.md) follow the Subagents section of the clean-room file.
+Follow [docs/agents/guidelines.md](../../../docs/agents/guidelines.md). In this repository spec §2.1 gives the module layout, the public signatures and the import bands, and the public API is those signatures plus the additions recorded as Q-n rows (CLAUDE.md, "Working from the spec"). Design here works inside them: internal seams, private helpers, the layout inside a module. A design that would change a §2.1 signature or the module layout isn't decided here: it goes to the owner as the spec looking wrong. One that adds a public signature the spec omits, or changes any number or output, becomes a Q-n row for the owner during a build, or a Q-n candidate on the tracker before one ("Where the prd files are written" in `docs/agents/guidelines.md`). The sub-agents of [DESIGN-IT-TWICE.md](DESIGN-IT-TWICE.md) follow the Subagents section of the guidelines file.
 
 ## Glossary
 

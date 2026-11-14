@@ -53,11 +53,11 @@ def _info(backend: str) -> dict[str, Any]:
     rasterizer = (
         {"name": "gsplat", "version": _version("gsplat")}
         if backend == "gsplat"
-        else {"name": "openftgs-reference", "version": _version("openftgs")}
+        else {"name": "openftgs-reference", "version": _version("openftgs-plus")}
     )
     return {
         "name": "openftgs",
-        "version": _version("openftgs"),
+        "version": _version("openftgs-plus"),
         "query_kinds": sorted(_adapter_forward.KINDS),
         "rasterizer": rasterizer,
         "render_conventions": render_conventions(),

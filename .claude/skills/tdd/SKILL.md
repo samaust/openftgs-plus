@@ -9,9 +9,9 @@ TDD is the red → green loop. This skill is the reference that makes that loop 
 
 When exploring the codebase, read `docs/GLOSSARY.md` so test names and interface vocabulary match the project's domain language.
 
-## Clean room
+## Guidelines
 
-Follow [docs/agents/clean-room.md](../../../docs/agents/clean-room.md). A test whose expected value depends on a choice the spec doesn't make is written against the provisional decision of its Q-n row, as CLAUDE.md says (record the row first if the gap is new), and cites the row; log every source you read to settle an expected value.
+Follow [docs/agents/guidelines.md](../../../docs/agents/guidelines.md). A test whose expected value depends on a choice the spec doesn't make is written against the provisional decision of its Q-n row, as CLAUDE.md says (record the row first if the gap is new), and cites the row; log every source you read to settle an expected value.
 
 ## What a good test is
 
@@ -43,7 +43,6 @@ Write each test from its row in spec §3, not from the code: the cases, the expe
 ## House rules
 
 - Every test file starts with `# SPDX-License-Identifier: Apache-2.0`.
-- Don't put "freetime" in test file names or test function names (CLAUDE.md): the clean-room guard blocks paths and pytest node IDs that contain it. `test_model.py::test_u5_…` names the model by its module instead.
 - Mark every test with the markers `pyproject.toml` defines (M0): CPU, GPU or dataset, plus weights when it needs pretrained weights downloaded at run time. CPU tests use the reference backend and run on any machine.
 - Compare tensors with `torch.testing.assert_close`, passing the row's `rtol` and `atol` explicitly. Run gradient checks in float64, on configurations kept away from the clamps and thresholds of E6.
 - Use the hypothesis property variants the spec asks for (U-1, U-2, U-5, U-13), drawing values within the row's stated domain.

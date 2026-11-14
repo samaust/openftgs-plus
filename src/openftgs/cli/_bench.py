@@ -264,7 +264,7 @@ def _environment() -> dict[str, Any]:
         "gsplat": _version("gsplat"),
         "fused_ssim": _version("fused_ssim"),
         "python": platform.python_version(),
-        "openftgs": _version("openftgs"),
+        "openftgs": _version("openftgs-plus"),
         "cpu": _cpu(),
         "commit": commit,
         "dirty": dirty,
@@ -1927,7 +1927,7 @@ def _missing_weights(missing: Mapping[str, Path]) -> str:
     if dino:
         lines.append(
             f"The DINO networks among them ({', '.join(dino)}) need the [init] extra first: "
-            "pip install 'openftgs[init]' (Q-248)"
+            "pip install 'openftgs-plus[init]' (Q-248)"
         )
     return "\n".join(lines)
 
@@ -2861,7 +2861,7 @@ def _init(ctx: _Context) -> _Result:
     try:
         weights = roma_weight_files(cfg)  # Q-198: where torch.hub keeps them
     except ImportError as error:  # Q-142, Q-166
-        _fail(f"bench init needs the [init] extra (pip install 'openftgs[init]'): {error}")
+        _fail(f"bench init needs the [init] extra (pip install 'openftgs-plus[init]'): {error}")
     missing = [str(path) for path in weights if not path.is_file()]
     if missing:  # Q-166, Q-192
         _fail(
@@ -2875,7 +2875,7 @@ def _init(ctx: _Context) -> _Result:
             points = roma_init(ctx.video, cfg)  # devices None: every visible GPU (Q-106)
             wall = time.perf_counter() - start
     except ImportError as error:  # Q-142: the [init] extra, found missing only now
-        _fail(f"bench init needs the [init] extra (pip install 'openftgs[init]'): {error}")
+        _fail(f"bench init needs the [init] extra (pip install 'openftgs-plus[init]'): {error}")
     timings = clock.read()
 
     def of(name: str) -> dict[str | None, list[Timing]]:

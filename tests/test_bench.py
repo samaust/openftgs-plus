@@ -1668,7 +1668,7 @@ def test_bench_losses_without_a_trunks_weights_exits_2(
     for net, file in publishers.items():
         assert net in error and str(checkpoints / file) in error, net
     assert _fetched_by(_fetch_command(error), monkeypatch) == list(publishers)
-    assert "SHA-256" in error and "pip install 'openftgs[init]'" in error
+    assert "SHA-256" in error and "pip install 'openftgs-plus[init]'" in error
     assert not hub.exists() and not out.exists()
     # VGG16 cached as its conversion alone is no longer missing (a stand-in: B-4 stops at the
     # other five before it reads anything).

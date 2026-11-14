@@ -18,10 +18,11 @@ import yaml
 ROOT = Path(__file__).resolve().parents[1]
 CI = ROOT / ".github" / "workflows" / "ci.yml"
 CPU_INDEX = "https://download.pytorch.org/whl/cpu"
-SITE = "https://openftgs.readthedocs.io"
-REPOSITORY = "https://github.com/samaust/openftgs"
+SITE = "https://openftgs-plus.readthedocs.io"
+REPOSITORY = "https://github.com/samaust/openftgs-plus"
+UPSTREAM = "https://github.com/samaust/openftgs"  # the repository this one forks; its issues predate the fork
 # Without `?version=`, the badge reports the project's default version (source log 315).
-BADGE = "https://app.readthedocs.org/projects/openftgs/badge/"
+BADGE = "https://app.readthedocs.org/projects/openftgs-plus/badge/"
 
 
 def _yaml(path: Path) -> Any:
@@ -174,29 +175,29 @@ def _markdown_targets(text: str) -> list[str]:
 def test_readme_states_the_release_and_links_the_records_on_github() -> None:
     """#370 (D-62, §0, Q-244): the README is also PyPI's project description, so every link and
     image opens on github.com or another absolute URL, never a path relative to the repository;
-    it installs with `pip install openftgs`, its status line is no longer M14's, and its
-    clean-room statement links the spec, the source log, the questions (whose raw file is linked
+    it installs with `pip install openftgs-plus`, its status line is no longer M14's, and its
+    provenance statement links the spec, the source log, the questions (whose raw file is linked
     too, since GitHub doesn't render a Markdown file that large), the milestones and the release
     checklist, and says that the project page's renderer was read for a documentation-only
     survey (#352)."""
     readme = (ROOT / "README.md").read_text(encoding="utf-8")
-    assert readme.startswith("# openftgs\n")
+    assert readme.startswith("# openftgs-plus\n")
     targets = _markdown_targets(readme)
     assert targets
     relative = [t for t in targets if not t.startswith(("https://", "#"))]
     assert relative == []
-    assert "pip install openftgs\n" in readme
+    assert "pip install openftgs-plus\n" in readme
     assert "M14" not in readme
     blob = f"{REPOSITORY}/blob/main/"
     for record in (
         "docs/spec/openftgs-spec.md",
-        "docs/clean-room/source-log.md",
-        "docs/clean-room/questions.md",
-        "docs/clean-room/milestones.md",
-        "docs/clean-room/release-checklist.md",
+        "docs/prd/source-log.md",
+        "docs/prd/questions.md",
+        "docs/prd/milestones.md",
+        "docs/prd/release-checklist.md",
     ):
         assert blob + record in targets, record
-    assert f"{REPOSITORY}/raw/main/docs/clean-room/questions.md" in targets
-    clean_room = readme.split("\n## Clean-room process\n", 1)[1].split("\n## ", 1)[0]
-    assert f"{REPOSITORY}/issues/352" in _markdown_targets(clean_room)
-    assert "renderer" in clean_room
+    assert f"{REPOSITORY}/raw/main/docs/prd/questions.md" in targets
+    provenance = readme.split("\n## Provenance\n", 1)[1].split("\n## ", 1)[0]
+    assert f"{UPSTREAM}/issues/352" in _markdown_targets(provenance)
+    assert "renderer" in provenance

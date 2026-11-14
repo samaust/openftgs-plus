@@ -101,7 +101,7 @@ def _output(what: str) -> Iterator[None]:
 
 def _producer() -> str:
     try:
-        return f"openftgs {importlib.metadata.version('openftgs')}"
+        return f"openftgs {importlib.metadata.version('openftgs-plus')}"
     except importlib.metadata.PackageNotFoundError:
         return "openftgs"
 
@@ -296,7 +296,7 @@ def _init(args: argparse.Namespace) -> int:
         with _as_input_error("RoMa initialization"):
             points = roma_init(video, cfg)
     except ImportError as error:  # Q-142: the [init] extra is missing
-        _fail(f"RoMa initialization needs the [init] extra (pip install 'openftgs[init]'): {error}")
+        _fail(f"RoMa initialization needs the [init] extra (pip install 'openftgs-plus[init]'): {error}")
     with _output(f"init points {args.out}"), _as_input_error(f"init points {args.out}"):
         args.out.parent.mkdir(parents=True, exist_ok=True)
         write_init_points(
@@ -964,7 +964,7 @@ def _export_loaded(loaded: _Loaded, out: Path) -> int:
 def _parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(
         prog="ftgs",
-        description="openftgs, an independent clean-room implementation of FreeTimeGS "
+        description="openftgs-plus, a fork of openftgs: an independent implementation of FreeTimeGS "
         "(Wang et al., CVPR 2025), not affiliated with its authors.",
     )
     commands = parser.add_subparsers(dest="command", required=True, metavar="COMMAND")

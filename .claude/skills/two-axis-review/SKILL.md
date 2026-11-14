@@ -10,9 +10,9 @@ Two-axis review of the diff between `HEAD` and a fixed point the owner supplies:
 
 Both axes run as **parallel sub-agents** so they don't pollute each other's context, then this skill aggregates their findings.
 
-## Clean room
+## Guidelines
 
-Follow [docs/agents/clean-room.md](../../../docs/agents/clean-room.md). Both sub-agent prompts start with the line from its Subagents section. The sub-agents don't write files: they list any source outside this repository and the spec under "Sources consulted", and you add those rows to the source log after aggregating, on the branch under review. When the review runs on `main`, list them in the report instead ("Where the clean-room files are written" in docs/agents/clean-room.md).
+Follow [docs/agents/guidelines.md](../../../docs/agents/guidelines.md). Both sub-agent prompts start with the line from its Subagents section. The sub-agents don't write files: they list any source outside this repository and the spec under "Sources consulted", and you add those rows to the source log after aggregating, on the branch under review. When the review runs on `main`, list them in the report instead ("Where the prd files are written" in docs/agents/guidelines.md).
 
 ## Process
 
@@ -33,7 +33,7 @@ Before going further, confirm the fixed point resolves (`git rev-parse <fixed-po
 
 The Spec axis checks two sources, in this order of authority:
 
-1. **The project spec**, `docs/spec/openftgs-spec.md`. Collect the spec items the commit messages cite (sections §n, equations E-n, decisions D-n, tests U-n, C-n, S-n, B-n, and Q-n rows in `docs/clean-room/questions.md`), plus any the owner passed as an argument. If the commits cite none, that is itself a Standards finding (CLAUDE.md, "Commits"): take the spec items from the "Spec items" section of the PRD, or of the agent brief for an issue implemented on its own, and ask the owner only if there is neither.
+1. **The project spec**, `docs/spec/openftgs-spec.md`. Collect the spec items the commit messages cite (sections §n, equations E-n, decisions D-n, tests U-n, C-n, S-n, B-n, and Q-n rows in `docs/prd/questions.md`), plus any the owner passed as an argument. If the commits cite none, that is itself a Standards finding (CLAUDE.md, "Commits"): take the spec items from the "Spec items" section of the PRD, or of the agent brief for an issue implemented on its own, and ask the owner only if there is neither.
 2. **The originating PRD**, if there is one: the issue labelled `skill:conversation-to-prd` that the commit messages reference (`#123`, `Closes #45`) or the owner passed, with any `skill:prd-to-tickets` tickets the commits reference (a referenced ticket's parent issue is its PRD), fetched as `docs/agents/issue-tracker.md` describes. For an issue implemented on its own, its latest agent brief comment takes the PRD's place.
 
 Where the PRD and the project spec disagree, the project spec wins, and the disagreement is itself a finding. If neither spec items nor a PRD can be identified, the **Spec** sub-agent will skip and report "no spec available".
@@ -45,7 +45,7 @@ This repository documents its standards in the files below; every one is on the 
 - `CLAUDE.md`: file headers (SPDX; vendored files keep their own, D-65), `# Q-n` markers, commit messages, dependencies, what may never be committed, and the branch and merge rules.
 - Spec §2.1 and CLAUDE.md "Working from the spec": the public API is the §2.1 signatures plus the additions recorded as Q-n rows; each module's `__all__` lists exactly that API and every other name starts with an underscore; a public name with neither a §2.1 signature nor a Q-n row is a finding; modules import from the bands below them and, within a band, only from the modules before them in the order CLAUDE.md gives.
 - Spec §2.3: dependencies, versions and licenses.
-- CLAUDE.md "Clean-room rules" and `docs/agents/clean-room.md`: provenance (the source log, forbidden sources).
+- CLAUDE.md "Guidelines rules" and `docs/agents/guidelines.md`: provenance (the source log, forbidden sources).
 - `.claude/skills/tdd/SKILL.md`, "Where expected values come from" and "House rules": the test standards.
 - `docs/GLOSSARY.md`: the names of domain concepts in code, tests and messages.
 
@@ -80,7 +80,7 @@ Issue both sub-agent calls together and wait for both reports before aggregating
 
 - The full diff command and commit list.
 - The list of standards-source files you found in step 3, **plus the smell baseline from step 3** pasted in full (the sub-agent has no other access to it).
-- The brief: "Report, per file/hunk where relevant, (a) every place the diff violates a documented standard: cite the standard (file + the rule); (b) provenance: code that looks taken from a third-party source (non-obvious constants, a ported algorithm, a vendored-looking block) with no matching row in `docs/clean-room/source-log.md`, any source-log row that names a forbidden source or the source code of copyleft, non-commercial or unlicensed software, code adapted from a permissive source without the attribution comment and NOTICE entry CLAUDE.md requires, and vendored files without their own license header; and (c) any baseline smell you spot: name it and quote the hunk. Mark each finding hard (a documented standard, provenance included) or judgement (a baseline smell, always), and give it a severity: critical, major, minor or nit, the scale of the milestone review in `docs/clean-room/milestones.md`. A documented repo standard overrides the baseline, and no suggested fix may change a §2.1 signature, a number or an output. Private tests (named without a §3 ID, `.claude/skills/tdd/SKILL.md` "Private tests") are allowed; a spec test that calls a private helper is a finding. Skip anything tooling enforces. One or two lines per finding."
+- The brief: "Report, per file/hunk where relevant, (a) every place the diff violates a documented standard: cite the standard (file + the rule); (b) provenance: code that looks taken from a third-party source (non-obvious constants, a ported algorithm, a vendored-looking block) with no matching row in `docs/prd/source-log.md`, any source-log row that names a forbidden source or the source code of copyleft, non-commercial or unlicensed software, code adapted from a permissive source without the attribution comment and NOTICE entry CLAUDE.md requires, and vendored files without their own license header; and (c) any baseline smell you spot: name it and quote the hunk. Mark each finding hard (a documented standard, provenance included) or judgement (a baseline smell, always), and give it a severity: critical, major, minor or nit, the scale of the milestone review in `docs/prd/milestones.md`. A documented repo standard overrides the baseline, and no suggested fix may change a §2.1 signature, a number or an output. Private tests (named without a §3 ID, `.claude/skills/tdd/SKILL.md` "Private tests") are allowed; a spec test that calls a private helper is a finding. Skip anything tooling enforces. One or two lines per finding."
 
 **Spec sub-agent prompt** should include:
 

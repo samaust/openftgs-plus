@@ -4,7 +4,7 @@ From multi-view video to a trained model, its metrics and renders at any time, o
 scene of [openftgs-synth](https://github.com/samaust/openftgs-synth), the dataset openftgs is
 validated on (D-79). The commands are the ones the project's own validation runs used, and the
 times are theirs, on one RTX 4090 (24 GB) with an Intel i9-12900
-({repo}`docs/clean-room/validation-runs.md`).
+({repo}`docs/prd/validation-runs.md`).
 
 You need openftgs with the `[init]` extra, a CUDA build of PyTorch and ffmpeg 5.1 or later
 ({doc}`installation`).

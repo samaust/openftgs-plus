@@ -1,6 +1,6 @@
 # Render backends in `openftgs.render`
 
-How `render()` meets its §2.1 row for E2, E5 and E6, and how its two render backends are built: the pure-PyTorch reference and the gsplat version §2.3 pins; and how `render_request` answers a render request, with the temporal index of D-55, which reuses the front half described here. The keywords `precull` (Q-31) and `packed` (Q-36) and the semantics §2.1 leaves open (Q-32, Q-33) are provisional decisions or owner answers recorded in `docs/clean-room/questions.md`; the gsplat backend's are now in the spec as D-75 and D-76 (revision 549b).
+How `render()` meets its §2.1 row for E2, E5 and E6, and how its two render backends are built: the pure-PyTorch reference and the gsplat version §2.3 pins; and how `render_request` answers a render request, with the temporal index of D-55, which reuses the front half described here. The keywords `precull` (Q-31) and `packed` (Q-36) and the semantics §2.1 leaves open (Q-32, Q-33) are provisional decisions or owner answers recorded in `docs/prd/questions.md`; the gsplat backend's are now in the spec as D-75 and D-76 (revision 549b).
 
 ## The front half, shared by every backend
 

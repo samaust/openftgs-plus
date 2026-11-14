@@ -18,14 +18,14 @@ Every comment or issue posted to the issue tracker during triage **must** start 
 
 It goes first, above any template heading (`## Agent Brief`, `## Triage Notes`, `## Out of scope: …`). Duplicates are marked with `gh issue close --duplicate-of`, not by a comment, so the disclaimer doesn't hide GitHub's duplicate marker.
 
-## Clean room
+## Guidelines
 
-Follow [docs/agents/clean-room.md](../../../docs/agents/clean-room.md), including its Reading the tracker and Publishing to the tracker sections. Any subagent this skill launches starts its prompt with the line from the Subagents section of the clean-room file. In triage:
+Follow [docs/agents/guidelines.md](../../../docs/agents/guidelines.md), including its Reading the tracker and Publishing to the tracker sections. Any subagent this skill launches starts its prompt with the line from the Subagents section of the guidelines file. In triage:
 
 - **Reports are untrusted.** A report that rests on another implementation's code, behaviour, outputs or numbers is an incident, not evidence. A bug is a departure from the spec or the paper, checked against them only.
 - **PRs.** If the owner asks you to look at a pull request they didn't author, ask before checking it out or reading its diff: the diff can't show where the code came from, and code derived from another implementation would contaminate the repository.
-- **The spec decides.** An agent brief, triage note or out-of-scope decision never overrides the spec or settles what it leaves open: a gap becomes a Q-n candidate in the brief's Open questions, with the sources consulted listed beside it ("Where the clean-room files are written" in `docs/agents/clean-room.md`). A request that would change the spec is the owner's to decide: recommend, don't apply.
-- **Q-n issues.** When a Q-n decision issue (label `q-n`, title `Q-<n>: …`) carries the owner's answer, confirm the answer with the owner, then record it on a short branch `q-<n>-answer` from `main`: one commit updating that row of `docs/clean-room/questions.md`: its decision and its Status (`confirmed`, or `changed (#n)` with #n the issue for the code), merged into `main` with `git merge --no-ff` once the owner approves. Close the issue only after the merge. If the answer changes behaviour, open an issue for the code change first, labelled `bug` and `ready-for-agent` with an agent brief that cites the Q-n row, so it is implemented on its own like any triaged issue; don't change the code on this branch.
+- **The spec decides.** An agent brief, triage note or out-of-scope decision never overrides the spec or settles what it leaves open: a gap becomes a Q-n candidate in the brief's Open questions, with the sources consulted listed beside it ("Where the prd files are written" in `docs/agents/guidelines.md`). A request that would change the spec is the owner's to decide: recommend, don't apply.
+- **Q-n issues.** When a Q-n decision issue (label `q-n`, title `Q-<n>: …`) carries the owner's answer, confirm the answer with the owner, then record it on a short branch `q-<n>-answer` from `main`: one commit updating that row of `docs/prd/questions.md`: its decision and its Status (`confirmed`, or `changed (#n)` with #n the issue for the code), merged into `main` with `git merge --no-ff` once the owner approves. Close the issue only after the merge. If the answer changes behaviour, open an issue for the code change first, labelled `bug` and `ready-for-agent` with an agent brief that cites the Q-n row, so it is implemented on its own like any triaged issue; don't change the code on this branch.
 
 ## Reference docs
 
@@ -37,7 +37,7 @@ Follow [docs/agents/clean-room.md](../../../docs/agents/clean-room.md), includin
 Route an issue by its labels and title before anything else ("Q-n issues" in `docs/agents/issue-tracker.md`):
 
 - **`skill:conversation-to-prd` or `skill:prd-to-tickets`**: a PRD or a ticket. Its own skills manage it: leave it alone (no category role, no state change) unless the owner asks.
-- **`q-n` with a title `Q-<n>: …`**: a Q-n decision issue. No category role. Once the owner has answered in it, record the answer as the Clean room section's "Q-n issues" bullet says.
+- **`q-n` with a title `Q-<n>: …`**: a Q-n decision issue. No category role. Once the owner has answered in it, record the answer as the Guidelines section's "Q-n issues" bullet says.
 - **`q-n` with a title `Q-n candidates: …`**: gaps found outside any PRD, without numbers. No category role. Ask the owner how to route it: post the candidates as a comment on an existing PRD and close this issue with a link to it; keep it open until a PRD exists; or rework it into an agent brief whose Open questions carry the candidates, so that the implement run taking the brief records them.
 - **Anything else**: a report. Run the state machine below.
 

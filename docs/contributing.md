@@ -1,12 +1,12 @@
 # Contributing
 
-openftgs is a clean-room implementation: before contributing code, read the clean-room rules in
+Before contributing code, read the guidelines rules in
 the repository's `CLAUDE.md` and §0 of {repo}`docs/spec/openftgs-spec.md`. In short, code is
 written from the paper and the specification only; nothing from any other implementation of the
 method is consulted; third-party source code is read only under a permissive license that allows
-commercial use; and every source consulted gets a row in {repo}`docs/clean-room/source-log.md`.
+commercial use; and every source consulted gets a row in {repo}`docs/prd/source-log.md`.
 Where the spec is silent, a provisional decision is recorded as a Q-n row in
-{repo}`docs/clean-room/questions.md`.
+{repo}`docs/prd/questions.md`.
 
 The development install and the tests are in the repository's README: `pip install -e .[dev]`,
 then `pytest`.
@@ -14,7 +14,7 @@ then `pytest`.
 ## Building the documentation
 
 The site's sources are the pages under `docs/` (`index.md`, the guides, `api/index.rst`) and
-`docs/conf.py`; everything else under `docs/` (the spec, the clean-room records, the module docs,
+`docs/conf.py`; everything else under `docs/` (the spec, the prd records, the module docs,
 the glossary) stays outside the build and is linked on GitHub. Its tools are the dependency group
 `docs` (Q-241), which never enters the package's metadata. The API pages import the package, so
 PyTorch comes first; a CPU build is enough:
