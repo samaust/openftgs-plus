@@ -79,7 +79,7 @@ The checks of step 7 run the tests the integration branch's changes can reach, n
 - A test file is affected when it changed, or when it reaches a changed file through imports at any depth, the test helpers' included, or by naming it in a string (a script's path, a data file, a dotted module name). A changed data file under `tests/<dir>/` reaches every test file there. `tests/test_skeleton.py` is always affected; Markdown files reach no test.
 - The whole suite is affected when a `conftest.py`, `pyproject.toml`, `harness/pyproject.toml` or the script itself changed.
 
-Run the files it lists with `-m "not gpu"`, then, when the machine has a GPU, with `-m gpu`: `pytest -n auto --dist loadgroup -m "not gpu" $(python3 <checkout>/.claude/skills/implement-without-subagents/scripts/affected_tests.py -C <checkout>)`. On the GPU run, pytest's exit code 5 means the files hold no GPU-marked tests, not a failure. List them again before every rerun, since a fix can touch files the earlier list didn't reach.
+Run the files it lists with `-m "not gpu"`, then, when the machine has a GPU, with `-m gpu`: `PYTHONPATH=<checkout>/src:<checkout>/harness/src pytest -n auto --dist loadgroup -m "not gpu" $(python3 <checkout>/.claude/skills/implement-without-subagents/scripts/affected_tests.py -C <checkout>)`. On the GPU run, pytest's exit code 5 means the files hold no GPU-marked tests, not a failure. List them again before every rerun, since a fix can touch files the earlier list didn't reach.
 
 ## Steps
 
