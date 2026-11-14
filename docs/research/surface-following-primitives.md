@@ -251,6 +251,7 @@ The list's table of Gaussian-splatting methods has columns for flow, normals, un
 - Every cell is filled. Where a column doesn't apply the cell says "none" and why, as "none: no estimator"; where the source read doesn't say, "not stated".
 - Every fact in a cell carries its source-log row, as `(row 499)` or `(rows 492, 495)`. On a ticket's branch a new row is cited by its temporary ID in the same form, `T`, the ticket's number, a point and the row's counter, and written in no other way, so that the merge can replace every one with its number.
 - A verdict or an answer taken from this document is cited by its section: the bar's verdict from section 3.3 or the family's own estimators table, the render backends' answer from section 2.4.
+- A cell that is the ticket's own reading of the spec or of this repository's code (columns 3 and 5, and parts of 4 and 9) cites the spec item or the Q-n row it rests on, which need no source-log row, beside the row of the paper the technique's needs were read from.
 - Nothing is filled from memory. A claim with no source read is left out, or logged as "No source read: general knowledge" and marked so in the cell.
 - Third-party text is paraphrased, never pasted.
 
