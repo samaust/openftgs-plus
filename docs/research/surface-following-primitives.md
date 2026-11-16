@@ -2,7 +2,7 @@
 
 A research document, written from 2026-11-14 on PRD #1 of openftgs-plus and its tickets #2 to #15, ahead of the first spec revision that departs from the paper (README, "Direction"). On the owner's private scene the cameras' images disagree about the person at the centre, and training answers with a shell of faint, short-lived primitives off the body's surface (section 2.1). The document surveys techniques that make primitives lie on the surface they represent and turn with it, and the prior maps from pretrained image networks that guide them; it measures how far the private scene's cameras disagree; and it recommends which techniques to adopt, each as a field of the training configuration that defaults to off, or that none should be. It proposes no code and changes no spec item: adopting a technique is a spec change the owner makes, as the next lettered revision ("Editing the spec" in `docs/agents/guidelines.md`), followed by its own implementation issue.
 
-Sections 1 to 9 are the nine the PRD fixes ("The phases", phase 4). The probes are sections 2.4 to 2.7 and the survey's families sections 3.1 to 3.6. The opening and sections 1 to 2.3 were written first (ticket #2). Every later section opens with a line naming the ticket that writes it, and a section that holds only that line, and the empty tables under it, is not written yet. A ticket writes between its section's heading and the blank line before the next heading, and changes neither, so that sections written in parallel merge without conflict.
+Sections 1 to 9 are the nine the PRD fixes ("The phases", phase 4). Section 1 states the scope and the owner's decisions; section 2 the failure, the spec items it touches and the code (sections 2.1 to 2.3), then the four probes (sections 2.4 to 2.7). Section 3 is the survey: five families of techniques, and the estimators against the bar (sections 3.1 to 3.6). Section 4 consolidates their tables, proposes four finalists and records the owner's answers at review 1 (section 4.7), and section 5 is the test plan a later PRD would run. Nothing was trained under the PRD (section 6). Section 7 holds the recommendation, and the place for the owner's answer at review 2 (section 7.7); section 8, what adopting the recommended techniques would change in the spec; section 9, the sources. The opening and sections 1 to 2.3 were written first (ticket #2), and every later section opens with a line naming the ticket that wrote it.
 
 **The owner's instructions and decisions** (PRD #1; the owner's comment on it of 2026-11-14, which replaces the body where they differ; two answers the owner gave in session on 2026-11-14, which the orchestrating session recorded in a second comment on the PRD the same day). Each is marked **confirmed** (the owner accepted what the plan or the implementer proposed), **answered** (the owner's own instruction, or an answer that replaced a proposal) or **default** (proposed by the plan of 2026-11-13, which the owner published unchanged, and not confirmed in words; it holds until the owner says otherwise on the PRD).
 
@@ -37,7 +37,7 @@ Sections 1 to 9 are the nine the PRD fixes ("The phases", phase 4). The probes a
 
 **Local paths** are written as placeholders: `$OPENFTGS_DATASETS` (openftgs-synth is at `$OPENFTGS_DATASETS/synth`); `<m17-runs>` and `<m15-runs>`, as `docs/prd/validation-runs.md` uses them; `<surface-runs>`, this work's folder outside the repository; `<scratch>`, the PRD's gitignored scratch directory, for scripts, environments and downloads ("Exploration notes" in `docs/agents/guidelines.md`); `<private-scene-A>`, private scene A's location, which is written nowhere. Prototype scripts are not committed: the section that used one records its commands, the versions and a one-line note on each run.
 
-**Clean-room record.** Ticket #15 completes this paragraph, with section 9. What holds from the start: the rules are CLAUDE.md's guidelines rules, which replace spec §0 on sources for this fork, and the PRD's "Clean room for the search" (section 3 summarizes it for the survey). The sources consulted while planning are rows 491 to 502 of `docs/prd/source-log.md`. Every ticket logs a source when it opens it, under a temporary ID `T<ticket>.<k>` on its branch, numbered at the merge, and the document cites a source by its row, as `(row 499)`. The opening and sections 1 to 2.3 rest on this repository, the spec and this repository's issues, which need no row, and on the owner's notes as the PRD's Notes report them (row 499); ticket #2 opened no other source and added no row.
+**Clean-room record.** Section 9 gives it in full. The rules are CLAUDE.md's guidelines rules, which replace spec §0 on sources for this fork, and the PRD's "Clean room for the search" (section 3 summarizes it for the survey). Every page, license file, model card, weights file, data file, opened search result and general-knowledge claim behind this document has a row in `docs/prd/source-log.md`: rows 491 to 830, 340 in all, logged by each ticket under temporary IDs `T<ticket>.<k>` on its branch, numbered at its merge, and cited by number, as `(row 499)`. Section 9.2 gives them by ticket: rows 491 to 502 are the planning's, three rows are the orchestrating session's checks (503, 607, 830), and tickets #2, #13, #14 and #15 added none. Each project's license file was read before anything else of it. Third-party source code was read only under Apache-2.0: gsplat 1.5.3 as installed (rows 497, 504 to 509, 653, 660, 804) and Depth Anything V2's model code, copied into a scratch directory and never into the repository (row 619). No survey opened a technique's code: every technique is taken from its paper, and repositories under non-commercial, share-alike or research-only licenses, or with none, were read for their license file and README only (section 9.4). Code that implements or extends FreeTimeGS was never opened; five rows record the hits that looked like it (765, 767, 772, 774, 821), and no row records EasyVolcap. Weights' terms come from each file's publisher, by anonymous requests (section 3.3); one weights file was downloaded, Depth Anything V2 Small's (row 618). Papers that cite FreeTimeGS and reproduce it were read under an interim rule from 2026-11-15 until the owner allowed them on 2026-11-16; two passages on a reproduction, one read by accident and one before the rule, took nothing (rows 771, 820; section 9.6). No row is an Incident row. Two slips of process are stated in section 9.7: one tool output read under `~/.claude/`, which CLAUDE.md forbids, and one command above its thread budget. Private scene A's name, paths, generator and images appear in no row, and its images were read by local scripts only (rows 614, 620).
 
 ## 1. Scope and the owner's decisions
 
@@ -2495,3 +2495,91 @@ Pending. The orchestrating session puts the document to the owner; the answer is
 ## 9. The sources
 
 *Ticket #15's section.* The clean-room record in full, completing the opening's: the source-log rows of every ticket of the PRD, what was read only as documentation, what was not opened, and any incident.
+
+**Every source behind this document has a row in `docs/prd/source-log.md`: rows 491 to 830, 340 in all. No row is an Incident row.** Five rows record hits deliberately left unopened, because they looked like code that implements or extends FreeTimeGS. Third-party source code was read in two places, both under Apache-2.0, and no survey opened a technique's code: every technique in sections 3.1 to 3.6 is taken from its paper. The opening's "Clean-room record" is the short form of this section.
+
+Written on 2026-11-16 from the source log, the integration branch's merge commits, the PRD's comments and the orchestrating session's record of the run, a working note outside the repository. A fact that only that record holds is marked "(the run's record)".
+
+### 9.1 The rules
+
+- **CLAUDE.md's guidelines rules,** which replace spec §0 on sources for this fork (owner rule, 2026-11-13), and the PRD's "Clean room for the search", which section 3 summarizes. Each project's license file is read before anything else of it; source code only under a permissive license that allows commercial use; a repository under a copyleft, non-commercial or missing license is documentation only; code that implements or extends FreeTimeGS, and EasyVolcap, are never opened; gsplat is read at 1.5.3 only; weights' terms come from their publisher; no repository-indexing tools; third-party text is paraphrased.
+- **The owner's rulings during the run,** recorded in the opening: papers that cite FreeTimeGS and describe or use their authors' own reproduction of it may be read and cited, set-up included, and FreeTimeGS++ may be read whole (2026-11-16; section 9.6); a third-party paper's published figure on SelfCap is a citation, not material derived from SelfCap (2026-11-16); decision 5 covers image content given as numbers (2026-11-16).
+- **Searches named FreeTimeGS,** as CLAUDE.md allows, to find the papers that cite it: the recency rounds of sections 3.1, 3.2, 3.4, 3.5 and 3.6 read their list. No result that looked like an implementation was opened (section 9.5).
+- **Private scene A.** Its name, paths, generator and images appear in no row, commit, search query or issue; the planning row on the generator's model card leaves out its name and address (row 496).
+
+### 9.2 The rows, by ticket
+
+| Rows | Who | What |
+| --- | --- | --- |
+| 491–502 | Planning (the PRD's "Sources consulted while planning") | The owner's search seeds, the list of row 495, the generator's model card (row 496), gsplat's entry points, openftgs-synth's card, the owner's notes, the rate-limited APIs, openftgs's issues, and the search map's names as general knowledge (row 502) |
+| 503 | The orchestrating session | The check of the web routes before the surveys |
+| 504–512 | Ticket #3, section 2.4 | gsplat 1.5.3's license and source, M17's run files, the probe's runs, general knowledge for its scripts |
+| 513–518 | Ticket #5, section 2.6 | The owner's notes and tools, the scene's manifests, the kept checkpoints, M17's stored depth results, openftgs-synth's ground truth |
+| 519–606 | Ticket #6, section 3.3 | The estimators: code repositories' licenses and READMEs, model cards and the weights' terms |
+| 607 | The orchestrating session | Depth Anything V2 Small's terms checked again before ticket #12 used it |
+| 608–617 | Ticket #4, section 2.5 | The notes, tools and manifest; openftgs-synth's card; the matcher's runtime packages and weights; the images as scripts read them; general knowledge for its scripts |
+| 618–625 | Ticket #12, section 2.7 | The weights file, the code repository's license and model code, the scenes' data as scripts read them, general knowledge for its scripts |
+| 626–654 | Ticket #7, section 3.1 | Family A |
+| 655–707 | Ticket #8, section 3.2 | Family B |
+| 708–743 | Ticket #9, section 3.4 | Family C, part 2 |
+| 744–784 | Ticket #10, section 3.5 | Family D |
+| 785–829 | Ticket #11, section 3.6 | Family E |
+| 830 | The orchestrating session | MoGe-2's normal model and DAViD's terms checked again before review 1 |
+
+Tickets #2, #13, #14 and #15 added no row: they read this repository, the spec, this repository's issues and the document's own sections, which need none. Each ticket logged under temporary IDs `T<ticket>.<k>` on its branch, and each merge commit's message carries the mapping to the final numbers. Eight rows are "No source read: general knowledge", each saying what it served: search terms (rows 502, 555, 708) and the two-view geometry, alignment and library calls of the probes' scripts (rows 512, 616, 617, 623, 625).
+
+### 9.3 Source code, and under which license
+
+- **gsplat 1.5.3,** as installed in the shared `.venv` (Apache-2.0; its license file read first, row 504): rows 497 and 505 to 509 for section 2.4 (the entry points, the stage functions, the 3DGS and 2DGS kernels, `depth_to_normal`, `accumulate`), 653 (`absgrad`, ticket #7), 660 (the position noise of `MCMCStrategy`, ticket #8) and 804 (the camera's gradient, ticket #11). No row records `gsplat/contrib/dynamic` or a newer branch.
+- **Depth Anything V2's model code,** at the commit of row 519 (Apache-2.0, its license file first): read, and copied unchanged into a scratch directory to run section 2.7's probe, never into the repository (row 619).
+- **Packages installed outside the shared `.venv`:** torchvision, einops and loguru, the vendored RoMa's runtime, installed into ticket #4's scratch folder; their license files and metadata were read and no source file was opened (row 612). The shared `.venv` was never written.
+- **This repository's own code** (the package, `scripts/gt_depth.py`, the test helpers U-12 uses), which needs no row.
+- **The surveys** (tickets #6 to #11) opened no source file of any repository, whatever its license. A repository was opened for its license file, read first, to fill a code-license column, and at most for its README, which is documentation and allowed under every license class.
+
+### 9.4 Read only as documentation
+
+Repositories under a non-commercial, share-alike or research-only license, or with no license found, were read for their license file and at most their README; the technique or estimator is taken from its paper or its publisher's pages.
+
+| Ticket | Rows | The licenses |
+| --- | --- | --- |
+| #6 | 542, 547, 556 to 558, 562, 565, 567, 573 to 576, 578, 588, 589, 592 to 594, 596, 599, 603, 605, 606 | Non-commercial or share-alike (Omnidata, DSINE, Sapiens, ECON, ICON, DUSt3R, MASt3R, MonST3R, CoTracker and others), licenses of the publisher's own with use restrictions (Sapiens2, VGGT, SAM 3), and no license found (GeoWizard, MoRe, St4RTrack, VideoMaMa's code) |
+| #7 | 634 to 639, 651, 652 | The Gaussian-Splatting License of Inria and MPII (2DGS, SuGaR, Gaussian Opacity Fields, RaDe-GS, GeoGaussian), PGSR's own non-commercial license, and no license found (Gaussian Surfels, TrimGS) |
+| #8 | 659, 693, 707 | The Gaussian-Splatting License (3DGS-MCMC, Binocular3DGS, Co-Adaptation of 3DGS), read through GitHub's license endpoint only; no license found (erank_gs, PhysGaussian, AniGS) |
+| #9 | 722, 727, 729, 737, 740, 741 | The Gaussian-Splatting License (DNGaussian, VCR-GauS, SparseGS), CC BY-NC 4.0 (UniDepth), no license found (MonoFusion, RI3D) |
+| #10 | 782 | No license found (MonoFusion) |
+| #11 | 797, 809, 812 to 814, 819 | The Gaussian-Splatting License, alone or for a bundled renderer (WildGaussians, PDF-GS, CoR-GS), CC BY-NC-SA 4.0 (PWC-Net), and no license found (3R-GS, EG4D) |
+
+Permissive repositories were read the same way, for their license file and at most their README, and no further (for example rows 657, 720, 724, 736, 739, 770, 777, 780, 783, 796, 799, 805, 808, 822, 824).
+
+### 9.5 Not opened
+
+| Row | What was left unopened | Why |
+| --- | --- | --- |
+| 765 | Split4D's code and project page | It builds on FreeTimeGS (the owner's search seed) |
+| 767 | FreeTimeGS++'s project page and released code | Code that reproduces and extends FreeTimeGS |
+| 772 | TRiGS's project page and code | Its codebase holds the authors' reproduction of FreeTimeGS, which TRiGS extends |
+| 774 | Dusting the Phantom's project page and code | It builds on a reproduced FreeTimeGS implementation |
+| 821 | GraphiXS's code repository | It upgrades a FreeTimeGS implementation; not even its license file was fetched |
+
+Beyond these rows, the rows of papers that cite FreeTimeGS say which of their links were not followed (for example row 757). No row records EasyVolcap, gsplat's `contrib/dynamic` or a repository-indexing tool.
+
+### 9.6 Weights, and the reproduction question
+
+**How weights' terms were read** (section 3.3, "How the bar is applied"). Per weights file, from its publisher only: the model card or license file of the weights' repository, or the publisher's README or release page, with its address, the commit it was read at and where the statement stands. Every request was anonymous; a gated repository was recorded as gated and its gate left alone. Where two statements of one publisher disagree, or a file is fine-tuned from another model, the stricter statement decides. A verdict holds for the commit and date of its row: the orchestrating session checked again the terms of the estimators the probes and finalist 4 rely on (rows 607 and 830). Review 1 screened out the "unclear" rows and kept the "fails as stated" rows failing (section 4.7, item 8). One weights file was downloaded, Depth Anything V2 Small's, without credentials into a scratch directory and loaded with `weights_only=True` (row 618); RoMa's and DINOv2's weights ran from the existing cache (rows 613, 622). No weights file was opened as text, committed or redistributed.
+
+**Papers that reproduce FreeTimeGS.**
+
+- **Two passages read outside the rule.** Ticket #10 read TRiGS's Appendix B, which describes its authors' reproduction of FreeTimeGS, by accident, through a line range wider than it meant; its row says so and that nothing of it is taken (row 771). Ticket #11 read GraphiXS's paragraph on an experiment that upgrades a FreeTimeGS implementation, and two rows of its table, before the interim rule was given, and recorded no figure from them (row 820).
+- **The interim rule, 2026-11-15,** set by the orchestrating session until the owner answered: sections that describe a reproduction's set-up are left unread, no set-up is recorded, and a cell whose evidence rests on an experiment on a reproduction says "rests on the authors' reproduction of FreeTimeGS". Ticket #10 left FreeTimeGS++'s "Reimplementation Details" and its appendices A to D unread under it (row 766), and ticket #11 read only its section on colour correction (row 829).
+- **The owner's ruling, 2026-11-16:** such papers may be read and cited freely, the reproduction's set-up included; FreeTimeGS++ may be read whole; code that implements or extends FreeTimeGS stays unopened. The marks stay where they are, as information. Neither row 771 nor row 820 is labelled Incident; the orchestrating session had proposed relabelling row 771 as one (the PRD's comment of 2026-11-16), and the ruling allows what it records. Nothing was re-read after the ruling, since the owner then answered that nothing further runs in this PRD: FreeTimeGS++ in full is one of section 5.1's reads.
+
+### 9.7 What went wrong or differently
+
+- **A forbidden read of Claude Code's own files.** Ticket #3's subagent opened one file under `~/.claude/`, a tool output the harness had saved there that held lines 1 to 190 of this document, which CLAUDE.md forbids. It was reported to the owner the same day, and a rule was added to the subagents' brief (the run's record).
+- **A thread budget exceeded.** Ticket #3 ran one command at about five cores against a budget of four (the run's record).
+- **Rows logged late,** after a usage cut or a run, each saying so in its own text: rows 575 to 594 (ticket #6), 640 to 642 (ticket #7), 721 (ticket #9) and 759 to 763 (ticket #10, covering 17 abstracts). The run's record adds ticket #3's later rows, written after its reading pass and its runs, and ticket #4's and ticket #12's rows for data that scripts read.
+- **A branch rebuilt.** Ticket #5 rebuilt its branch once before its merge to take a few file names of the notes' folder out of a commands table; no scene name or absolute path was ever committed (the run's record).
+- **Usage cuts and the subagents.** Account usage limits cut subagents off several times from 2026-11-14 to 16, and work resumed from commits and scratch notes. From 2026-11-15 the owner asked for one subagent at a time, and on 2026-11-16 moved the remaining subagents to another model (the run's record).
+- **No `tdd`.** No §3 test belongs to this PRD and only the document and the source log changed, so the `tdd` skill was not used; each ticket's acceptance criteria stood in.
+- **Private scene A's images** were never opened with an image reader by any agent, and nothing derived from them left the machine: scripts read them (rows 614, 620). The owner checked the placeholder-pixel sheets by eye on 2026-11-16 (section 2.5).
+- **Requests to the web** carried no name, email, project name or anything about private scene A, and model cards and license files were fetched without credentials (the rows say so per source).
