@@ -128,6 +128,68 @@ The hours are on one RTX 4090, one run at a time, as the PRD counts them; sectio
 
 *Ticket #21's section.* The gradient of a depth channel in the colour pass against the same loss through Q-226's device, in U-12's configuration, held to U-12's bounds.
 
+**The result.** The depth channel passes U-12's bounds against the device on every stored tensor, in every scene where the gradient is not zero, in the four layouts. The loss is on expected depth at Q-227's pixels, the one fixed as the check's verdict. The worst cosine is 1 − 1.6·10⁻¹⁰ and the largest relative L2 error 1.79·10⁻⁵, both for `opacity_logits`, against 0.999 and 10⁻³. The same holds for accumulated depth on every pixel Q-39 keeps, where no gradient is zero, and at an alpha cut of 0.01. At the cut 0.1, one figure is outside the bounds: `log_durations` in scene 102, 1.11·10⁻³ against the device on the reference backend. It is section 2.4's case, a gradient near zero on which the two float32 backends differ by their rounding; the channel's figure against the device on the gsplat backend is 1.45·10⁻⁴, and against a float64 computation 7.28·10⁻⁴. So section 5.1's row (f) reads as passed. The adopted form of finalists 3 and 4, a depth output of `render` made of a channel of the colour pass, needs no second pass, and the way z reaches `means`, through `fully_fused_projection`'s backward, holds. Normals in the colour pass, which finalist 3's adopted form would also add, were not part of the check.
+
+**What was run.** No gsplat file was opened, and no source outside the repository (row T21.1). The colour pass is the package's own `render()` on the gsplat backend, unchanged. A scratch script wraps two of gsplat's stage functions at run time, as the backend looks them up, so that `fully_fused_projection`'s depths go into `rasterize_to_pixels` as a fourth channel beside the colours (the 4-channel kernel, section 2.4, cell 1a). The wrapper keeps that channel, accumulated depth Σwᵢzᵢ, and hands the backend the first three. In unpacked mode the depths of the rows that fail the radius test are set to 0 before compositing, as the backend does for the 2D means (D-75). Every gradient was checked to be finite. The device, its two parts (i) and (ii), and U-12's scenes, cameras, time, weights and pixels are those of ticket #3's script, copied unchanged from section 2.4 ("The gradient experiment: the configuration"). One thing differs on the channel's side: both cameras are rendered in one call, as U-12 does, since the channel's z comes from the projection of each camera. The loss is the same function of accumulated depth and alpha on both sides. It reads no colour, so `sh0` and `shN` get no gradient on either side: none from the channel's graph, and none from the device, which never reads the model's SH tensors. U-12's figures cover the seven slice tensors, and its norm > 0 cannot hold for those two.
+
+**What was fixed before the first run** (in `<scratch>/ticket-21/`, before any GPU command):
+
+- **The verdict** is the channel against the device on the reference backend, U-12's reference. The device on the gsplat backend, same layout, is reported beside it, since it isolates the path from a depth channel back to `means`.
+- **The losses** are four. Expected depth at Q-227's cut, alpha ≥ 0.5, is the verdict. Expected depth at 0.1 and at 0.01, and accumulated depth on every pixel Q-39 keeps, are reported as controls, as section 2.4 reported them. The masks come from the reference backend's alpha of the device's render, once per scene, for every comparison.
+- **The zero-gradient rule** is section 2.4's. A (scene, tensor) is left out where the device's gradient on the reference backend in float64, on the CPU, has a norm below 10⁻⁹. That leaves out scenes 102, 108 and 111 at the cut 0.5, scene 111 at 0.1 and 0.01, and none for accumulated depth, always for the four tensors that have part (i) only. The figures left out are at least seven orders of magnitude apart: a largest float64 norm of 3.4·10⁻¹³ left out, against a smallest of 2.8·10⁻⁴ kept.
+- **A localizer.** The channel's gradient with the depths detached should be the device's part (i), and the rest should be part (ii).
+
+**The sanity check.** The device's gradient norms on the reference backend reproduce section 2.4's table to its six digits for every tensor: `means` 3.78465 / 32.3102 / 115.152, for example. The copied device has not drifted.
+
+**At Q-227's pixels**, alpha ≥ 0.5: 2,647 pixels of 122,880, 0 to 264 a camera, median 48. These are the worst figures over the scenes kept and the four layouts:
+
+| Stored tensor | Scenes | Gradient norm through the channel: least / median / largest | Against the device on the reference backend: lowest cosine, largest relative L2 error | Against the device on the gsplat backend: lowest cosine, largest relative L2 error |
+| --- | --- | --- | --- | --- |
+| `means` | 20 | 3.78465 / 32.3101 / 115.152 | 1 − 7.1·10⁻¹², 3.77·10⁻⁶ | 1 − 3.6·10⁻¹², 2.70·10⁻⁶ |
+| `opacity_logits` | 17 | 0.00215005 / 2.78788 / 17.2819 | 1 − 1.6·10⁻¹⁰, 1.79·10⁻⁵ | 1 − 3.4·10⁻¹⁰, 4.22·10⁻⁵ |
+| `times` | 20 | 1.04023 / 15.2178 / 66.5263 | 1 − 3.8·10⁻¹², 2.79·10⁻⁶ | 1 − 2.1·10⁻¹², 2.08·10⁻⁶ |
+| `velocities` | 20 | 0.284468 / 7.27065 / 25.6786 | 1 − 2.3·10⁻¹², 2.21·10⁻⁶ | 1 − 9.9·10⁻¹⁴, 4.70·10⁻⁷ |
+| `log_durations` | 17 | 0.000276061 / 3.16328 / 13.7959 | 1 − 1.3·10⁻¹², 1.27·10⁻⁵ | 1 − 7.6·10⁻¹³, 5.36·10⁻⁵ |
+| `log_scales` | 17 | 0.0605743 / 11.4854 / 44.2033 | 1 − 6.1·10⁻¹², 3.50·10⁻⁶ | 1 − 2.9·10⁻¹², 2.92·10⁻⁶ |
+| `quats` | 17 | 0.0743028 / 10.5384 / 49.1698 | 1 − 1.3·10⁻¹¹, 5.09·10⁻⁶ | 1 − 6.1·10⁻¹², 3.49·10⁻⁶ |
+| `sh0`, `shN` | 20 | 0 | no gradient on either side | no gradient on either side |
+
+The norms are those of the packed layout with the opacity cull inside gsplat; the other layouts' agree to the digits shown. The largest errors, for `opacity_logits` and `log_durations`, are scene 114's, where those gradients are the smallest, as in section 2.4. In the scenes left out, the channel's norms are 3.6·10⁻⁸ to 8·10⁻⁷, the order of the device's float32 rounding there (7·10⁻⁸ to 10⁻⁶).
+
+**The controls.** These are the worst figures over the four layouts and the seven slice tensors, against the device on the reference backend:
+
+| Loss | Pixels a camera: least / median / largest | Scenes left out for the four tensors with part (i) only | `means`: largest relative error | Largest relative error over the other six tensors | Against the device on the gsplat backend: largest relative error |
+| --- | --- | --- | --- | --- | --- |
+| Expected depth, alpha ≥ 0.5 (Q-227; the verdict) | 0 / 48 / 264 | 102, 108, 111 | 3.77·10⁻⁶ | 1.79·10⁻⁵ (`opacity_logits`) | 5.36·10⁻⁵ (`log_durations`) |
+| Expected depth, alpha ≥ 0.1 | 13 / 426 / 1,719 | 111 | 3.86·10⁻⁶ | **1.11·10⁻³** (`log_durations`, scene 102, cosine 1 − 6.0·10⁻⁷); `opacity_logits` 7.04·10⁻⁴, the same scene | 1.45·10⁻⁴ (`log_durations`, scene 102) |
+| Expected depth, alpha ≥ 0.01 | 67 / 1,256 / 3,070 | 111 | 1.46·10⁻⁵ | 1.11·10⁻⁴ (`quats`, scene 108) | 1.25·10⁻⁵ (`times`) |
+| Accumulated depth | 3,067 / 3,071 / 3,072, every pixel Q-39 keeps | none | 4.61·10⁻⁶ | 2.65·10⁻⁶ (`quats`) | 1.01·10⁻⁶ (`quats`) |
+
+Every cosine in the table is at least 1 − 6.0·10⁻⁷.
+
+**The one figure outside U-12's bounds.** At the cut 0.1, in scene 102, the gradients for `log_durations` and `opacity_logits` are near zero: norms of 3.3·10⁻³ and 1.0·10⁻², against medians of 15 and 22. The channel and the reference backend's device differ there by 3.7·10⁻⁶ and 7.2·10⁻⁶ absolute, in all four layouts alike. The two backends' devices give 1.20·10⁻³ and 7.37·10⁻⁴ between themselves, section 2.4's figures, and the channel lies near the gsplat device (1.45·10⁻⁴ and 5.5·10⁻⁵). To see which side the figure belongs to, a second script was written after the first run had shown the figure; nothing else was changed. It computes the device on the reference backend in float64, on the CPU, with the same CUDA-drawn weights and the same pixels. It then holds the three float32 gradients to that, over the 20 scenes and the four losses, in the default layout: the channel, the device on gsplat and the device on the reference backend. All three are inside U-12's bounds everywhere. At the cut 0.1 the largest relative errors are 7.28·10⁻⁴ for the channel, 8.34·10⁻⁴ for the gsplat device and 3.95·10⁻⁴ for the float32 reference, all three for `log_durations` in scene 102. At Q-227's cut they are at most 3.16·10⁻⁵, 2.35·10⁻⁵ and 4.43·10⁻⁵, and for accumulated depth at most 3.78·10⁻⁶, 2.02·10⁻⁶ and 2.22·10⁻⁶. So the figure outside the bounds is one float32 computation against another, on a gradient whose relative figure compares rounding. It is expected depth's own property, which section 2.4 named, not an error in the channel's path. Section 5.1 says what follows if a tensor fails: the adopted form keeps a second pass, or the way z reaches `means` is looked at first. Neither follows here, since every tensor is within the bounds against float64, and against the device at Q-227's cut.
+
+**The localizer.** Away from the scenes where part (i) is zero, the channel's gradient with the depths detached matches the device's part (i). For `means`, `times` and `velocities` at Q-227's cut, the cosines are at least 1 − 1.1·10⁻¹⁰ and the relative errors at most 1.62·10⁻⁵. What the depths add matches part (ii), at least 1 − 1.7·10⁻¹¹ and at most 5.87·10⁻⁶. For accumulated depth the figures are at most 5.95·10⁻⁶ and 4.15·10⁻⁶. So the colour pass divides into the device's two parts: through the weights, and through z to `means`, `velocities` and `times` (E1). For the four tensors that have part (i) only, the detached channel is the channel itself.
+
+**The forward pass.** Outside Q-39's pixels, the channel's accumulated depth differs from the device's image on the gsplat backend by at most 9.5·10⁻⁷, and from the reference backend's by at most 1.48·10⁻⁵, where it reaches 7.97. Section 2.4 found the same 1.45·10⁻⁵ between the two backends' devices. Alpha differs by at most 1.9·10⁻⁶. The channel's expected depth differs from the reference device's by at most 3.8·10⁻⁶ at Q-227's pixels, 1.48·10⁻⁵ at alpha ≥ 0.1 and 4.29·10⁻⁵ at alpha ≥ 0.01, alike in the four layouts.
+
+**What it changes.** Section 5.1's row (f) reads as passed. The depth output that finalists 3's and 4's adopted form would add to `render` can be a fourth channel of the colour pass, about 0.6 ms on kitchen (section 2.4, "The cost"), without a second pass, and its gradient agrees with the device's within U-12's bounds. Three things stay as section 2.4 left them:
+
+- **A U-12 line for a depth output** would still weight accumulated depth, or expected depth with image and alpha, so that U-12's norm > 0 holds. Expected depth's gradient is zero for four tensors wherever one primitive covers every kept pixel, and a relative figure there compares rounding.
+- **The reference backend** has no depth channel. This check compares the gsplat backend's colour pass with the device on both backends, and the reference backend's side of such an output is still the spec revision's (section 2.4, part 3).
+- **Normals** as channels of the colour pass (cell 4a) were not run against anything.
+
+The finalists' tests go through the device, as section 5.1 says, and did not wait on this.
+
+**The commands.** The package is this ticket's branch at 9bd213c (`src/`, `tests/` and `scripts/` as `main`'s at 02e3686); Python 3.14.10, PyTorch 2.15.0+cu132, gsplat 1.5.3; RTX 4090, CUDA 13.2, driver 595.99.02. The two scripts, `channel_gradients.py` and `tiebreak.py`, are in `<scratch>/ticket-21/` and are not committed, with a third, `tables.py`, which only reads `gradients.json` for the tables' worst figures and their scenes. The two scripts import the worktree's package and its test helpers (`tests/builders.py`, `tests/render_margins.py`) read-only. Every command ran in `<scratch>/ticket-21/` with `OMP_NUM_THREADS=2 MKL_NUM_THREADS=2 OPENBLAS_NUM_THREADS=2` and `PYTHONPATH=<worktree>/src:<worktree>/harness/src:<worktree>/tests:<scratch>/ticket-21`. `<worktree>` is this ticket's worktree, `$PY` the shared `.venv`'s Python, and `$LOCK` the PRD's shared GPU lock under `<scratch>`. Each command ran once.
+
+| Command | Device | Wall time | What it gave |
+| --- | --- | --- | --- |
+| `CUDA_VISIBLE_DEVICES= $PY channel_gradients.py norms64 <surface-runs>/ticket-21/norms64.json` | CPU | 2 s | In float64 on the reference backend, the device's gradient norm per scene, tensor and loss: the zero-gradient rule's input |
+| `flock $LOCK $PY channel_gradients.py gradients <surface-runs>/ticket-21/gradients.json <surface-runs>/ticket-21/norms64.json` | GPU | 10 s | U-12's 20 scenes in the four layouts, the four losses; the channel against the device on both backends, the localizer, and the forward differences |
+| `CUDA_VISIBLE_DEVICES= $PY -I tables.py <surface-runs>/ticket-21/gradients.json` | CPU | seconds | The worst figures per tensor and loss over the scenes and layouts, with the scene and layout of each; the scene-102 figures and the localizer's were read from the same file |
+| `flock $LOCK $PY tiebreak.py <surface-runs>/ticket-21/tiebreak.json <surface-runs>/ticket-21/norms64.json` | GPU and CPU | 7 s | Written after the first run: the channel and both float32 devices against the device on the reference backend in float64, with the same weights and pixels, default layout |
+
 ### 2.5 The three reads: FreeTimeGS++, SparseCam4D, SSA-3DGS
 
 *Ticket #22's section.* FreeTimeGS++ in full (arXiv 2605.03337), SparseCam4D (arXiv 2603.26481) and SSA-3DGS (arXiv 2607.05598), each ending in a screening row of its family with section 3's nine columns.
