@@ -2362,7 +2362,7 @@ H1 as the owner worded it, with a prior that fits no scale, shift or anchor (sec
 | 5 | Finalist 3 | Step 2 | 6 |
 | 6 | Finalist 4 | Finalist 3's flattening weight; the first step on normals | 4.5, or 6.5 |
 
-The four finalists with the baseline come to 17 to 19 GPU hours as section 4.5 counts them, and to 25 to 27 if a run on private scene A takes twice the notes' median. Each step's result goes to the owner before the next starts, and the owner can stop after any of them.
+Step 3's hours leave out check (c), which step 1 counts and section 4.5 counts in finalist 1's 2 hours, and include the control's optional 2. The four finalists with the baseline come to 17 to 19 GPU hours as section 4.5 counts them, and to 25 to 27 if a run on private scene A takes twice the notes' median. Each step's result goes to the owner before the next starts, and the owner can stop after any of them.
 
 **What the plan leaves open.**
 
