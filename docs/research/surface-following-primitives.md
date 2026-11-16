@@ -792,14 +792,14 @@ The GPU commands ran one at a time, from `$T/run_gpu.sh`, between 01:44:29 and 0
 
 | Pairs | Alignment | Scale and shift fitted to | Static: median, 90th percentile (cm) | Static: share of the depth | Static: signed, median of the images | Dynamic: median, 90th percentile (cm) | Dynamic: share of the depth | Dynamic: signed, median of the images |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- |
-| D-22's 13 pairs and `cam00`–`cam01` | whole image | the pair's anchors | 4.2, 16.1 | 1.22%, 4.36% | -0.14% | 12.1, 32.1 | 3.67%, 9.65% | +3.72% |
-| D-22's 13 pairs and `cam00`–`cam01` | whole image | the ground truth itself | 4.3, 16.1 | 1.24%, 4.34% | -0.02% | 12.5, 32.6 | 3.78%, 9.80% | +3.86% |
-| D-22's 13 pairs and `cam00`–`cam01` | regional | the pair's anchors | 4.3, 16.2 | 1.22%, 4.36% | -0.11% | 4.8, 21.4 | 1.47%, 6.51% | -0.02% |
+| D-22's 13 pairs and `cam00`–`cam01` | whole image | the pair's anchors | 4.2, 16.1 | 1.22%, 4.36% | −0.14% | 12.1, 32.1 | 3.67%, 9.65% | +3.72% |
+| D-22's 13 pairs and `cam00`–`cam01` | whole image | the ground truth itself | 4.3, 16.1 | 1.24%, 4.34% | −0.02% | 12.5, 32.6 | 3.78%, 9.80% | +3.86% |
+| D-22's 13 pairs and `cam00`–`cam01` | regional | the pair's anchors | 4.3, 16.2 | 1.22%, 4.36% | −0.11% | 4.8, 21.4 | 1.47%, 6.51% | −0.02% |
 | D-22's 13 pairs and `cam00`–`cam01` | regional | the ground truth itself | 4.3, 16.2 | 1.24%, 4.35% | +0.01% | 5.0, 19.0 | 1.54%, 5.54% | +0.10% |
-| The six pairs about 15° apart | whole image | the pair's anchors | 3.3, 12.7 | 0.91%, 3.80% | -0.22% | 11.9, 31.2 | 3.57%, 9.43% | +3.86% |
-| The six pairs about 15° apart | whole image | the ground truth itself | 3.3, 12.9 | 0.93%, 3.69% | -0.03% | 12.6, 32.4 | 3.76%, 9.79% | +4.11% |
-| The six pairs about 15° apart | regional | the pair's anchors | 3.3, 12.7 | 0.90%, 3.80% | -0.22% | 5.2, 22.5 | 1.57%, 6.69% | +0.01% |
-| The six pairs about 15° apart | regional | the ground truth itself | 3.3, 13.0 | 0.93%, 3.70% | -0.00% | 5.3, 19.2 | 1.63%, 5.43% | +0.16% |
+| The six pairs about 15° apart | whole image | the pair's anchors | 3.3, 12.7 | 0.91%, 3.80% | −0.22% | 11.9, 31.2 | 3.57%, 9.43% | +3.86% |
+| The six pairs about 15° apart | whole image | the ground truth itself | 3.3, 12.9 | 0.93%, 3.69% | −0.03% | 12.6, 32.4 | 3.76%, 9.79% | +4.11% |
+| The six pairs about 15° apart | regional | the pair's anchors | 3.3, 12.7 | 0.90%, 3.80% | −0.22% | 5.2, 22.5 | 1.57%, 6.69% | +0.01% |
+| The six pairs about 15° apart | regional | the ground truth itself | 3.3, 13.0 | 0.93%, 3.70% | −0.00% | 5.3, 19.2 | 1.63%, 5.43% | +0.16% |
 
 And per camera, with the whole-image alignment on the anchors of D-22's pairs and of `cam00`–`cam01`:
 
@@ -854,18 +854,18 @@ And per camera, with the whole-image alignment on the anchors of D-22's pairs an
 
 | Pair | Admitted matches per pair-frame | Sampled matches that are anchors | Sampled matches D-22's filters would keep | Anchors on the person; on the background | Person's anchors: depth, 5th / 50th / 95th percentile | Whole-image alignment, person's anchors: median (cm); share of the depth; signed | Whole-image, background's anchors: share of the depth; signed | Regional alignment, person's anchors: median (cm); share of the depth | Regional, background's anchors: share of the depth |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
-| `cam0`–`cam1` | 221,944 | 100.0% | 94.0% | 57%; 43% | 1.05 / 1.11 / 1.20 | 6.0; 5.36%; +2.88% | 14.05%; -7.65% | 1.4; 1.30% | 1.28% |
-| `cam1`–`cam4` | 237,443 | 100.0% | 47.4% | 54%; 46% | 0.98 / 1.07 / 1.19 | 5.6; 5.42%; +2.82% | 13.02%; -3.71% | 2.0; 2.22% | 2.55% |
-| `cam2`–`cam5` | 223,221 | 100.0% | 87.5% | 53%; 46% | 1.00 / 1.07 / 1.14 | 5.3; 5.15%; +0.81% | 5.65%; -1.64% | 2.3; 2.15% | 3.24% |
-| `cam3`–`cam4` | 212,398 | 100.0% | 57.8% | 62%; 38% | 1.06 / 1.14 / 1.27 | 7.0; 6.12%; +3.13% | 13.56%; -4.77% | 4.6; 4.24% | 1.88% |
-| `cam3`–`cam5` | 210,979 | 100.0% | 60.2% | 58%; 40% | 1.00 / 1.09 / 1.19 | 4.8; 4.91%; +0.65% | 4.23%; -0.23% | 3.6; 3.30% | 2.69% |
-| `cam6`–`cam7` | 163,640 | 100.0% | 57.8% | 69%; 31% | 0.89 / 1.01 / 1.14 | 3.5; 3.58%; +1.10% | 15.39%; -10.59% | 1.2; 1.17% | 1.37% |
-| `cam6`–`cam8` | 151,467 | 100.0% | 67.9% | 77%; 22% | 0.86 / 0.98 / 1.08 | 3.1; 3.00%; +0.45% | 22.46%; -16.88% | 1.2; 1.28% | 3.06% |
-| The 7 pairs together | 203,013 | 100.0% | 67.5% | 61%; 38% | 0.94 / 1.06 / 1.17 | 4.7; 4.84%; +1.23% | 13.50%; -5.48% | 1.8; 1.78% | 2.33% |
+| `cam0`–`cam1` | 221,944 | 100.0% | 94.0% | 57%; 43% | 1.05 / 1.11 / 1.20 | 6.0; 5.36%; +2.88% | 14.05%; −7.65% | 1.4; 1.30% | 1.28% |
+| `cam1`–`cam4` | 237,443 | 100.0% | 47.4% | 54%; 46% | 0.98 / 1.07 / 1.19 | 5.6; 5.42%; +2.82% | 13.02%; −3.71% | 2.0; 2.22% | 2.55% |
+| `cam2`–`cam5` | 223,221 | 100.0% | 87.5% | 53%; 46% | 1.00 / 1.07 / 1.14 | 5.3; 5.15%; +0.81% | 5.65%; −1.64% | 2.3; 2.15% | 3.24% |
+| `cam3`–`cam4` | 212,398 | 100.0% | 57.8% | 62%; 38% | 1.06 / 1.14 / 1.27 | 7.0; 6.12%; +3.13% | 13.56%; −4.77% | 4.6; 4.24% | 1.88% |
+| `cam3`–`cam5` | 210,979 | 100.0% | 60.2% | 58%; 40% | 1.00 / 1.09 / 1.19 | 4.8; 4.91%; +0.65% | 4.23%; −0.23% | 3.6; 3.30% | 2.69% |
+| `cam6`–`cam7` | 163,640 | 100.0% | 57.8% | 69%; 31% | 0.89 / 1.01 / 1.14 | 3.5; 3.58%; +1.10% | 15.39%; −10.59% | 1.2; 1.17% | 1.37% |
+| `cam6`–`cam8` | 151,467 | 100.0% | 67.9% | 77%; 22% | 0.86 / 0.98 / 1.08 | 3.1; 3.00%; +0.45% | 22.46%; −16.88% | 1.2; 1.28% | 3.06% |
+| The 7 pairs together | 203,013 | 100.0% | 67.5% | 61%; 38% | 0.94 / 1.06 / 1.17 | 4.7; 4.84%; +1.23% | 13.50%; −5.48% | 1.8; 1.78% | 2.33% |
 
 - **Every sampled match is an anchor,** since none lies behind a camera or under 1°. D-22's own filters would keep 67.5% of them, from 47% for `cam1`–`cam4` to 94% for `cam0`–`cam1`, which is section 2.5's figure for D-22's draw (67.4%).
 - **With D-22's own anchors the person can be left without any.** Run with all of D-22's filters, `cam1`–`cam4` has no anchor on the person in 28 of its 120 frames and fewer than 100 in 45, too few to align the person on; in its median frame 8% of its anchors lie on the person, against 54% without the 2 px filter. That is the pair with the highest residual on the background in section 2.5 (2.24 px). No other pair loses the person (36% to 69% of their anchors stay on it), and "The variants", below, gives their figures with D-22's anchors.
-- **Where the anchors are.** 61% lie on the person, at 0.94 to 1.17 units (5th to 95th percentile), and 38% on the background, at 2.6 to 6.0 units. On `kitchen` the dynamic objects hold 3 to 4% of the anchors. So the whole-image alignment is mostly a fit to the person on private scene A and mostly a fit to the room on `kitchen`: it is the regional alignment that sets the two scenes side by side.
+- **Where the anchors are.** 61% lie on the person, at 0.94 to 1.17 units (5th to 95th percentile), and 38% on the background, at 2.6 to 6.0 units. On `kitchen` the dynamic objects hold 3 to 4% of the anchors. So in the whole-image alignment the person weighs more than the background on private scene A, and `kitchen`'s dynamic objects hardly weigh at all against its room: it is the regional alignment that sets the person beside `kitchen`'s dynamic objects like for like.
 - **One scale and one shift do not fit both regions.** After the whole-image alignment the person's anchors lie 4.7 cm from their triangulated depth at the median, 4.8% of it, on the far side, and the background's 13.5% of theirs, on the near side. `kitchen` shows the same thing, smaller: 0.8% on the static anchors and 4.4% on the dynamic ones, also on the far side. On both scenes the estimator's map does not hold the subject and its surroundings in the one affine relation to depth that its output is defined by, and on private scene A the misfit is the larger: 4.8% and 13.5%, against 4.4% and 0.8%.
 - **Fitted alone, the person's anchors still miss by 1.8%.** With the regional alignment the person's anchors lie 1.8 cm from their triangulated depth at the median (1.17% to 4.24% by pair), and the background's 2.3%. `kitchen`'s read 1.1% (dynamic) and 0.8% (static). That residual is what a technique that fits a prior map to the init points on the person would be left with: about twice `kitchen`'s.
 
@@ -928,7 +928,7 @@ Then with the regional alignment, where a comparison counts only with both ends 
 
 - **Most large gaps have both ends on the person.** 9.7% of the person's comparisons are more than a tenth of the depth apart, and 32% of those leave the person; on `kitchen`'s dynamic objects 12.0% are, and 68% of those leave. With both ends on the person the 90th percentile is 7.3% (5.4% in frames 0 to 79 and 11.9% in frames 80 to 119), against 7.4% on `kitchen`'s dynamic objects.
 - **In front, with both ends on the person,** the 90th percentile is 6.1% (5.3% early, 7.3% late), against 7.25% on `kitchen`. So with the whole-image alignment the part of the tail that neither occlusion nor a point leaving the person explains is no heavier than `kitchen`'s. With the regional alignment it is: 9.3% in front, against 5.04% on `kitchen`'s dynamic objects. The two pairs whose cameras sit one above the other make the difference (17% and 23% in front; the five others read 2.8% to 8.9%).
-- **The rest of the late frames' tail lies behind.** In frames 80 to 119 the comparisons with both ends on the person read 11.9% at the 90th percentile over both sides and 7.3% in front: the excess is points of one camera that lie behind the other camera's surface, on the person. `cam6`–`cam8` (52% and 8.0%) and `cam3`–`cam5` (37% and 9.6%) carry most of it. A part of the body that hides another part from one camera gives exactly this, and more of it as the person comes closer; so would a limb that the two cameras place differently, though that would show in front as well, and in front the tail is `kitchen`'s. The probe cannot tell the two apart beyond that.
+- **The rest of the late frames' tail lies behind.** In frames 80 to 119 the comparisons with both ends on the person read 11.9% at the 90th percentile over both sides and 7.3% in front: the excess is points of one camera that lie behind the other camera's surface, on the person. `cam6`–`cam8` (52% and 8.0%) and `cam3`–`cam5` (37% and 9.6%) carry most of it. A part of the body that hides another part from one camera would give exactly this, and more of it as the person comes closer; so would a limb that the two cameras place differently, though that would show in front as well, and in front the tail is `kitchen`'s. The probe cannot tell the two apart beyond that.
 - **Points that leave the person** are 7% of the kept comparisons (11% in front), with gaps of several times the depth at their 90th percentile: a point of the person that lands, in the other image, on a pixel lifted to the background or outside that camera's crop. Rule a's crop is the tools' default rectangle on seven cameras, and it holds only 47% to 85% of a camera's near pixels (85% on `cam0`, 47% on `cam7`), so part of these are the crop's doing; "The variants" runs rule b.
 
 **Private scene A: two controls inside the scene.** `kitchen` is a rendered room; private scene A is generated footage of a person. Two figures from the scene itself say how the estimator behaves on that footage with no second camera in play.
