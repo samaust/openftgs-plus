@@ -1036,6 +1036,25 @@ The eleven unclear rows are the owner's call, as the precedent's borderline rows
 
 *Ticket #11's section.* The survey of the adjacent family E, with the cap of 120 abstracts and 24 full reads; the setting is decision 4's: no camera of private scene A is a real video or trusted above the others, and some of its pixels are placeholder pixels.
 
+**The setting, in the parts the rows answer to.** Section 2.5 measured it, and columns 5 and 6 name its parts in these words:
+
+- **The background's part.** The manifest's cameras are not quite the cameras the images show. A turn of one camera of each pair by 0.1° to 0.4°, fitted on the background, brings the background's residual from 0.29 to 2.24 px down to 0.3 to 0.6 px, and holds for every frame. A correction per camera could absorb it.
+- **The person's part.** After that turn the person's matches still lie 0.9 to 4.0 px from epipolar agreement at the median, 2 to 13 times the background's, unevenly over the frames, on the fifth of the crop the matcher can match. Frame offsets explain none of it. What could act on it is a deformation per camera or per time, or a lower weight per pixel or region, which needs a signal for where the images disagree.
+- **Placeholder pixels.** One camera only, `cam0`: 0.263% of its pixels, all inside the person's crop, with a mask per frame already computed. They can be left out of E7.
+- **Colour.** Decision 4 says the nine cameras share their colour temperature and sharpness, and section 2.5 measured no colour difference between cameras. A colour correction per camera answers a part nobody has measured.
+
+**Three readings that hold for every row,** cited in the cells as readings 1 to 3. They are this ticket's readings of the spec and of the code (section 2.3), not findings of a paper.
+
+1. **The integration classes.** The five classes of column 3 name no trainable parameters per camera (a pose, a colour transform, an embedding, a deformation) and no second model trained beside the first. A row of that kind gives the nearest class and says what the class leaves out; ticket #13 may want a sixth class for them.
+2. **Weights and masks.** `total_loss` takes no mask and no weight per pixel, and the manifest reader refuses a `mask` on a training image (section 2.3; §2.2). A row that weights or masks pixels therefore changes §2.1's `total_loss` and, where the masks come as files, §2.2; with its field off nothing changes. Four things follow whichever technique supplies the weight:
+   - The mask has to be defined for each of E7's three terms: L1, per pixel; SSIM, whose 11 × 11 valid window mixes kept and masked pixels (D-8); and the perceptual network, which reads whole images (D-89). Q-233 met the same question for the metrics and reports the kept-pixel PSNR alone, with SSIM and ꟻLIP not masked.
+   - E10's accumulated gradient g, which chooses growth's candidates and relocation's targets, comes from the same loss, so pixels with a lower weight ask for fewer primitives.
+   - E8 is not a per-pixel term. A primitive whose pixels are masked in every image loses the render's gradient and keeps E8's pull on its opacity, so it fades below D-14's threshold and is relocated (E10, E11).
+   - A technique whose signal marks the person, in every camera and frame, as the content that disagrees would therefore remove the person. Each such row says so in column 6: it is a finding, not a fit.
+3. **Test views.** E16 and D-67 score a test image against the render at the manifest's camera, over the whole image or D-67's crop. A correction fitted per training camera (a pose, a colour transform, a deformation) does not exist for a held-out camera. Scored without it, the model is charged for the held-out camera's own offset; scored with a correction fitted on the test image, the score depends on a fit to the image being scored. No camera is ground truth (decision 4), so a row with such a correction says in column 8 what its test-view score would mean.
+
+A row is one technique. A paper with two techniques of different integration classes has two rows, and counts as one full read.
+
 **Screening table.**
 
 | Technique | 1. Weights' license | 2. Code license | 3. Integration class | 4. Render backends | 5. Fit with the primitives | 6. Cameras that disagree | 7. Prior maps | 8. Evidence | 9. Training cost |
