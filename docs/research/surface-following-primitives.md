@@ -2376,6 +2376,15 @@ Step 3's hours leave out check (c), which step 1 counts and section 4.5 counts i
 
 *Ticket #15's section.* For every finalist review 1 cleared to train, its results against the agreed criteria; or the record that none was cleared, or that a finalist waits for its spec revision and is tested later behind its field.
 
+**No finalist was cleared to train under this PRD, so this section holds no result.** At review 1, on 2026-11-16, the owner answered that there are no tests in this PRD: nothing trains under PRD #1, the document stops at the test plan, and the recommendation rests on the evidence from papers and from the probes (section 4.7, lines R, H and K). Asked the same day which of the work that trains nothing should run before the test plan was written, the owner answered: none, straight to the test plan (section 4.7, items 10, 14 and 15). So no check, read or measurement was made after review 1. The six checks of section 4.6's item 15, the three reads of its item 10 and the fourth nine-camera model of its item 14 are the first rows of section 5.1, for a later PRD. The one thing settled after review 1 is the owner's check, by eye, of section 2.5's placeholder-pixel sheets, which fixed the share of `cam0`'s placeholder pixels at the loose rule's 0.300 % (sections 2.5 and 4.7).
+
+**What stands as the evidence.**
+
+- **The probes,** all run before review 1. Section 2.4: what gsplat 1.5.3's stage functions and the reference backend can composite, and Q-226's device, whose gradients agree between the backends within U-12's bounds. Section 2.5: the cameras' disagreement about the person against `kitchen`'s floor, the background's part of it, and the placeholder pixels. Section 2.6: the notes' shell measures on private scene A's 45 kept checkpoints, and the geometry residual on M17's checkpoints of openftgs-synth. Section 2.7: one depth estimator's maps lifted between cameras on both scenes. Section 4.2 reads the four against H2's premise.
+- **The papers,** screened in sections 3.1 to 3.6: 85 techniques, consolidated in section 4.8, and the estimators against the bar, consolidated in section 4.9. The finalists' evidence is weighed in section 4.3.
+
+**What does not exist.** Any test of H1 or of H2. Any result of a finalist, on private scene A or on openftgs-synth. The control section 4.2 lacks, the notes' measures on cameras that agree. A fit of all nine cameras as one set, and whether any fit reaches the 4 % by which two pairs place the person apart. Any normal estimator's output on either scene. The cost of finalist 2's patch search, and the cost of any technique as it would be adopted (section 4.5). A later PRD that runs section 5's plan reports its results here or in a document of its own (section 5.7).
+
 ## 7. The recommendation
 
 *Ticket #15's section.* Which techniques to adopt, each as a field of the training configuration that defaults to off, or that none should be adopted.
