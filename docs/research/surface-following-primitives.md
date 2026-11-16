@@ -2463,7 +2463,14 @@ The other techniques that a survey flagged and section 4.3 did not propose are n
 
 ### 7.7 The owner's answer at review 2
 
-Pending. The orchestrating session puts the document to the owner; the answer is recorded here with its date. Review 2 decides on the recommendation of section 7.1 (no finalist adopted; row E13 with the first revision that touches its places), on whether section 5's plan becomes a later PRD, and on the two questions left open in section 7.2.
+Review 2 took place on 2026-11-16, in session, between the owner and the orchestrating session, on sections 6 to 9 as drafted. The answers, as the owner gave them (written here by the orchestrating session):
+
+- **The recommendation of section 7.1 is accepted:** no technique against the shell is adopted now, and section 5's test plan is to run as a later PRD, starting with the work that trains nothing. **Confirmed** (2026-11-16).
+- **Row E13, known masks for the placeholder pixels,** is adopted with the next related spec revision: one that already touches what a training image in `ftgs-scene` may carry or what `total_loss` reads. No revision is made for it alone. **Confirmed** (2026-11-16).
+- **Finalist 1's camera fit** is made once per held-out copy, without the held-out camera's images, as section 5.3 proposes for D-66's reason; a joint fit of all nine cameras, as section 4.5 first described it, is not the plan's. **Answered** (2026-11-16).
+- **Finalist 4's arm** leaves out the total-variation term of its source row, as section 5.6 has it, so that its result reads as the prior's effect. **Confirmed** (2026-11-16).
+
+What is not decided here: the wording of a spec revision, which the owner makes as the next lettered revision on an issue of its own ("Editing the spec" in `docs/agents/guidelines.md`), and the later PRD itself.
 
 ## 8. What adopting it would change
 
