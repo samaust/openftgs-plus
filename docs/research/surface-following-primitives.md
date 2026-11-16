@@ -24,6 +24,9 @@ Sections 1 to 9 are the nine the PRD fixes ("The phases", phase 4). The probes a
   - The ticket breakdown: 14 tickets, the PRD's sub-issues (#2 to #15). The training tests are ticketed after review 1, each blocking the last ticket, or become a PRD of their own. **Confirmed.**
   - Temporary source-log IDs on a ticket's branch use the ticket's number, `T<ticket>.<k>`, as the implement skills do, not the PRD's. **Answered.**
   - This work's run directories, prior maps and sheets go in a folder outside the repository, which the owner allowed the orchestrating session to create; this document writes it `<surface-runs>`. **Confirmed** (2026-11-14, in session).
+  - Papers that cite FreeTimeGS and describe or use their authors' own reproduction of it may be read and cited freely, the reproduction's set-up included, and FreeTimeGS++ (arXiv 2605.03337) may be read whole. Code that implements or extends FreeTimeGS stays unopened, as CLAUDE.md's guidelines rules say. **Answered** (2026-11-16, in session, to a question tickets #10 and #11 raised). Until then the surveys followed an interim rule of 2026-11-15: such sections were left unread, and a cell whose evidence comes from an experiment on a reproduction says "rests on the authors' reproduction of FreeTimeGS"; those marks stay where they are.
+  - Decision 5 covers image content given as numbers: the placeholder pixels' colour and the pixel ranges of the person's crop (section 2.5). **Answered** (2026-11-16, in session).
+  - A third-party paper's published figure on SelfCap is a citation, not material derived from SelfCap (CLAUDE.md, "Commits"; spec §1.4), and stays where the surveys cite one. **Confirmed** (2026-11-16, in session; the orchestrating session's reading).
 
 **Hypotheses.** The probes test H2's premise. H1 is tested only by training with a technique.
 
