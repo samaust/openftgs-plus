@@ -2433,6 +2433,8 @@ Step 3's hours leave out check (c), which step 1 counts and section 4.5 counts i
 
 **What does not exist.** Any test of H1 or of H2. Any result of a finalist, on private scene A or on openftgs-synth. The control section 4.2 lacks, the notes' measures on cameras that agree. A camera fit, per held-out copy or of all nine cameras as one set, and whether any fit reaches the 4 % by which two pairs place the person apart. Any normal estimator's output on either scene. The cost of finalist 2's patch search, and the cost of any technique as it would be adopted (section 4.5). A later PRD that runs section 5's plan reports its results here or in a document of its own (section 5.7).
 
+**Where the results are.** PRD #16 runs section 5's plan and reports in a document of its own, `docs/research/surface-following-tests.md`.
+
 ## 7. The recommendation
 
 *Ticket #15's section.* Which techniques to adopt, each as a field of the training configuration that defaults to off, or that none should be adopted.
