@@ -1615,7 +1615,7 @@ The eleven unclear rows are the owner's call, as the precedent's borderline rows
 | 12 | 2026-11-15 | Web search, the same four hosts | 4D Gaussian splatting velocity regularization neighboring Gaussians similar velocity smoothness loss k-nearest neighbors linear velocity primitives multi-view dynamic scene | 10 | 1: EvoGS | 1 | 0 | 0 | A first attempt was cut by a usage limit and is not a round; this is the rerun. 4D-Rotor GS's 4D consistency loss came up here (row 764) |
 | Total | | | | | 50 abstracts of the cap's 60 | 36 techniques | 12 of the cap's 12: 11 papers and the survey | 11 | The family stopped at the cap of full reads |
 
-**The estimators the rows name.** SAM, SAM 2, SAM 3, RAFT, DUSt3R and MoGe have their verdicts in section 3.3. UFM and DINOv2 are screened in the table above: UFM fails on its publisher's README, and DINOv2's backbone files pass. RoMa is the package's own dense matcher (§2.3, D-58). MonoFusion's masks come from a user-prompted model the sections read do not name (row 781).
+**The estimators the rows name.** SAM, SAM 2, SAM 3, RAFT, DUSt3R and MoGe have their verdicts in section 3.3. UFM and DINOv2 are screened in the table above: UFM fails on its publisher's README, and DINOv2's backbone files pass. RoMa is the package's own dense matcher (§2.3, D-58). MonoFusion's masks come from a user prompt, and the sections this section read do not name the model (row 781); section 3.4's read of the paper's implementation details names SAM 2, which passes (row 728; section 3.3).
 
 **The search seeds.** Each has a row, or the reason it has none.
 
@@ -2159,7 +2159,7 @@ One row per technique of the five families, 85 in all: 17 from section 3.1, 15 f
 **Techniques that two families screened, reconciled.**
 
 - **SharpTimeGS.** Sections 3.1, 3.2 and 3.5 read the same paper, under three source-log rows, and agree: on its class, on its ablation (26.76 → 27.36 dB without and with the radius) and that nothing isolates its lifespan loss. Row D3 is the whole method; rows B8 and B9 are the two parts a field could hold; its PGSR-style terms are in rows A1 and A3.
-- **MonoFusion.** Row C12 is its depth alignment and row D11 the whole method. The two sections disagree on one point: section 3.4 gives its masks to SAM 2, which passes, and section 3.5 says the parts it read do not name the model behind them. No verdict here depends on it, since both rows are screened out on other grounds.
+- **MonoFusion.** Row C12 is its depth alignment and row D11 the whole method. Its masks are SAM 2's, from a user prompt, by section 3.4's read (row 728), which passes; the parts section 3.5 read do not name the model, and section 3.5 now points to section 3.4's read (step-7 review). No verdict here depends on it, since both rows are screened out on other grounds.
 - **GC-4DGS.** Rows C4 and C6 only; sections 3.5 and 3.6 name it and hand it to section 3.4.
 - **TrimGS.** Its trimming is row A12, and its consistency term is one of row A3's forms. Section 3.2 names it and has no row for it.
 - **FreeTimeGS++.** Row D2 is its gate and row E27 its colour correction, with the same figures in section 3.5's hand-over and in section 3.6's row. Its third technique, an initial velocity from optical flow in place of E15, has no row: section 3.5 handed it to section 3.4, which could not read the paper under the interim rule. Its estimator, UFM, fails (section 4.9).
