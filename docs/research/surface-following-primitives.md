@@ -2035,7 +2035,23 @@ Each line has its options, the recommendation and what another answer changes. T
 
 ### 4.7 The owner's answers at review 1
 
-**Pending.** Review 1 has not taken place. It happens between the owner and the orchestrating session, in session or on PRD #1, on the material of sections 4.1 to 4.6. The orchestrating session then writes the answers here, each with its date: which finalists are kept, the criteria as accepted or changed, the route and the hours cleared for each finalist kept, and the answer to each line of section 4.6. Until then nothing trains, sections 4.1 to 4.6 are proposals, and ticket #14 has no finalist to plan for.
+Review 1 took place on 2026-11-16, in session, between the owner and the orchestrating session, on the material of sections 4.1 to 4.6. The answers, as the owner gave them; the letters and numbers are the lines of section 4.6.
+
+- **F1 to F4, the finalists.** All four are kept: the cameras corrected once before training, the alignment-tolerant pixel loss, the surface terms without a prior, and the normal prior on top of them. Keeping finalist 1 goes with the yes to item 11c below. **Answered** (2026-11-16).
+- **C, the criteria.** Section 4.4's are accepted as drafted, the 0.3 dB guard on a test-view score and the sheets judged with their labels hidden included. **Confirmed** (2026-11-16).
+- **R, H and K: the routes, the hours and the control on `kitchen`.** No tests in this PRD. Nothing trains under PRD #1: the document stops at the test plan (section 5), which records the finalists and how they would be tried, and the recommendation (section 7) rests on the evidence from papers and from the probes. Section 4.5's routes, hours and control stand as that plan's proposal and clear no run. **Answered** (2026-11-16).
+- **Items 5 to 18.** All take their recommended answers. **Confirmed** (2026-11-16), which gives:
+  - 5: forming median depth or the pairwise distortion from gsplat 1.5.3's pair list does not count as "gsplat 1.5.3 can supply it".
+  - 6: flat-primitive techniques are eligible as finalists; none is proposed.
+  - 7: a depth a paper computes in its own kernels counts as suppliable where it composites as channels, after a numeric check.
+  - 8: the "unclear" weights rows are screened out, and the "fails as stated" rows keep failing.
+  - 9: three class labels are added for this document only: an initialization; trained beside the primitives; a preprocessing.
+  - 11a: no camera is the reference. 11b: finalist 1 is scored at both poses of the held-out camera and judged by the shell's measures and the sheets. 11c: a one-off correction of the manifest's cameras is in scope, as preprocessing.
+  - 13: the tools' default rectangle. 16: section 3.3 keeps no nine-column table. 17: the two "default" marks of the opening are confirmed (decision 1's core; the PRD's extension of the privacy instruction). 18: the document's length is tightened at the step-7 review.
+- **Items 10, 14 and 15, and what does not run in this PRD.** Asked the same day which of the work that trains nothing should run before the test plan is written (the six checks of item 15, the three further reads of item 10, the fourth nine-camera model of item 14), the owner answered: none, straight to the test plan. So no further check, read or measurement is made under PRD #1. The three reads (FreeTimeGS++ in full, SparseCam4D, SSA-3DGS), the fourth nine-camera model, which may be opened, and the six checks in section 4.6's order are written into the test plan as the first work of a later PRD. **Answered** (2026-11-16).
+- **Item 12, the owner's check of the placeholder-pixel sheets.** Still pending. It is wanted before any run is scored on `cam0`, and no run is scored under this PRD.
+
+What follows for the later sections: section 5 (ticket #14) plans for the four finalists and opens with the work that trains nothing; section 6 (ticket #15) records that no finalist was cleared to train under this PRD; and a finalist stays a proposal to test, so section 7's recommendation cannot rest on a test of any of them.
 
 ### 4.8 The consolidated screening table
 
