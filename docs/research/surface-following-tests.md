@@ -924,12 +924,12 @@ Written on 2026-11-16 from sections 2.1 to 2.5 here and the research document's 
 
 *Ticket #24's section.* The seven baseline runs by plain `ftgs train`, each with its measures, its sheet or `scripts/gt_depth.py`; and the scratch script's runs with every added weight at 0 against a plain run, on private scene A and on `kitchen`, within openftgs issue 395's tolerance.
 
-Run on 2026-11-16, at the owner's go of that day (section 2.6 here), with this branch's code at 163bd39 (`src/` and `scripts/` as `main`'s), Python 3.14.10, torch 2.15.0+cu132, gsplat 1.5.3, NumPy 2.5.4, SciPy 1.18.1 and Pillow 13.0.0 from the shared `.venv`. The hardware was one RTX 4090 (driver 595.99.02), alone on the machine, under the shared GPU lock, with 16 CPU threads. Scripts read tensors, JSON, images and mask files and wrote numbers and files. No image, render or sheet of private scene A was looked at. Every existing frame-cache file beside the scenes' manifests passed the package's own validity check before training, so the runs read them and wrote nothing beside a manifest. A search afterwards found no file under `<private-scene-A-exp>`, `<m15-runs>/kitchen`, or `<m17-runs>`'s `kitchen`, `studio` and `reference` newer than the first run. In all, about 3.6 GPU hours: the nine full runs took 2.4, the parity control's 25 short runs about 1.1, and the renders, scores and diagnostics the rest. "The commands", at the end, lists every run.
+Run on 2026-11-16, at the owner's go of that day (section 2.6 here), with this branch's code at 163bd39 (`src/` and `scripts/` as `main`'s), Python 3.14.10, torch 2.15.0+cu132, gsplat 1.5.3, NumPy 2.5.4, SciPy 1.18.1 and Pillow 13.0.0 from the shared `.venv`. The hardware was one RTX 4090 (driver 595.99.02), alone on the machine, under the shared GPU lock, with 16 CPU threads. Scripts read tensors, JSON, images and mask files and wrote numbers and files. No image, render or sheet of private scene A was looked at. Every existing frame-cache file beside the scenes' manifests passed the package's own validity check before training, so the runs read them and wrote nothing beside a manifest. A search afterwards found no file under `<private-scene-A-exp>`, `<m15-runs>/kitchen`, or `<m17-runs>`'s `kitchen`, `studio` and `reference` newer than the first run. In all, about 3.8 GPU hours: the nine full runs took 2.4, the parity control's 32 short runs about 1.3, and the renders, scores and diagnostics the rest. "The commands", at the end, lists every run.
 
 **The owner's answers during this step** (2026-11-16, in session, relayed by the orchestrating session):
 
 - **The sharpness ratio** (section 1 here, item 1). It is the notes' scorer's `crop.sharp`, with its `crop_late.sharp` and `train.sharp` reported beside it (row T24.1). The owner named it after a summary of what the scorer computes; this section writes the definition down, below.
-- **Parity.** The PRD's criterion cannot be met by two plain runs, so it is replaced by the form of (a) below, judged with wrapper v2. When v2 failed that form on both scenes, the owner chose three diagnostics on `kitchen`: plain runs from the wrapper's own entry script with the wrappers not installed, four more plain repeats, and plain and v2 runs with `perf.frame_cache` set explicitly.
+- **Parity.** The PRD's criterion cannot be met by two plain runs, so it is replaced by the form of (a) below, judged with wrapper v2. When v2 failed that form on both scenes, the owner chose three diagnostics on `kitchen`: plain runs from the wrapper's own entry script with the wrappers not installed, four more plain repeats, and plain and v2 runs with `perf.frame_cache` set explicitly. Then, having seen them, the owner asked for four more plain and three more v2 repeats on the centre copy, and gave the rule for accepting v2: v2 is accepted if, on the centre copy's 8 plain runs, it is indistinguishable from plain as it is on `kitchen`, by the same comparison as the diagnostics (each arm's shift in plain standard deviations and a two-sided Mann–Whitney test, on the 1–1,000 means of L1, ꟻLIP and total).
 
 **The sharpness ratio, defined.** It comes from the notes' scorer, and the scorer was not run. A scratch script `score_a.py` computes it anew, and its figures equal the score files the notes keep beside `c3_s4` and `h1_init_s4` in every printed digit (row T24.5).
 
@@ -983,7 +983,7 @@ The plain ranges are 8 runs on `kitchen`, stopped after 2,200, and 4 on the cent
 | `kitchen`, each plain run against the other 7 | 8 | 8 of 8 | 3 of 8 | 8 of 8 | 8 of 8 | 3 of 8 pass |
 | Centre copy, each plain run against the other 3 | 4 | 2 of 4 (gaps up to 5.2·10⁻⁵) | 0 of 4 | 4 of 4 | not reached | 0 of 4 pass |
 
-**v2 fails (a) on both scenes, and plain runs fail it against each other as often.** A run drawn like the others falls outside the range of n others in a term with chance 2/(n + 1), and outside on any of five correlated terms more often. On the centre copy, part 1 fails between plain runs too. Whether v2 is accepted is the owner's, and it is not recorded here.
+**v2 fails (a) on both scenes, and plain runs fail it against each other as often.** A run drawn like the others falls outside the range of n others in a term with chance 2/(n + 1), and outside on any of five correlated terms more often. On the centre copy, part 1 fails between plain runs too. (a) was therefore not used to accept v2; the owner's rule below decides it.
 
 **The diagnostics: which one finds the shift.** Each arm is a set of `kitchen` seed-0 runs stopped after 2,200. The table gives the arm's mean, over its runs, of the 1–1,000 loss means, against the 8 plain runs in units of their standard deviation, with a two-sided Mann–Whitney test against them (SciPy):
 
@@ -999,7 +999,15 @@ The plain ranges are 8 runs on `kitchen`, stopped after 2,200, and 4 on the cent
 - **The one shift located is version 1's.** Keeping the previous render output alive moved the losses up: L1 by 1.3 standard deviations of the plain runs, p = 0.004.
 - **What is not the cause, on `kitchen`.** The entry script, with nothing installed (ii), moves nothing distinguishable from noise. Diagnostic (iii) tested less than its name says. `kitchen`'s training frames take 21.8 GiB, more than half the card, so "auto" always resolves to "mmap" there (D-51's rule). Fixing "mmap" removed only the PNG-decoding iterations before the cache opens, and with that, v2 lies below the plain mean. The placement itself can differ only where the cache may fit, as on the centre copy (2.5 GiB), and was not tested there.
 - **Version 2 on `kitchen`** is not distinguishable from plain runs on these samples.
-- **On the centre copy** the three v2 repeats lie above all four plain runs in L1, ꟻLIP and total, 1.7 to 2.2 plain standard deviations high. That is complete separation; p = 0.057 is the smallest value a test of 3 runs against 4 can give. No diagnostic ran there, and no v2 run went to 30,000 iterations on either scene, so part 4 of (a) was never judged on the centre copy.
+- **On the centre copy, first count.** The three v2 repeats lay above all four plain runs then in L1, ꟻLIP and total, 1.7 to 2.2 plain standard deviations high. That is complete separation; p = 0.057 is the smallest value a test of 3 runs against 4 can give.
+- **On the centre copy, at the owner's 8 plain runs** (the baseline's and 7 repeats to 1,100) **and 6 v2 runs:**
+
+  | Arm | Runs | L1 | ꟻLIP | Total |
+  | --- | --- | --- | --- | --- |
+  | Plain `ftgs train` | 8 | 0.072858 (0.072644 to 0.073186) | 0.290293 (0.289562 to 0.291249) | 0.229195 (0.228637 to 0.229972) |
+  | Wrapper v2 | 6 | 0.072985 (0.072912 to 0.073080): +0.70 SD, p = 0.08 | 0.290653 (0.290310 to 0.290918): +0.60 SD, p = 0.18 | 0.229479 (0.229252 to 0.229683): +0.62 SD, p = 0.14 |
+
+  On `kitchen` v2 lay +0.95 to +1.14 SD high, p = 0.19 to 0.28. **By the owner's rule, v2 is accepted:** on both scenes no test reaches p < 0.05, and the shifts are under 1.2 plain standard deviations. "Indistinguishable" is read here as p ≥ 0.05 in each of the three terms; the rule names no threshold, so that reading is this section's. Two facts sit beside the acceptance. All six v2 runs lie above the plain median in L1, and L1's p = 0.08 is close to the threshold. No v2 run went to 30,000 iterations on either scene, and no diagnostic ran on the centre copy.
 - **The final scores of the one full wrapper run there (v1)** differ from plain about as much as two seeds do. E16 PSNR on `cam0` is 24.78 against 24.79 dB, the crop's PSNR 24.36 against 24.36, the sharpness ratio 0.732 against 0.726. The near-side far-5 cm share is 0.126 against 0.140 and 0.141 (below): either a third draw of the measure's spread or the wrapper's own effect. The question is put below (question 3).
 
 **The reference init points files, fixed for every later arm** (section 4.4's line on the far-5 cm share). The files are the copies' kept stride-4 inits from `<private-scene-A-exp>`, D-21's stride, which `c3_s4` and `h1_init_s4` trained from (row T24.3). Copied unchanged to `<surface-runs>/ticket-24/init/`, they are the files the baseline trained from:
@@ -1092,7 +1100,7 @@ What these runs give the criteria (section 4.4):
 
 **Against the ticket's acceptance criteria.**
 
-- **Parity on both scenes.** Not met as the PRD wrote it, and not met by the owner's replacement (a). Plain runs meet neither reliably, so the call is the owner's (above).
+- **Parity on both scenes.** Not met as the PRD wrote it, nor by the owner's first replacement (a), which plain runs meet no more reliably. Met by the owner's acceptance rule, on 8 plain runs per scene against 3 (`kitchen`) and 6 (centre copy) v2 runs, read at p ≥ 0.05 (above).
 - **The seven baseline runs, each with its measures.** Done: the tables above, from the files under `<surface-runs>/ticket-24/`.
 - **One reference init points file per copy.** Fixed and recorded above.
 - **The sharpness ratio and its spread.** Defined above, at the owner's answer, with its spread between the centre copy's two seeds beside every near-side measure's.
@@ -1108,12 +1116,12 @@ What these runs give the criteria (section 4.4):
    - (c) also retrain the baseline from fresh inits.
 
    Recommended: (a). It is section 4.4's two-reference rule for finalist 1 with a fresh manifest-camera file, and costs one init.
-3. **Parity and the off arm.** It blocks every arm through the script, finalists 2 to 4. Options:
-   - (a) accept wrapper v2 on the evidence above;
-   - (b) run a full v2 seed-0 run and another plain seed-0 run on the centre copy, measured like the baseline (about 27 minutes of GPU), to tell readings (i) and (ii) of the 0.015 apart;
-   - (c) compare finalists 2 to 4 with an off arm through the script, v2 at weight 0 at two seeds, instead of the plain baseline. The script's own effect then cancels out of the comparison.
+3. **The wrapper's effect on the named measure.** v2 is accepted on its losses. The one full wrapper run on the centre copy, though, was v1, and its near-side far-5 cm share lies 0.015 below the plain seeds'. Whether that is v1's shift or the measure's own spread is not settled. Options:
+   - (a) nothing more, with v2 accepted;
+   - (b) run a full v2 seed-0 run and another plain seed-0 run on the centre copy, measured like the baseline (about 27 minutes of GPU);
+   - (c) compare finalists 2 to 4 with an off arm through the script, v2 at weight 0 at two seeds, instead of the plain baseline, so that the script's own effect cancels out of the comparison.
 
-   Recommended: (b), then (c) if (ii) holds.
+   Recommended: (b) before step 4, then (c) if v2's share also lies apart from plain's. It bears on finalists 2 to 4's readings, not on step 3, finalist 1, which needs no script.
 4. **Two seeds and the named measure.** A third draw moved the near-side far-5 cm share by 0.015. Whether section 4.4's two seeds per arm stand is for the owner, and nothing here changes them.
 
 **The commands.** Each ran with `OMP_NUM_THREADS=16 MKL_NUM_THREADS=16 OPENBLAS_NUM_THREADS=16`, `PYTHONPATH=<worktree>/src:<worktree>/harness/src` and the shared `.venv`'s Python, the CPU ones with `CUDA_VISIBLE_DEVICES=` empty and the GPU ones under the shared lock. Every timed training ran under `/usr/bin/time -v`, with `nvidia-smi` sampling memory once a second. `$T` is `<scratch>/ticket-24`, `$O` is `<surface-runs>/ticket-24`, `$X` is `<private-scene-A-exp>`, `$K` is `<m15-runs>/kitchen`, `$M` is `<m17-runs>`, `$G` is `$OPENFTGS_DATASETS/synth/ground_truth`, `$S` is `<surface-runs>/ticket-5/side_request.json`. The scripts are not committed.
@@ -1124,7 +1132,7 @@ What these runs give the criteria (section 4.4):
 | `ftgs train $M/studio/scene/scene.json --init $M/studio/init.safetensors --out $O/runs/studio_s0 --seed 0` | GPU | 23 min 45 s | The baseline on `studio`; peak 23,868 MiB |
 | `ftgs train $X/scene_h<c>/scene.json --init $O/init/ref_h<c>_s4.safetensors --out $O/runs/A_h<c>_s<n> --seed <n>`, for (c, n) = (0, 0), (0, 1), (1, 0) | GPU | 13 min 9 s, 13 min 12 s, 13 min 24 s | The baseline on private scene A, the copies' manifests as `<private-scene-A-exp>` holds them; peak 23,394 to 23,982 MiB |
 | `python $T/wrap_train_v1.py --stats … -- <the same arguments>`, for `kitchen` and the centre copy at seed 0 | GPU | 17 min 20 s, 13 min 29 s | The parity runs, wrapper v1, every weight at 0, 30,000 calls of each wrapper |
-| `bash $T/short_run.sh`-driven repeats of the same commands (`wrap_train.py` for v2 and `--no-patch`), stopped by SIGTERM once the log passed iteration 2,200 (`kitchen`) or 1,100 (the centre copy): 7 plain, 3 v1, 3 v2, 3 `--no-patch`, 3 plain and 3 v2 with `--config` holding `{"perf": {"frame_cache": "mmap"}}` on `kitchen`; 3 plain and 3 v2 on the centre copy | GPU | about 2.5 and 1.5 min each | The parity control and the diagnostics; each saved its checkpoint and exited 143 |
+| `bash $T/short_run.sh`-driven repeats of the same commands (`wrap_train.py` for v2 and `--no-patch`), stopped by SIGTERM once the log passed iteration 2,200 (`kitchen`) or 1,100 (the centre copy): 7 plain, 3 v1, 3 v2, 3 `--no-patch`, 3 plain and 3 v2 with `--config` holding `{"perf": {"frame_cache": "mmap"}}` on `kitchen`; 7 plain and 6 v2 on the centre copy | GPU | about 2.5 and 1.5 min each | The parity control and the diagnostics; each saved its checkpoint and exited 143 |
 | `python $T/parity.py`, `python $T/parity2.py`, `python $T/arms.py` on the runs' `train_log.jsonl` | CPU | under 1 s each | The tables of parity, of (a) and of the diagnostics |
 | `ftgs init roma $X/scene_h0/scene.json $O/init/regen_h0_s4.safetensors --stride 4`, with `PYTHONPATH` adding ticket #18's `env-init` | GPU | 1 min 23 s | The reproduction check: 120,000 points, other positions |
 | `ftgs render <checkpoint> --request $S`; `ftgs render <checkpoint> --request $X/requests/heldout_novel.json` (the left copy: `heldout1_novel.json`) | GPU | seconds each | The sheet's 39 renders and the scorer's 142 |
