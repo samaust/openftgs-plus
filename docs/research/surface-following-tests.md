@@ -1413,6 +1413,115 @@ The private scene's folders, `<m15-runs>` and `<m17-runs>` were read and never w
 
 *Ticket #26's section.* Finalist 2's patch search, timed on one training image, then its arms, run as the research document's section 5.4 says and judged by section 4.4's criteria.
 
+**The first step** was run on 2026-11-17, at the owner's go of that day (section 4 here), before any arm or off-arm run, with this branch's code at ef7864b (`src/` and `scripts/` as `main`'s), Python 3.14.10, torch 2.15.0+cu132, gsplat 1.5.3, NumPy 2.5.4 and Pillow 13.0.0 from the shared `.venv`. The hardware was one RTX 4090 (driver 595.99.02), under the shared GPU lock, with 16 CPU threads. During every timing no other compute process held the GPU: `nvidia-smi` listed one desktop application holding 384 MiB, at 0 % utilization. Scripts read tensors, JSON and images and wrote numbers. No image or render of private scene A was looked at.
+
+**The owner's answers at step 4's go** (the ends of sections 2.6, 3 and 4 here):
+
+- **The named measure** is the near-side far-5 cm share, with the tail beyond 25 cm beside it, read by rule (b) with the margin 0.021. The under-two-frames share is reported but is not the criterion (section 2.6 here, question 6, option (a); section 3 here, question 1).
+- **Finalist 1 is dropped,** so the arm trains on the manifest's cameras (section 4 here, question 2, option (a)).
+- **The off arm** is wrapper v2 with every added weight at 0, at two seeds per copy of private scene A and on `kitchen` (seeds 0 to 2) and `studio` (seed 0), as the baseline is. It is run once, here, and reused by finalists 3 and 4. Section 3 here's plain baseline is reported beside it (section 3 here, question 3, option (b)).
+- **Two seeds per arm** stand.
+
+**The patch side** (the PRD's owner item 2). AligNeRF's paper gives it, re-read on arXiv (v1; row T26.1): a rendered patch of 32 × 32 is matched against every sub-patch of a 48 × 48 patch of the training image, "in all of our experiments", so the shift reaches 8 px each way, the window section 5.4 names. **The arm's patch side is 32 px.**
+
+**The term, as the arm runs it** (`<scratch>/ticket-26/align_term.py`, not committed). The paper's Eq. 4 is the minimum over sub-patches of D + λ·√(Δx² + Δy²), with D the squared L2 norm of the patch's difference and λ = 0.01 (row T26.1). E7's L1 replaces D here, as section 5.4 asks:
+
+| | AligNeRF (row T26.1) | The arm |
+| --- | --- | --- |
+| Patches | 32 × 32, 32 per batch, sampled anew each iteration, in a fine-tuning stage after a plain pre-training stage | The whole render tiled by 32 × 32 from its top-left corner at every iteration, from the first. Private scene A's 736 × 1280 tiles exactly; on `kitchen` (1352 × 1014) and `studio` (1920 × 1080) the last row (and on `kitchen` the last column) of patches is narrower, 22 px or 24 px |
+| The shifts | Every sub-patch of the 48 × 48 patch | Every shift with \|Δy\|, \|Δx\| ≤ 8 px: 289. At the image's edges a patch is compared on its pixels whose shifted target lies inside the image |
+| The distance | Squared L2, its normalization not stated | E7's L1: the mean over the patch's compared pixels and the channels |
+| The penalty | 0.01 · √(Δx² + Δy²) | The same, added to that mean (but see question 1 below) |
+| The choice | The minimum, inside the loss, at every iteration | The same: per patch at every iteration, without a gradient; ties go to the smaller shift, the zero shift first |
+| The value | L_PM, with a feature loss on VGG-19's first block that reads the aligned patch, weight 0.05 | The patches' costs at their shifts, averaged with weights equal to their pixel counts. At window 0 it is E7's L1 itself, and nothing else is computed (section 5.4) |
+| SSIM and the perceptual term | – | Unchanged: D-8's SSIM and D-89's ꟻLIP read the unshifted image |
+
+- **In the wrapper.** It is ticket #24's wrapper v2 copied (`<scratch>/ticket-26/wrap_train.py`), with one term, `align`, registered: λ_img · (L_align − L1), at weight 1. The total is then E7 with L_img's L1 replaced by the aligned one, and the package's own logged `l1` stays the plain L1. With the weight at 0, the off arm, nothing of the term runs. The copy also records, through a pass-through wrapper of a private method called once per run, where D-51's `auto` placed the frame cache.
+- **E10's g.** The term is on the colour render, so its gradient reaches the 2D means through `out.image` before `Trainer.step` reads their gradient. Growth's test against τ_pos and relocation's score read the new loss with no further step, as section 5.4 says.
+- **What the test settles for a revision.** SSIM and ꟻLIP do not read the shifted target in this arm. A shift is chosen per patch at every iteration, as the paper does, and is not held.
+
+**The scratch check** (`check_term.py`, on the CPU and on the GPU). It passes:
+
+- **A render that is the image shifted by k pixels costs k times the penalty.** The check covers k = 1 to 8 down, and k = 1, 4 and 8 up, left and right. The diagonals (1, 1), (3, 3) and (5, 5) cost k√2 times it, AligNeRF's Euclidean offset. It holds within 10⁻⁶ on random images of 1280 × 736 and 301 × 247, the second with partial patches, with every patch at the true shift. Beyond the window (k = 10) the value is not k times the penalty, and no shift exceeds the window.
+- **On a real frame it holds as a bound.** On a frame of `kitchen` the value stays at or below k times the penalty: the minimum can take a smaller shift where a patch is smooth. At the paper's relative scale (question 1) every patch takes the true shift.
+- **A window of 0 gives E7's L1.** The short cut returns `l1_loss`'s value exactly. The search forced at window 0 equals it within 10⁻⁷ relative, with the same gradient. The wrapped term λ_img · (L_align − L1) is 0 with a zero gradient.
+- **The batched search that the arm runs** makes the same choice per patch as a plain loop over the 289 shifts, on all 12 baseline renders below, at both scales, and on two random pairs. Its costs agree within 2·10⁻⁶ relative. Replayed as a CUDA graph, it gives the same values bit for bit.
+
+**The term on the baseline's own renders of training cameras.** Each render is the baseline checkpoint at a training camera's pose and time, against that camera's training image: `A_h0_s0` at `cam1`, frames 0, 30, 60, 90 and 119; `kitchen_s0` at `cam05`, frames 0, 100, 200 and 299; `studio_s0` at `0003`, frames 149, 179 and 208 (row T26.2). The table gives the share of pixels whose patch takes a shift other than 0, their mean shift, and how much the term's L1 part lies below E7's L1. Two scales of the penalty are shown: the ticket's, 0.01 against the patch's mean L1, and the paper's relative scale, 0.01 against a sum over the patch's 32 × 32 × 3 values, that is 0.01 / 3,072 ≈ 3.3·10⁻⁶ against the mean.
+
+| Run, frames | E7's L1 | Ticket's scale: pixels moved / mean shift / L1 lower by | Paper's relative scale: pixels moved / mean shift / L1 lower by | Paper's scale: patches at a shift of 4 px or more |
+| --- | --- | --- | --- | --- |
+| `A_h0_s0`, `cam1`, 5 frames | 0.0098 to 0.0126 | 0.000 to 0.001 / 0.00 px / 0.1 % at most | 0.39 to 0.58 / 1.2 to 2.2 px / 2.5 % to 6.5 % | 16.7 % |
+| `kitchen_s0`, `cam05`, 4 frames | 0.0127 to 0.0131 | 0 / 0 / 0 | 0.08 to 0.14 / 0.1 to 0.4 px / 0.3 % to 1.3 % | 2.8 % |
+| `studio_s0`, `0003`, 3 frames | 0.0138 to 0.0153 | 0 / 0 / 0 | 0.02 to 0.04 / 0.05 to 0.08 px / 0.1 % to 0.2 % | 0.5 % |
+
+- **At the ticket's scale nothing moves at the end of training.** A trained model's L1 at a training camera is about 0.01 per patch, so a shift of one pixel costs as much as the whole patch's error. A run at this scale can choose shifts only while its renders are far from the images, early in training, and these renders cannot say how long that lasts.
+- **At the paper's relative scale, private scene A stands apart.** Between 39 % and 58 % of its pixels' patches take a shift, 17 % of them by 4 px or more, against 8 % to 14 % on `kitchen` and 2 % to 4 % on `studio`, whose cameras agree. That is the order section 2.5 measured for the person's residual after the turns, 0.9 to 4.0 px at the median.
+
+**The search, timed on one training image.** It was timed on the first frame of each set above, synchronized, after 5 warm-up calls, as the median of 100 calls. The term's time includes its value and its backward to a render that requires a gradient, against E7's L1 and its backward:
+
+| Image | The term, graphed (median; 90th percentile) | Of which the search | E7's L1 | Extra memory at peak | A baseline iteration (30,000 in the run's time) | The term's share of it |
+| --- | --- | --- | --- | --- | --- | --- |
+| Private scene A, 736 × 1280 | 8.1 ms; 8.2 ms | 7.9 ms | 0.06 ms | 69 MiB, and 22 MiB held by the graph | 26 ms | +31 % |
+| `kitchen`, 1352 × 1014 | 11.3 ms; 11.3 ms | 11.0 ms | 0.12 ms | 102 MiB, and 31 MiB | 34 ms | +34 % |
+| `studio`, 1920 × 1080 | 21.7 ms; 21.8 ms | 21.2 ms | 0.19 ms | 155 MiB, and 48 MiB | 48 ms | +46 % |
+
+- **The first form was slower.** A loop over the 289 shifts took 120 ms, 141 ms and 160 ms on the same images. Batching the shifts and replaying them as one CUDA graph removed the launches; what remains is bound by memory traffic.
+- **What this time is.** It is a one-line note, not a benchmark. Section 5.4's assumption of 1 to 2 times a default run holds: the arm's runs should take 1.3 to 1.5 times the baseline's.
+- **Memory.** The baseline's runs on private scene A peaked at 23,394 to 23,982 MiB of the card's 24,564 MiB in `nvidia-smi` (section 3 here). The term adds up to 70 MiB there, and it may change where D-51's `auto` puts the frame cache. Both arms record the placement.
+
+**The arm and the off arm, as planned for the owner's go.**
+
+- **The arm.** The default training configuration, 30,000 iterations, through the wrapper copy with `--term align=1`: window 8 px, patch side 32 px, penalty 0.01 at the scale question 1 settles. Nothing else differs.
+- **The off arm.** The same script with `--term align=0`, which is wrapper v2.
+- **The runs, eight per arm, mirrored.**
+  - On private scene A: the centre copy and the left copy at seeds 0 and 1, from the kept stride-4 files `ref_h0_s4` and `ref_h1_s4` (section 3 here).
+  - On openftgs-synth: `kitchen` at seeds 0, 1 and 2, and `studio` at seed 0, from M17's init files.
+  - The left copy's second seed is one run more than section 5.2's three per arm. The owner's off arm has it, and section 4.4's rule needs two seeds a side to read the left copy.
+- **The measures** are section 3 here's, by ticket #24's scripts copied unchanged:
+  - the named measure against the kept files, with the tail beside it;
+  - the under-two-frames share, near side and whole model;
+  - the sharpness ratio and the tiles' coverage;
+  - the test-view scores with Q-233's kept-pixel PSNR on the centre copy;
+  - on openftgs-synth, `scripts/gt_depth.py`'s shares, `scripts/reference_flaws.py`'s kept-pixel PSNR and the far shares.
+
+  The arm's logs also carry, every 100 iterations, the share of pixels whose patch moved and the mean shift. The sheets of each copy and seed, off arm and arm, are relabelled blind as in section 4 here.
+- **GPU hours, estimated from the baseline's times and the term's timing.**
+
+  | Part | Estimate |
+  | --- | --- |
+  | The off arm: 4 runs on private scene A, 3 on `kitchen`, 1 on `studio` | 54 min + 51 min + 24 min, about 2.1 hours |
+  | The arm, at 1.31, 1.34 and 1.46 times those | 70 min + 68 min + 35 min, about 2.9 hours |
+  | Renders, scores, `gt_depth.py` and `reference_flaws.py`, about 16 runs | about 0.6 hours |
+  | In all | **about 5.6 hours** |
+
+  That is beyond the ticket's 2 to 4 hours, which counted no off arm through the script. The off arm alone is 2.1 hours, and finalists 3 and 4 reuse it.
+
+  Two ways to save time, neither assumed: ticket #24's `A_h0_s0_v2` is already a full v2 run of the centre copy at seed 0, and reusing it as the off arm's run saves 13 minutes. Running the arm on the left copy at one seed, as section 5.2 plans, saves 17 minutes more, but leaves the left copy unreadable by the rule.
+
+**The questions for the owner at the first step.**
+
+1. **The penalty's scale.** The paper's 0.01 is set against a sum of squared differences over a patch, with no normalization stated (row T26.1). The ticket's check, "a shift of k pixels costs k times the penalty, and a window of 0 gives E7's L1", puts the same 0.01 against the patch's mean L1. Against the mean, one pixel of shift costs about as much as a trained model's whole error in a patch.
+   - (a) The ticket's scale: 0.01 against the patch's mean L1. On the baseline's renders nothing moves (above). The arm can then differ from the off arm only early in training. If it ends near the off arm, that cannot be told from section 7.2's drop clause, "the share does not move".
+   - (b) The paper's relative scale: 0.01 against the patch's sum over its 32 × 32 × 3 values, 3.3·10⁻⁶ against the mean. The penalty is then what the paper calls it, a tie-breaker for blurry patches. On the baseline's renders 39 % to 58 % of private scene A's pixels move, against 2 % to 14 % on openftgs-synth. The check holds as stated, with the penalty in the mean's units.
+   - (c) Both, as two arms: about 2.9 GPU hours more.
+
+   **Recommended: (b).** It is the paper's setting (section 1 here: one arm per finalist at its paper's settings), and it is the scale at which the term acts on what section 2.5 measured. A 300-iteration run of each scale on `kitchen` would show how early (a) stops choosing shifts. It takes about 2 minutes and was not run before the go.
+2. **The hours:** about 5.6 GPU hours (above), or less by the two savings.
+3. **The left copy's second seed for the arm** (above): run it, recommended, or keep section 5.2's one seed.
+
+**The first step's commands.** Each ran with `OMP_NUM_THREADS=16 MKL_NUM_THREADS=16 OPENBLAS_NUM_THREADS=16`, `PYTHONPATH=<worktree>/src:<worktree>/harness/src` and the shared `.venv`'s Python. The CPU ones ran with `CUDA_VISIBLE_DEVICES=` empty, the GPU ones under the shared lock. `$T` is `<scratch>/ticket-26`, `$O` is `<surface-runs>/ticket-26`, `$B` is `<surface-runs>/ticket-24/runs`, `$X` is `<private-scene-A-exp>`, `$K` is `<m15-runs>/kitchen`, `$M` is `<m17-runs>`. The scripts are not committed.
+
+| Command | Device | Time | Note |
+| --- | --- | --- | --- |
+| `curl -sSL -o $T/dl/aligner.html https://arxiv.org/html/2211.09682`, then a text extraction | CPU | seconds | AligNeRF re-read (row T26.1) |
+| `python $T/check_term.py --penalty <0.01 or 0.01/3072> --image $K/images/cam05/000100.png` | CPU, and GPU with `--device cuda` | 20 to 50 s | The scratch check; passes at both scales |
+| `python $T/probe.py request <manifest> <camera> <frames> $O/probe/req_<set>.json` | CPU | seconds | Requests at training cameras' poses and times: `$X/scene_h0` `cam1`, `$K` `cam05`, `$M/studio/scene` `0003` |
+| `ftgs render $B/<run>/checkpoint --request $O/probe/req_<set>.json --out $O/probe/render_<set>.safetensors`, for `A_h0_s0`, `kitchen_s0`, `studio_s0` | GPU | seconds each | The baseline's renders of training images |
+| `python $T/probe.py measure $O/probe/req_<set>.json $O/probe/render_<set>.safetensors $O/probe/probe_<set>.json` | GPU | about 1 min each | The shares moved at both scales; the first form's timing (120 to 160 ms) |
+| `python $T/equiv.py <the three pairs of request and renders>` | GPU | about 1 min | The batched and graphed searches against the loop |
+| `python $T/prof.py <the same>` | GPU | about 1 min | The table of times |
+
 **The owner's answer on step 4** (the go for step 5 or a stop): *not yet given.* **Date:** *not yet given.*
 
 ## 6. Step 5: finalist 3, surface terms without a prior
