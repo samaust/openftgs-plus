@@ -1471,6 +1471,12 @@ The private scene's folders, `<m15-runs>` and `<m17-runs>` were read and never w
 - **What this time is.** It is a one-line note, not a benchmark, and it is the term timed alone, not inside a training run. Section 5.4's assumption of 1 to 2 times a default run holds: the arm's runs should take 1.3 to 1.5 times the baseline's.
 - **Memory.** The baseline's runs on private scene A peaked at 23,394 to 23,982 MiB of the card's 24,564 MiB in `nvidia-smi` (section 3 here). The term adds up to 70 MiB there, and it may change where D-51's `auto` puts the frame cache. Both arms record the placement.
 
+**The owner's answers at the first step** (2026-11-17, in session, relayed by the orchestrating session, after the first step's report):
+
+- **The penalty's scale** (question 1 below): option (c), both. Two arms, window 8 px and patch side 32 px each: `align_rel` at the paper's relative scale as this section translates it (0.01 / 3,072 against the patch's mean L1), and `align_abs` at the ticket's (0.01 against it). The 300-iteration probes at both scales are cleared, as the smoke run.
+- **The hours** (questions 2 and 3): about 8.5 GPU hours cleared in all, for the off arm and both arms on both copies of private scene A at seeds 0 and 1, the left copy's second seed included, `kitchen` at seeds 0 to 2 and `studio` at seed 0. Ticket #24's `A_h0_s0_v2` is reused as the off arm's run on the centre copy at seed 0, since it is wrapper v2 at every weight 0 on the same manifest, init and seed. Past about 9.5 hours, the work stops and reports first.
+- **The frame-cache record** on the off arm is accepted: it records only.
+
 **The arm and the off arm, as planned for the owner's go.**
 
 - **The arm.** The default training configuration, 30,000 iterations, through the wrapper copy with `--term align=1`: window 8 px, patch side 32 px, penalty 0.01 at the scale question 1 settles. Nothing else differs.
