@@ -911,7 +911,14 @@ Written on 2026-11-16 from sections 2.1 to 2.5 here and the research document's 
 
    **Recommended: (a),** on section 2.1 here's reading that finalists 1 and 2 keep their reason through the far share and the sheet. It blocks step 4.
 
-**The owner's answer on step 1** (each finalist kept or dropped, and the go for step 2 or a stop): *not yet given.* **Date:** *not yet given.*
+**The owner's answer on step 1** (each finalist kept or dropped, and the go for step 2 or a stop), given in session:
+- **Finalist 1: kept, with both pairings** (question 1, option (c)). Step 3 runs the corrected cameras with the manifest's pairs and, beside it, with the pairing the corrections give, and reports the pairing's effect apart from the correction's.
+- **Finalists 2, 3 and 4: kept.** Finalist 2's named measure is the near-side far-5 cm share, with the tail beside it, and the under-two-frames share stays a reported figure (question 6, option (a)).
+- **The ruler** (question 5): option (a). The near-side far-5 cm share stays the named measure of finalists 1, 3 and 4, and the share beyond 25 cm is reported beside it, with its reading rule fixed from the baseline's seeds.
+- **Questions 2, 3 and 4:** the recommendations stand, since the owner gave no other answer: the fourth model's figure stays empty, the four marks stay "Confirmed", and check (f)'s "passed" stands.
+- **Step 2: go.** The sharpness ratio's scorer is still to be pointed to in session, before the baseline is scored.
+
+**Date:** 2026-11-16.
 
 ## 3. Step 2: the baseline, the wrapper script and its parity runs
 
