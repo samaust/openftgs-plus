@@ -1165,7 +1165,14 @@ What these runs give the criteria (section 4.4):
 
 The private scene's folders, `<m15-runs>` and `<m17-runs>` were read and never written.
 
-**The owner's answer on step 2** (the go for step 3 or a stop): *not yet given.* **Date:** *not yet given.*
+**The owner's answer on step 2** (the go for step 3 or a stop), given in session after seeing the two full runs through the script:
+- **The off arm for finalists 2 to 4** (question 3): option (b). They are compared with an off arm through the script, v2 with every added weight at 0, at two seeds per copy of private scene A and on `kitchen` and `studio` as the baseline is, run once at step 4. The plain baseline stays the off arm of finalist 1, which needs no script.
+- **The tail's reading rule** (question 1): option (b). The tail has moved when both of the arm's seeds lie beyond both of the off arm's and the means differ by more than the plain runs' range, 0.021.
+- **Finalist 1's init** (question 2): option (a). Finalist 1 is measured against the kept stride-4 file and, beside it, against a fresh init from the manifest's cameras.
+- **Two seeds per arm** (question 4): they stand, since the owner gave no other answer.
+- **Step 3: go,** with finalist 1's optional control on `kitchen` (2 more GPU hours).
+
+**Date:** 2026-11-16.
 
 ## 4. Step 3: finalist 1, the cameras corrected once
 
