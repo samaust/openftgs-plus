@@ -362,6 +362,189 @@ The private scene's folders were read and never written.
 
 *Ticket #19's section.* One correction per camera, fitted on the background once per held-out copy without that copy's test-view images, then sections 2.5's and 2.7's measures again on held-out frames, stated in section 5.3's two cases.
 
+**What was measured, and with what.** One correction per camera of private scene A, fitted on the background's matches, then sections 2.5's and 2.7's measures again with the corrected cameras, on 2026-11-16, by uncommitted scratch scripts under `<scratch>/ticket-19` ("Runs", at the end of this section, lists every command), with the worktree's package (`src/` as on `main` at 02e3686), Python 3.14.10, torch 2.15.0+cu132, NumPy 2.5.4 and SciPy 1.18.1, within four CPU threads, and the RTX 4090 for six minutes of matching under the shared lock; the dense matcher's packages are PRD #1's scratch folder of source-log row 612. Results are in `<surface-runs>/ticket-19`. The scripts read private scene A's matches and manifests and, for the matching alone, its images, and wrote numbers and files; no image was looked at. Camera names are the manifests', as in section 2.5: `cam0` is the centre camera and `cam1` the one left of it.
+
+**The two copies, and the pairs the fit reads.** The *centre copy* holds `cam0` out and the *left copy* `cam1`: each is private scene A's manifest with that camera's 120 images in the test split, the same nine cameras bit for bit and the same images file for file (rows 850 and 851). Ticket #4's saved matches of D-22's seven pairs therefore serve both copies (row 852). D-22's pairing, run by the package on each manifest:
+
+| Manifest | D-22's pairs |
+| --- | --- |
+| private scene A, nine training cameras | `cam0`–`cam1`, `cam1`–`cam4`, `cam2`–`cam5`, `cam3`–`cam4`, `cam3`–`cam5`, `cam6`–`cam7`, `cam6`–`cam8` |
+| the centre copy | `cam1`–`cam4`, `cam2`–`cam5`, `cam3`–`cam4`, `cam3`–`cam5`, `cam6`–`cam7`, `cam6`–`cam8` |
+| the left copy | `cam0`–`cam2`, `cam2`–`cam5`, `cam3`–`cam4`, `cam3`–`cam5`, `cam6`–`cam7`, `cam6`–`cam8` |
+
+- **The rig's angles tie.** `cam0` is 15.0° from `cam1`, `cam2`, `cam3` and `cam6`; `cam1` from `cam0`, `cam4` and `cam7`; `cam2` from `cam0`, `cam5` and `cam8` (row 610). D-22 picks among them by the float32 values' last bits, so a turn of a tenth of a degree picks again ("The corrected manifests", below). A first pass fitted on D-22's own pairs only, and on the left copy the corrected manifest paired `cam0` with `cam3`, a pair that fit had not read.
+- **So the fit reads D-22's pairs with their ties kept:** each training camera with every camera within 0.01° of its closest. On the centre copy 8 pairs (`cam1`–`cam4`, `cam1`–`cam7`, `cam2`–`cam5`, `cam2`–`cam8`, `cam3`–`cam4`, `cam3`–`cam5`, `cam6`–`cam7`, `cam6`–`cam8`), on the left copy 9 (`cam0` with `cam2`, `cam3` and `cam6`; `cam2`–`cam5`, `cam2`–`cam8`, `cam3`–`cam4`, `cam3`–`cam5`, `cam6`–`cam7`, `cam6`–`cam8`), for the nine as one set all 12. Five of them were not ticket #4's and were matched for this section, all 120 frames each: `cam0`–`cam2`, `cam0`–`cam3`, `cam0`–`cam6`, `cam1`–`cam7` and `cam2`–`cam8`, by ticket #12's `match_pair.py` with the package's matcher and settings (D-58, Q-106; row 851).
+
+**The fit.**
+
+- **What it changes.** Each camera is turned about its own centre by three numbers, R' = exp([w]×) R with w in the camera's frame. Centres and K are kept; a variant that also moves the centres is given apart ("The variant that moves the centres", below).
+- **What it reads:** the background alone, the far matches of section 2.5's split by depth (the rays' closest approach 2.2 or more along camera A's axis, with the manifest's cameras), on the even frames.
+- **Two terms, both in pixels.**
+  - Each pair's Sampson error (section 2.5), on 1,500 far matches per pair and frame.
+  - For each camera with two partners, section 2.7's agreement in depth: its grid points admitted in both pairs, each triangulated with each partner (closest approach), and the two inverse depths along its axis compared, times f·b (789.2 px × 0.274 units). That is how far, in pixels along the epipolar line in the second partner's image, the match lies from where the first partner's depth puts it: the direction section 2.5's residual does not read. 500 points per camera, pair of partners and frame.
+  - Both through Cauchy's loss at a scale of 0.5 px, the one section 2.5's turn used, written into the residuals so that the two terms below stay quadratic.
+- **The rig's common turn is held at zero.** Turning every camera by one rotation, centres kept, leaves the matches of a distant point almost as consistent as before, so the background barely reads it (row 853). In each fit of several cameras the three smallest singular values of the Jacobian, 34 to 121 px per degree, lie well below the others, 181 to 7,300; the smallest is the common turn about the optical axes, and without the hold the fit drifts along the common turn about the vertical axis (below). Only the smallest one's direction was kept, so that the other two are the common turn's other components is inferred, not read. The mean turn of the cameras fitted together is held at zero (1,000 px per degree), which keeps the manifest's orientation of the rig as a whole. Without that hold, on the centre copy's D-22 pairs, every camera turned 2.2° to 5.0°, mostly about its vertical axis, for about the same background residual on the fit's own matches (0.28 to 0.55 px at the median by pair, against 0.24 to 0.59 px with the hold). A damping of 1 px per degree on each component keeps any other direction the matches leave free at the manifest's value.
+- **Solved** by SciPy's `least_squares` (trust region) from no turn, with the Jacobian by differences, block by block; every fit stopped on its cost or step tolerance, in 26 to 65 evaluations and 12 to 130 s.
+- **Per copy, two steps** (section 5.3, D-66, and the owner's answer at review 2, section 7.7):
+  1. the training cameras' turns, from the pairs between training cameras only, so that no image of the test view is read;
+  2. the held-out camera's turn, with the training cameras fixed at theirs, from its own images' matches with every camera at its smallest angle: `cam0` with `cam1`, `cam2`, `cam3` and `cam6`, and its six pairs of partners; `cam1` with `cam0`, `cam4` and `cam7`, and its three.
+- **The nine as one set:** one step over all 12 pairs and 22 pairs of partners; it never trains.
+- **Measured on the odd frames,** which no fit read, with every match's region (person or background) fixed by the manifest's cameras before and after, and every figure after a correction read from the corrected manifest as written and read back by the package's reader.
+
+**Checks of the fit.**
+
+- **The measures reproduce the research document's.** Over all 120 frames with the manifest's cameras, the scripts give section 2.5's table by depth and section 2.7's table of one camera with two partners, and its fixed relation, to the digits printed there: `cam1`–`cam4` 5.23 and 9.62 px on the person, 2.24 and 3.44 px on the background; `cam3` 6.45% and 8.47%, a = 1.077, b = −0.0045. On the odd frames alone the figures barely differ (the five cameras' person 3.99% and 6.10%, against 4.02% and 6.07%), so the odd frames' "before" columns below stand for section 2.5's and 2.7's.
+- **A turn put in is a turn taken out.** `cam4` was turned by (0.2°, −0.3°, 0.1°) in a manifest written by the same script, and fitted again on its two pairs and two partners: the camera so corrected lies 0.0035° from the one fitted on the manifest itself.
+- **The file is the fit.** Read back, each corrected camera's rotation differs from the fit's by 3·10⁻⁸ at most, float32's rounding.
+- **What the odd frames hold out.** The cameras and the background do not change from frame to frame, so the odd frames test the fit against new matches of the same scene, not against a new scene. The stronger hold-out is the test view's own pairs, which the first step never reads ("The held-out camera", below).
+
+**The corrections,** in degrees: the turn's angle, then its components about the camera's x, y and z axes (x to the right, y down, z along the optical axis).
+
+| Camera | The centre copy | The left copy | The nine as one set |
+| --- | --- | --- | --- |
+| `cam0` | 0.10° (−0.04, +0.03, +0.09) | 0.05° (−0.05, +0.00, +0.00) | 0.07° (−0.05, +0.04, +0.03) |
+| `cam1` | 0.24° (−0.06, −0.14, +0.18) | 0.23° (−0.05, −0.22, −0.01) | 0.21° (−0.05, −0.20, +0.03) |
+| `cam2` | 0.30° (−0.06, +0.18, −0.23) | 0.23° (−0.04, +0.22, −0.06) | 0.26° (−0.02, +0.25, −0.05) |
+| `cam3` | 0.20° (−0.07, +0.06, −0.17) | 0.09° (+0.04, −0.04, −0.07) | 0.08° (+0.04, −0.00, −0.06) |
+| `cam4` | 0.38° (+0.09, −0.37, +0.04) | 0.38° (+0.18, −0.33, −0.05) | 0.45° (+0.17, −0.40, −0.11) |
+| `cam5` | 0.37° (−0.09, +0.21, −0.29) | 0.25° (+0.04, +0.22, −0.12) | 0.27° (+0.05, +0.24, −0.10) |
+| `cam6` | 0.25° (+0.09, −0.01, +0.23) | 0.10° (−0.08, −0.03, +0.05) | 0.07° (−0.06, +0.02, +0.05) |
+| `cam7` | 0.38° (+0.12, +0.08, +0.35) | 0.26° (+0.01, −0.09, +0.24) | 0.22° (+0.03, −0.02, +0.22) |
+| `cam8` | 0.11° (−0.01, +0.03, −0.11) | 0.15° (−0.10, +0.11, +0.01) | 0.16° (−0.08, +0.14, −0.00) |
+
+- **Their size** is section 2.5's: 0.05° to 0.45°, where its turn of one camera per pair was 0.10° to 0.41°.
+- **The copies agree on most cameras:** `cam4` turns 0.38° to 0.45°, about −0.33° to −0.40° on its y axis, in all three fits; `cam2` and `cam5` +0.18° to +0.25° on theirs. They differ most where a copy reads a camera least: `cam3`, `cam6` and `cam7` on the centre copy, which lacks every pair with `cam0`, turn 0.20° to 0.38° there and 0.07° to 0.26° in the other two fits.
+
+**Epipolar residuals on the odd frames,** with section 2.5's split by depth: the median and the 90th percentile in pixels over every admitted match of the 60 odd frames.
+
+| Pair | The background: before | The centre copy | The left copy | The nine as one set |
+| --- | --- | --- | --- | --- |
+| `cam0`–`cam1` | 0.29, 0.89 | 0.28, 0.82 | 0.20, 0.87 | 0.20, 0.82 |
+| `cam1`–`cam4` | 2.25, 3.45 | 0.51, 1.43 | 1.15, 2.38 | 0.53, 1.46 |
+| `cam2`–`cam5` | 0.71, 2.63 | 0.48, 2.20 | 0.49, 2.06 | 0.49, 2.06 |
+| `cam3`–`cam4` | 1.30, 3.27 | 0.61, 2.11 | 0.67, 1.79 | 0.68, 2.10 |
+| `cam3`–`cam5` | 0.58, 1.62 | 0.52, 1.68 | 0.57, 1.57 | 0.58, 1.55 |
+| `cam6`–`cam7` | 0.70, 1.43 | 0.26, 1.06 | 0.26, 1.28 | 0.26, 1.24 |
+| `cam6`–`cam8` | 0.58, 2.78 | 0.48, 2.43 | 0.57, 2.25 | 0.59, 2.18 |
+| The 7 pairs together | 0.87, 2.85 | 0.43, 1.67 | 0.55, 1.92 | 0.47, 1.68 |
+| `cam0`–`cam2` | 0.42, 1.01 | 0.76, 1.59 | 0.37, 0.86 | 0.37, 0.88 |
+| `cam0`–`cam3` | 0.61, 1.20 | 0.49, 1.22 | 0.24, 0.62 | 0.24, 0.60 |
+| `cam0`–`cam6` | 0.43, 0.93 | 0.63, 1.07 | 0.31, 0.73 | 0.33, 0.74 |
+| `cam1`–`cam7` | 1.77, 3.67 | 0.53, 2.00 | 0.61, 2.52 | 0.49, 2.07 |
+| `cam2`–`cam8` | 1.25, 2.42 | 0.40, 2.36 | 0.43, 2.33 | 0.44, 2.40 |
+| The 5 other pairs together | 0.69, 1.94 | 0.55, 1.41 | 0.33, 1.14 | 0.33, 1.04 |
+
+| Pair | The person: before | The centre copy | The left copy | The nine as one set |
+| --- | --- | --- | --- | --- |
+| `cam0`–`cam1` | 0.95, 2.67 | 0.99, 2.71 | 0.95, 2.71 | 0.95, 2.71 |
+| `cam1`–`cam4` | 5.23, 9.72 | 3.17, 7.35 | 4.17, 8.60 | 3.40, 7.71 |
+| `cam2`–`cam5` | 1.10, 3.25 | 1.41, 3.57 | 1.24, 3.62 | 1.23, 3.62 |
+| `cam3`–`cam4` | 3.07, 6.92 | 1.98, 6.35 | 2.07, 6.27 | 2.17, 6.31 |
+| `cam3`–`cam5` | 3.81, 13.84 | 3.64, 13.28 | 3.71, 13.72 | 3.71, 13.74 |
+| `cam6`–`cam7` | 3.35, 6.47 | 3.71, 6.72 | 4.37, 7.51 | 4.34, 7.46 |
+| `cam6`–`cam8` | 1.88, 8.74 | 2.71, 10.06 | 2.02, 9.08 | 2.06, 9.17 |
+| The 7 pairs together | 2.37, 7.64 | 2.29, 7.04 | 2.35, 7.50 | 2.30, 7.30 |
+| `cam0`–`cam2` | 1.01, 3.20 | 1.24, 3.53 | 0.92, 2.97 | 0.89, 2.92 |
+| `cam0`–`cam3` | 1.48, 3.20 | 2.09, 3.66 | 1.25, 2.80 | 1.27, 2.78 |
+| `cam0`–`cam6` | 1.96, 3.92 | 1.45, 3.58 | 1.64, 3.62 | 1.74, 3.72 |
+| `cam1`–`cam7` | 3.55, 6.35 | 1.86, 4.54 | 2.47, 5.22 | 2.10, 4.81 |
+| `cam2`–`cam8` | 7.93, 14.71 | 6.25, 13.16 | 6.64, 13.60 | 6.63, 13.57 |
+| The 5 other pairs together | 2.31, 7.99 | 2.12, 6.37 | 1.88, 6.73 | 1.84, 6.68 |
+
+- **The background falls, not in every pair.** Over the seven pairs its median goes from 0.87 to 0.43 px on the centre copy, 0.55 px on the left copy and 0.47 px with the nine as one set, and its 90th percentile from 2.85 to 1.67 to 1.92 px. It falls most where it was most off: `cam1`–`cam4` from 2.25 to 0.51 px (1.15 px on the left copy, which reads `cam1` only in the second step), `cam3`–`cam4` from 1.30 to 0.61 to 0.68 px, `cam1`–`cam7` from 1.77 to 0.49 to 0.61 px, `cam2`–`cam8` from 1.25 to 0.40 to 0.44 px. It stays in `cam3`–`cam5` (0.58 to 0.52 to 0.58 px) and `cam6`–`cam8` (0.58 to 0.48 to 0.59 px), and on the centre copy it rises in `cam0`'s pairs with `cam2` and `cam6` (0.42 to 0.76 px, 0.43 to 0.63 px). Section 2.5's turn of one camera for one pair reached 0.28 to 0.60 px in every pair; one turn per camera for every pair at once reaches 0.20 to 0.76 px.
+- **The person's does not follow.** Over the seven pairs its median is 2.37 px before and 2.29, 2.35 and 2.30 px after, its 90th percentile 7.64 and 7.04 to 7.50 px. By pair it moves as section 2.5 found for its turn: lower where the background was most off (`cam1`–`cam4` from 5.23 to 3.17 to 4.17 px, `cam3`–`cam4` from 3.07 to 1.98 to 2.17 px, `cam1`–`cam7` from 3.55 to 1.86 to 2.47 px) and higher in `cam2`–`cam5`, `cam6`–`cam7` and `cam6`–`cam8` (`cam6`–`cam7` from 3.35 to 3.71 to 4.37 px).
+- **D-22's filters** (2 px in both views, in front of both, 1° between the rays), applied to a uniform sample of 2,000 admitted matches per pair, frame and region with each set of cameras. This is not the package's draw by certainty inside the crop, so it is not section 2.5's column. On the background they keep more where the residual fell (`cam1`–`cam4` from 69% to 93% to 97%, `cam3`–`cam4` from 74% to 92% to 94%). On the person, more in `cam1`–`cam4` (28% to 35% to 43%), `cam3`–`cam4` (47% to 61% to 64%) and `cam1`–`cam7` (34% to 53% to 64%), and fewer in `cam6`–`cam7` (45% to 25% to 37%) and `cam2`–`cam5` (87% to 80% to 83%).
+
+**The held-out camera.** Its pairs are the ones no training camera's fit read: the background's median on the odd frames, at three stages.
+
+| Copy | Pair | The manifest | The training cameras corrected, the held-out camera as in the manifest | The held-out camera corrected too | The nine as one set |
+| --- | --- | --- | --- | --- | --- |
+| the centre copy, `cam0` | `cam0`–`cam1` | 0.29, 0.89 | 0.92, 1.40 | 0.28, 0.82 | 0.20, 0.82 |
+| the centre copy, `cam0` | `cam0`–`cam2` | 0.42, 1.01 | 0.70, 1.63 | 0.76, 1.59 | 0.37, 0.88 |
+| the centre copy, `cam0` | `cam0`–`cam3` | 0.61, 1.20 | 0.79, 1.41 | 0.49, 1.22 | 0.24, 0.60 |
+| the centre copy, `cam0` | `cam0`–`cam6` | 0.43, 0.93 | 0.44, 1.34 | 0.63, 1.07 | 0.33, 0.74 |
+| the left copy, `cam1` | `cam0`–`cam1` | 0.29, 0.89 | 0.57, 1.21 | 0.20, 0.87 | 0.20, 0.82 |
+| the left copy, `cam1` | `cam1`–`cam4` | 2.25, 3.45 | 1.30, 2.31 | 1.15, 2.38 | 0.53, 1.46 |
+| the left copy, `cam1` | `cam1`–`cam7` | 1.77, 3.67 | 2.86, 4.82 | 0.61, 2.52 | 0.49, 2.07 |
+
+- **The manifest's pose of the test view no longer agrees with the corrected training cameras.** With them, `cam0`'s four pairs read 0.44 to 0.92 px at the median, against 0.29 to 0.61 px with the manifest's cameras, and `cam1`'s three 0.57 to 2.86 px, against 0.29 to 2.25 px. A model trained on a corrected manifest and scored at the manifest's pose of the test view is scored at a pose that disagrees with its training cameras by that much, which is why section 5.3 scores both poses.
+- **The held-out camera's own correction** brings `cam1`'s pairs to 0.20 to 1.15 px and `cam0`'s to 0.28 to 0.76 px. On the centre copy, `cam0`'s pairs with `cam1` and `cam3` end below the manifest's and those with `cam2` and `cam6` above: the training cameras' turns, fitted without `cam0`, leave no pose of `cam0` that agrees with its four partners as well as the manifest's did. The nine fitted as one set reach 0.20 to 0.37 px on `cam0`'s pairs and 0.20 to 0.53 px on `cam1`'s. That is what D-66's fit per copy costs here, against the nine fitted as one set: up to 0.4 px on the held-out camera's pairs, and 0.6 px on `cam1`–`cam4` on the left copy (1.15 against 0.53 px).
+
+**Agreement in depth between the pairs that share a camera,** as section 2.7's "One camera, two partners": per camera and pair of partners, the median over the odd frames of each frame's median of |z₂/z₁ − 1|, and of its 90th percentile, then the signed median; the person by the first partner's depth (with the manifest's cameras) and rule a's crop, the background at 2.2 or more. The five cameras' row pools their 300 frames, as section 2.7's row of 600.
+
+| Camera | Its two partners | The person: before | The centre copy | The left copy | The nine as one set |
+| --- | --- | --- | --- | --- | --- |
+| `cam1` | `cam0`, `cam4` | 1.37%, 2.83%; −0.87% | 1.48%, 3.02%; −0.82% | 1.39%, 2.79%; −1.15% | 1.46%, 2.84%; −0.95% |
+| `cam3` | `cam4`, `cam5` | 6.45%, 8.47%; −6.45% | 4.38%, 6.44%; −4.37% | 6.24%, 8.08%; −6.24% | 5.47%, 7.38%; −5.47% |
+| `cam4` | `cam1`, `cam3` | 3.90%, 5.67%; +3.90% | 1.67%, 3.38%; +1.53% | 3.51%, 5.19%; +3.51% | 2.54%, 4.24%; +2.53% |
+| `cam5` | `cam2`, `cam3` | 1.58%, 4.10%; +0.41% | 1.69%, 4.67%; −1.09% | 1.58%, 4.36%; −0.86% | 1.57%, 4.33%; −0.84% |
+| `cam6` | `cam7`, `cam8` | 5.85%, 7.57%; −5.85% | 6.87%, 8.51%; −6.87% | 6.15%, 7.91%; −6.15% | 6.30%, 8.04%; −6.30% |
+| The five cameras | – | 3.99%, 6.10%; 4.1 cm | 2.96%, 5.34%; 3.4 cm | 3.80%, 6.01%; 4.1 cm | 3.19%, 5.51%; 3.4 cm |
+
+| Camera | Its two partners | The background: before | The centre copy | The left copy | The nine as one set |
+| --- | --- | --- | --- | --- | --- |
+| `cam1` | `cam0`, `cam4` | 1.71%, 5.81%; −0.39% | 1.32%, 3.78%; −0.38% | 1.57%, 5.20%; −0.59% | 1.37%, 4.01%; −0.28% |
+| `cam3` | `cam4`, `cam5` | 6.25%, 13.90%; −3.74% | 5.99%, 12.21%; +2.87% | 5.02%, 10.90%; −2.11% | 5.93%, 10.31%; +1.99% |
+| `cam4` | `cam1`, `cam3` | 5.34%, 12.80%; +5.34% | 2.05%, 6.79%; +0.24% | 3.85%, 10.20%; +3.82% | 1.85%, 5.69%; +0.50% |
+| `cam5` | `cam2`, `cam3` | 4.98%, 8.53%; +4.96% | 1.58%, 4.91%; −0.23% | 1.50%, 4.73%; −0.31% | 1.51%, 4.84%; −0.42% |
+| `cam6` | `cam7`, `cam8` | 3.14%, 5.57%; +2.72% | 1.95%, 5.74%; +0.51% | 1.55%, 4.13%; +0.16% | 1.54%, 4.18%; −0.07% |
+| The five cameras | – | 4.59%, 8.83%; 19.2 cm | 1.92%, 5.60%; 8.0 cm | 2.45%, 6.21%; 8.8 cm | 1.76%, 5.12%; 6.9 cm |
+
+| Camera | Its two partners | Scale a: before; the centre copy, the left copy, the nine | Shift b (per unit of depth): before; after | The person, what the relation leaves: before; after |
+| --- | --- | --- | --- | --- |
+| `cam1` | `cam0`, `cam4` | 1.009; 1.006, 1.011, 1.008 | −0.0021; −0.0023, −0.0021, −0.0032 | 1.58%; 1.64%, 1.55%, 1.62% |
+| `cam3` | `cam4`, `cam5` | 1.077; 1.076, 1.079, 1.082 | −0.0042; −0.0221, −0.0095, −0.0192 | 1.32%; 1.31%, 1.27%, 1.28% |
+| `cam4` | `cam1`, `cam3` | 0.971; 0.977, 0.971, 0.968 | −0.0073; +0.0069, −0.0032, +0.0069 | 1.01%; 1.06%, 1.01%, 0.99% |
+| `cam5` | `cam2`, `cam3` | 1.010; 1.016, 1.013, 1.013 | −0.0097; −0.0012, −0.0004, 0.0000 | 1.66%; 1.75%, 1.64%, 1.63% |
+| `cam6` | `cam7`, `cam8` | 1.099; 1.107, 1.092, 1.094 | −0.0366; −0.0335, −0.0277, −0.0276 | 1.51%; 1.48%, 1.60%, 1.59% |
+
+- **The person's 4.0% falls to 3.0% to 3.8%, not towards 1.0% to 1.6%.** Over the five cameras, 3.99% before (4.1 cm), 2.96% on the centre copy (3.4 cm), 3.80% on the left copy (4.1 cm) and 3.19% with the nine as one set. By camera: `cam4` from 3.90% to 1.67% to 3.51%, `cam3` from 6.45% to 4.38% to 6.24%; `cam1` and `cam5` about the same; `cam6` from 5.85% to 6.15% to 6.87%, higher. How much falls depends on which camera the copy leaves out.
+- **The background's falls by half.** Over the five cameras, 4.59% before (19.2 cm), 1.92%, 2.45% and 1.76% after; by camera, `cam4`, `cam5` and `cam6` to 1.5% to 3.9%, and `cam3` hardly (6.25% to 5.0% to 6.0%).
+- **Why the person's does not follow: the turn reaches b and not a.** Section 2.7 found one fixed relation per camera, 1/z₂ = a/z₁ + b, that takes the person's 4.0% to 1.0% to 1.6%. Fitted again over the odd frames, its scale a does not move with any fit (`cam3` 1.077, then 1.076 to 1.082; `cam6` 1.099, then 1.092 to 1.107; `cam4` 0.971, then 0.968 to 0.977), its shift b does, and it leaves 1.0% to 1.8% on the person after every fit as before. A turn along the epipolar lines adds one amount to every inverse depth, which is b; a scale of every depth, a, needs a baseline or a focal length that is not the manifest's (section 2.7). The turns took out part of b, and with it half of the background's figure; on the person the scale part, 8% to 10% for `cam3` and `cam6`, is what stays.
+- **Pairs of partners beyond section 2.7's five** tell the same. Of the 17 more that the five other pairs make, the person's figure falls by more than half a point on both copies in 6 (`cam3` with `cam0` and `cam4` from 5.48% to 1.78% and 3.88%; `cam1` with `cam0` and `cam7` from 5.55% to 3.30% and 3.71%), rises as much in 4 (`cam0` with `cam2` and `cam3` from 2.27% to 3.96% and 3.03%) and stays in 7; the background's falls in 13 and rises in none.
+
+**The variant that moves the centres.** A turn reaches section 2.7's shift b and not its scale a, which needs a baseline or a focal length. So the same fit was run again with each camera's centre free as well, three more numbers damped at 1 px per cm, the rig's common shift and its size (the mean distance of the centres from their centroid) held as its common turn is, on 600 and 250 points per pair or camera and frame. A first try that held the shift and not the size grew the rig 2.4 times, which shrinks every inverse depth and the depth term with it, and was stopped. The variant is evidence on what a centre move can reach, not a manifest proposed for training: it moves S.
+
+- **The centres move** up to 2.4 cm (`cam4` and `cam8` on both copies; the held-out cameras 0.2 cm and 1.5 cm), and the turns stay 0.08° to 0.42°.
+- **The background falls a little further:** 0.38 and 0.40 px over the seven pairs at the median, 1.33 and 1.40 px at the 90th percentile, against 0.43 and 0.55 px with turns alone.
+- **The person's residual rises:** 3.23 and 5.65 px over the seven pairs at the median, 12.0 and 14.3 px at the 90th percentile, against 2.37 and 7.64 px before. A centre moved to suit the background is wrong for the person, whose matches it moves more since they are nearer (section 2.5, "What the turn does and does not show").
+- **The person's 4.0% between pairs** is 3.58% and 3.09%. The scale a now moves, but not towards 1 in every camera: `cam3`'s from 1.077 to 0.967 and 1.005, so its person falls to 3.71% and 1.77%, while `cam4`'s goes from 0.971 to 1.109 and 1.089, and its person rises to 7.42% and 5.64%.
+- **D-22's pairs flip on these too:** `cam1`–`cam7` on the centre copy, `cam0`–`cam6` on the left copy.
+
+So this centre move, fitted on the background, does not reach the person's offset either, and it costs the person's epipolar residual and S. How well the background fixes the centres was not measured, and shifts of 2 cm from the background alone may be loose; a focal length per camera, the other cause section 2.7 names for a, was not tried.
+
+**Centres and S (D-27).** The turns move no centre: read back from the corrected manifests, the largest change of a centre is 2.6·10⁻⁸ units, float32's rounding, and S by the package's `spatial_scale` (factor 1) is 0.378230496 before and 0.378230499 after on the centre copy, 0.402766772 and 0.402766771 on the left copy. E13's position rates and growth's split threshold of 0.01·S are unchanged. The variant that moves the centres changes S by +1.2% on the centre copy (0.378230 to 0.382828) and +0.37% on the left copy (0.402767 to 0.404241), and E13's rates and the split threshold with it; it stays in `<surface-runs>/ticket-19/manifests/V2`, not proposed for training.
+
+**The corrected manifests.** In `<surface-runs>/ticket-19/manifests/P/h0` (the centre copy) and `P/h1` (the left copy), each `scene.json` beside a link `images` to its copy's images, not committed:
+
+- **What they are:** the copy's manifest unchanged, records, splits, paths and metadata, except every camera's `world_to_camera`, turned as above, and a `metadata.camera_correction` that records the tool (this section's scratch fit, a prototype), the copy's SHA-256, both steps' settings, and per camera its turn, its centre's shift (none) and its `world_to_camera` before. The test view's two poses, the manifest's and the corrected one, are both in the file (section 5.3's measures row).
+- **Valid `ftgs-scene` v1 files:** the package's `read_scene_manifest` and `MultiViewVideo.from_manifest` read each without error, 1,080 records, 120 of them the test view's, and load one training and one test image through the link.
+- **D-22's pairs change on both,** since the turns break the 15.0° ties (above): on the centre copy `cam1`–`cam4` and `cam2`–`cam5` become `cam1`–`cam7` and `cam2`–`cam8`; on the left copy `cam0`–`cam2` and `cam2`–`cam5` become `cam0`–`cam6` and `cam2`–`cam8`. The fit read all four new pairs. But an init on a corrected manifest would take `cam2`'s person from `cam2`–`cam8`, where D-22's filters keep 0.8% to 2.1% of the person's sample against 80% to 83% in `cam2`–`cam5`, and where the person disagrees by 6.3 to 7.9 px at the median before and after; `cam1`–`cam7` keeps more of it than `cam1`–`cam4` (64% against 43% on the centre copy) and `cam0`–`cam6` a little less than `cam0`–`cam2` (82% against 89% on the left copy). So a run on a corrected manifest would differ from the baseline's in its init's pairs as well as in its cameras; whether finalist 1's inits keep the manifest's pairs is put to the owner (step 1's review, section 2.6 here).
+- **The test view at the manifest's pose beside the corrected training cameras** is `P/h0-train-only` and `P/h1-train-only`: each copy's manifest with its first step's turns alone, the files that score the test view's first pose ("The held-out camera", above).
+- **The nine as one set** has its manifest in `P/all9-never-trains`, for these measures only. The first pass's manifests, on D-22's own pairs, are set aside in `first-pass-not-for-training`.
+
+**The outcome: section 5.3's second case.** The background's residual falls, over the seven pairs from 0.87 to 0.43 to 0.55 px, though not in every pair; the person's epipolar residual does not (2.37 to 2.29 to 2.35 px), and its 4.0% between pairs falls to 3.0% on one copy and 3.8% on the other, not towards the 1.0% to 1.6% that section 2.7's fitted relation leaves, which the turns leave in place. So finalist 1, with turns fitted on the background, tests the background's part of the disagreement alone, and little change is expected on the person (section 5.3, "The route, and the first step"). The variant that also moves the centres gives the same case, with the person's epipolar residual higher and S moved. The nine as one set does not reconcile the pairs either: it gives about the copies' figures (0.47 px and 2.30 px over the seven pairs, 3.19% on the person's depth), with `cam3`'s background still 5.9% and `cam6`'s person 6.3%.
+
+**Runs.** `python` is the shared `.venv`'s, with `PYTHONPATH=<worktree>/src:<worktree>/harness/src` and `OMP_NUM_THREADS`, `MKL_NUM_THREADS` and `OPENBLAS_NUM_THREADS` at the thread count given, and `CUDA_VISIBLE_DEVICES` empty except for the matcher. The matcher's runs add `<worktree>/scripts` and PRD #1's `.scratch/surface-following-primitives/ticket-4/env-init` to `PYTHONPATH`, with `PYTHONDONTWRITEBYTECODE=1`, and hold the shared GPU lock. `$S` is `<scratch>/ticket-19`, `$O` is `<surface-runs>/ticket-19`, `$O4` is `<surface-runs>/ticket-4/private-scene-A`, `$G` is the grid folders `$O4/d22` and `$O/matches/<pair>` for the five pairs matched here, and `<copy>` is a held-out copy's folder, `<private-scene-A-exp>/scene_h0` or `scene_h1`, where `<private-scene-A-exp>` is the folder of the owner's notes on private scene A that holds the copies, written nowhere, as `<private-scene-A>` is. `run_fits2.sh`, `run_measure.sh` and `run_check.sh` chain the commands below with the pairs and pairs of partners given above.
+
+| Command | Threads; device | What it ran; time | Note |
+| --- | --- | --- | --- |
+| `python -I $S/same_images.py <private-scene-A>/scene.json <private-scene-A-exp>/scene_h0/scene.json <private-scene-A-exp>/scene_h1/scene.json` | 4; CPU | 3,240 files; 1 s | the copies' images are the scene's |
+| `python $S/tie_pairs.py <manifest>`, on the scene and the two copies | 1; CPU | seconds | D-22's pairs with their ties kept |
+| `flock <scratch>/gpu.lock python $S/match_pair.py <private-scene-A>/scene.json $O/matches --label private-scene-A --tag cam0-cam2 --pair cam0:cam2 --device cuda:0`, and the same for `cam0:cam3`, `cam0:cam6`, `cam1:cam7` and `cam2:cam8` | 4; GPU | 120 evaluations each; 66 to 71 s each | ticket #12's script, unchanged: the five pairs' matches, in ticket #4's grid format |
+| `python $S/measure.py <private-scene-A>/scene.json <private-scene-A>/scene.json $O/measures/manifest-all.json --grids $G --crops $O4/crops.json --frames all --pairs <D-22's 7> --triples <section 2.7's five> --d22-sample 2000` | 4 processes of 1 thread; CPU | 840 pair-frames and 600 images; 2 min 6 s | the reproduction of sections 2.5's and 2.7's tables |
+| `python $S/fit.py <copy>/scene.json $O/fits/first-pass/h0-train-component.json --grids $G --pairs <D-22's pairs of the copy> --triples <their pairs of partners> --free <its training cameras>`, then the held-out camera's step, for both copies and the nine; and the centre copy's first step again with `--gauge none` | 4; CPU | 12 to 73 s each | the first pass, set aside: it showed the pairs' flip and the common turn |
+| `python $S/fit.py <copy>/scene.json $O/fits/first-pass/h0-train-loss-on-hold.json …` on the centre copy's D-22 pairs, without and then with the hold, before the Cauchy loss was written into the residuals; the second run's output was replaced by the next row's | 4; CPU | 6 min 7 s and 1 min 47 s | set aside: the loss also took the hold and the damping, which then held nothing, and every camera turned 1.6° to 2.4°; a run without the hold under that code was stopped |
+| `$S/run_fits2.sh P`: `python $S/fit.py <copy>/scene.json $O/fits/P/h0-train.json --grids $G --pairs <the copy's pairs, ties kept> --triples <their pairs of partners> --free <its training cameras>`, then `python $S/fit.py <copy>/scene.json $O/fits/P/h0.json --grids $G --pairs <the held-out camera's pairs> --triples <its pairs of partners> --free cam0 --fixed $O/fits/P/h0-train.json`; the same for the left copy; `python $S/fit.py <private-scene-A>/scene.json $O/fits/P/all9.json --grids $G --pairs <all 12> --triples <all 22> --free cam0,…,cam8` | 4; CPU | 12 to 130 s each | the corrections |
+| `python $S/write_manifest.py <copy>/scene.json $O/fits/P/h0.json $O/manifests/P/h0 --label copy-h0 --train-fit $O/fits/P/h0-train.json --note "…"`; the same for the left copy; for the nine, into `P/all9-never-trains`; and from each copy's first step alone, into `P/h0-train-only` and `P/h1-train-only` | 4; CPU | seconds each | the corrected manifests, read back by the package, with S and D-22's pairs before and after |
+| `$S/run_measure.sh <manifest> $O/measures/<name>-odd.json`, which runs `python $S/measure.py <manifest> <private-scene-A>/scene.json … --frames odd --pairs <the 12> --triples <the 22> --d22-sample 2000` | 4 processes of 1 thread; CPU | 720 pair-frames and 1,320 images; 4 min each | the measures before (the manifest) and with each corrected manifest; the scene's manifest fixes the regions |
+| `python $S/measure.py $O/manifests/P/h0-train-only/scene.json <private-scene-A>/scene.json … --pairs <cam0's four> --triples <its six>`; the same for the left copy with `cam1`'s | 4 processes of 1 thread; CPU | 1 to 2 min each | the held-out camera at the manifest's pose beside the corrected training cameras |
+| `$S/run_check.sh`: `write_manifest.py` with `cam4` turned by (0.2°, −0.3°, 0.1°), `fit.py` on the centre copy and on that manifest with `--free cam4`, then `python $S/compose.py` | 4; CPU | about 1 min | the conventions' check |
+| `$S/run_v2.sh`: `run_fits2.sh V2 --centres --per-frame 600 --tri-per-frame 250` for the two copies, `write_manifest.py` into `$O/manifests/V2/h0` and `V2/h1`, and `run_measure.sh` on both | 4; CPU | fits 12 to 186 s; measures 4 min each | the variant that moves the centres; a first try without the rig's size held, stopped after 11 min, is set aside |
+| `python $S/doc_tables2.py $O/measures $O/fits` | 1; CPU | seconds | the tables of this section |
+
+The GPU ran for six minutes in all, for the five pairs' matching; everything else ran on the CPU. No output file holds private scene A's location or name: the scene is named by `--label`, and the corrected manifests, which hold the copies' own metadata, stay in `<surface-runs>`.
+
 ### 2.3 Checks (d) and (e): two seeds' disagreement where the shell is, and colour between cameras
 
 *Ticket #20's section.* `A_default_s0` against `A_default_s1` where the shell is; and the colour difference at the two ends of section 2.5's admitted matches, per camera pair, against `kitchen`'s floor.
