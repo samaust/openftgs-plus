@@ -1178,6 +1178,208 @@ The private scene's folders, `<m15-runs>` and `<m17-runs>` were read and never w
 
 *Ticket #25's section.* Finalist 1's arms on the corrected cameras, run as the research document's section 5.3 says and judged by section 4.4's criteria.
 
+Run on 2026-11-16 and 2026-11-17, at the owner's go of 2026-11-16 (section 3 here), with this branch's code at 5b0151a (`src/` and `scripts/` as `main`'s), Python 3.14.10, torch 2.15.0+cu132, gsplat 1.5.3, NumPy 2.5.4, SciPy 1.18.1 and Pillow 13.0.0 from the shared `.venv`, and, for the inits and the matcher, ticket #18's scratch packages (row 849). The hardware was one RTX 4090 (driver 595.99.02), alone on the machine, under the shared GPU lock, with 16 CPU threads. Scripts read tensors, JSON, images and mask files and wrote numbers and files. No image, render or sheet of private scene A was looked at. Every run wrote only under `<surface-runs>/ticket-25`: a search afterwards found no file under `<private-scene-A-exp>`, `<m15-runs>/kitchen` or `<m17-runs>/kitchen` newer than the first init. In all, about 4.3 GPU hours: the six runs on private scene A and their inits, scores and renders 1.8, the control on `kitchen` 2.5. "The commands", at the end, lists every run.
+
+**The owner's answers at step 3's go** (2026-11-16, in session, relayed by the orchestrating session; the ends of sections 2.6 and 3 here):
+
+- **Both pairings** (section 2.6 here, question 1, option (c)). Arm `F1m` trains on the corrected cameras from an init made with the manifest's D-22 pairs; arm `F1c` from plain `ftgs init roma` on the corrected manifest, with the pairs the corrections give. The correction's effect is read from `F1m` against the baseline, the pairing's from `F1c` against `F1m`.
+- **The off arm** is section 3 here's plain baseline, `A_h0_s0`, `A_h0_s1` and `A_h1_s0`, with no script.
+- **The references** (section 3 here, question 2, option (a)): the named measure is taken against the kept stride-4 file and a fresh init of the manifest's cameras, beside the ticket's two files triangulated from the same matches with the manifest's cameras and with the corrected ones.
+- **The tail beyond 25 cm** is reported beside the named measure and read by rule (b): both of the arm's seeds beyond both of the off arm's, and the means more than 0.021 apart.
+- **Two seeds per arm** stand.
+- **The optional control on `kitchen` is cleared,** with its 2 GPU hours.
+
+**The manifests.** Ticket #19's corrected manifests `P/h0` and `P/h1` and their train-only forms (section 2.2 here), copied byte for byte into `<surface-runs>/ticket-25/manifests`, each with a link to its copy's images, so that the frame caches training writes beside a manifest land there (row T25.1).
+
+**The inits: four per copy, one sample of matches per pairing.** Every init is `ftgs init roma --stride 4`, D-21's stride, as the baseline's: 120,000 points (row T25.2). A pair's drawn matches depend on its two images, the seed, the slot and the two cameras' names, not on the cameras' poses (Q-110). So two inits with one pairing and two sets of cameras triangulate the very same matches, and D-22's filters then keep different ones.
+
+- **The scratch init** (`init_pairs.py`) runs `openftgs.cli.main(["init", "roma", …])` unchanged, with one private name of `openftgs.init` replaced at run time: `_pairs` returns the package's own pairing, computed on another manifest's cameras for the same admitted images. `_triangulated` is also wrapped, unchanged, to count the share D-22's filters keep per pair, which the written file no longer shows after the per-slot subset. No public function lets a caller name the pairs, so this is the seam of section 1 here applied to a private name, not the package's public API.
+- **It was checked first.** On the centre copy's own manifest with its own pairing it writes a file equal tensor for tensor to ticket #24's `regen_h0_s4`, made by plain `ftgs init roma` (section 3 here). On each corrected manifest with its own pairing, its file equals plain `ftgs init roma`'s.
+- **The four, per copy.** `MM`: the manifest's cameras and pairs, the fresh init of section 3 here's question 2. `CM`: the corrected cameras with the manifest's pairs, arm `F1m`'s init. `CC`: the corrected cameras with their own pairs, by plain `ftgs init roma`, arm `F1c`'s init. `MC`: the manifest's cameras with the corrected pairing. `MM` and `CM` are arm `F1m`'s two references from the same matches; `MC` and `CC` are arm `F1c`'s.
+
+**D-22's kept share per pair,** of the 150,000 matches each pair draws over the 30 slots, beside section 2.7's column "Sampled matches D-22's filters would keep" (the manifest's cameras, all 120 frames, the scene's seven pairs):
+
+| Pair | Section 2.7 | Centre copy: `MM` | `CM` | `MC` | `CC` | Left copy: `MM` | `CM` | `MC` | `CC` |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| `cam0`–`cam2` | – | | | | | 89.9% | 91.7% | | |
+| `cam0`–`cam6` | – | | | | | | | 87.0% | 90.2% |
+| `cam1`–`cam4` | 47.4% | 47.7% | 67.2% | | | | | | |
+| `cam1`–`cam7` | – | | | 53.2% | 76.6% | | | | |
+| `cam2`–`cam5` | 87.5% | 88.1% | 86.5% | | | 88.1% | 88.3% | | |
+| `cam2`–`cam8` | – | | | 32.3% | 33.3% | | | 32.3% | 32.6% |
+| `cam3`–`cam4` | 57.8% | 58.1% | 73.6% | 58.1% | 73.6% | 58.1% | 73.2% | 58.1% | 73.2% |
+| `cam3`–`cam5` | 60.2% | 62.0% | 63.0% | 62.0% | 63.0% | 62.0% | 62.4% | 62.0% | 62.4% |
+| `cam6`–`cam7` | 57.8% | 58.2% | 52.8% | 58.2% | 52.8% | 58.2% | 44.3% | 58.2% | 44.3% |
+| `cam6`–`cam8` | 67.9% | 68.5% | 60.4% | 68.5% | 60.4% | 68.5% | 67.9% | 68.5% | 67.9% |
+| All pairs | 67.5% (seven) | 63.8% | 67.3% | 55.4% | 60.0% | 70.8% | 71.3% | 61.0% | 61.8% |
+
+- **The manifest's figures reproduce section 2.7's** at stride 4, within 2 points per pair.
+- **The corrections keep more where the background was most off,** `cam1`–`cam4` from 48% to 67% and `cam3`–`cam4` from 58% to 74%, and fewer in `cam6`–`cam7` (58% to 53% and 44%) and `cam6`–`cam8` on the centre copy (69% to 60%). That is the direction section 5.3 found with section 2.5's turns (67% from 47%, 73% from 58%; 47% from 58%, 54% from 68%).
+- **The corrected pairing loses most of `cam2`–`cam8`:** 32% to 33% kept against 88% in `cam2`–`cam5`, as section 2.2 here foresaw for the person (0.8% to 2.1% there). `cam1`–`cam7` keeps 77% on the corrected cameras, more than `cam1`–`cam4`'s 67%. Over all pairs, `CC` keeps 60% and 62% against `CM`'s 67% and 71%.
+
+**The runs.** Each is `ftgs train` unchanged, 30,000 iterations of the default training configuration, 3,000,000 primitives at the end.
+
+| Run | Copy, seed | Init | Cap reached at | Time | GPU peak |
+| --- | --- | --- | --- | --- | --- |
+| `F1m_h0_s0` | centre, 0 | `CM_h0` | 10,400 | 13 min 12 s | 23,921 MiB |
+| `F1m_h0_s1` | centre, 1 | `CM_h0` | 10,500 | 13 min 0 s | 23,788 MiB |
+| `F1m_h1_s0` | left, 0 | `CM_h1` | 9,700 | 15 min 49 s | 23,785 MiB |
+| `F1c_h0_s0` | centre, 0 | `CC_h0` | 10,300 | 13 min 9 s | 23,601 MiB |
+| `F1c_h0_s1` | centre, 1 | `CC_h0` | 10,400 | 13 min 1 s | 23,788 MiB |
+| `F1c_h1_s0` | left, 0 | `CC_h1` | 9,600 | 13 min 2 s | 23,794 MiB |
+
+The baseline's caps fell at 10,800, 11,100 and 9,700 (section 3 here).
+
+**The named measure: the near-side far-5 cm share,** with the tail beyond 25 cm beside it, against the five reference files: the kept stride-4 file (`kept`), and the copy's `MM`, `CM`, `MC` and `CC`. Each cell is 5 cm / beyond 25 cm. The baseline's checkpoints were measured again against every file; against the kept file they give section 3 here's figures. The near side is cut along the centre copy's manifest's `cam0` for every run, as in section 3 here.
+
+| Run | `kept` | `MM` | `CM` | `MC` | `CC` |
+| --- | --- | --- | --- | --- | --- |
+| `A_h0_s0`, baseline | 0.1401 / 0.0349 | 0.1320 / 0.0316 | 0.1349 / 0.0310 | 0.1672 / 0.0385 | 0.1722 / 0.0380 |
+| `A_h0_s1`, baseline | 0.1409 / 0.0267 | 0.1395 / 0.0257 | 0.1352 / 0.0248 | 0.1540 / 0.0325 | 0.1534 / 0.0325 |
+| `A_h0_s0_rep`, plain, not a baseline run | 0.1485 / 0.0475 | 0.1426 / 0.0466 | 0.1529 / 0.0431 | 0.1726 / 0.0511 | 0.1805 / 0.0522 |
+| `F1m_h0_s0` | 0.1347 / 0.0344 | 0.1316 / 0.0307 | 0.1288 / 0.0303 | 0.1594 / 0.0427 | 0.1525 / 0.0433 |
+| `F1m_h0_s1` | 0.1481 / 0.0276 | 0.1456 / 0.0246 | 0.1448 / 0.0232 | 0.1742 / 0.0359 | 0.1702 / 0.0355 |
+| `F1c_h0_s0` | 0.1301 / 0.0318 | 0.1298 / 0.0303 | 0.1318 / 0.0278 | 0.1595 / 0.0397 | 0.1599 / 0.0386 |
+| `F1c_h0_s1` | 0.1208 / 0.0295 | 0.1111 / 0.0267 | 0.1183 / 0.0238 | 0.1457 / 0.0334 | 0.1458 / 0.0329 |
+| `A_h1_s0`, baseline | 0.1632 / 0.0438 | 0.1541 / 0.0440 | 0.1546 / 0.0436 | 0.1768 / 0.0538 | 0.1699 / 0.0451 |
+| `F1m_h1_s0` | 0.1333 / 0.0381 | 0.1302 / 0.0386 | 0.1277 / 0.0390 | 0.1561 / 0.0490 | 0.1475 / 0.0405 |
+| `F1c_h1_s0` | 0.1301 / 0.0402 | 0.1172 / 0.0399 | 0.1164 / 0.0393 | 0.1365 / 0.0451 | 0.1302 / 0.0417 |
+
+**Judged by section 4.4's rule** on the centre copy's two seeds: both of the arm's seeds below both of the baseline's, and the means more than 0.01 apart.
+
+| Arm, against | `kept` | `MM` | `CM` | `MC` | `CC` | Its two references from the same matches |
+| --- | --- | --- | --- | --- | --- | --- |
+| `F1m` against the baseline | not moved (seeds 0.135, 0.148; means 0.001 apart) | not moved (0.003) | not moved (0.002) | not moved (0.006) | not moved (−0.001) | `MM` and `CM`: **not lower** |
+| `F1c` against the baseline | **lower** by 0.015 | **lower** by 0.015 | **lower** by 0.0100 (0.01005) | not moved: seed 0 at 0.160 above the baseline's 0.154 (0.008) | not moved: 0.160 above 0.153 (0.010) | `MC` and `CC`: **not lower** |
+| `F1c` against `F1m` (the pairing) | **lower** by 0.016 | **lower** by 0.018 | not moved (0.012) | not moved (0.014) | not moved (0.009) | – |
+
+- **Neither arm counts as lower.** `F1m`, the correction with the baseline's pairs, does not move the named measure against any file: its seeds straddle the baseline's (0.135 and 0.148 against 0.140 and 0.141 on the kept file). `F1c` is lower against the kept file, `MM` and `CM`, by 0.010 to 0.015, but not against `MC` and `CC`, its two files from the same matches, where its seed 0 lies above the baseline's seed 1.
+- **The third plain draw** of seed 0 (`A_h0_s0_rep`, section 3 here) lies at 0.149 on the kept file and above both arms' seeds against every file. Against the three plain draws, `F1c`'s seed 0 is below all three on the kept file and `MM`, and not on the others.
+- **The left copy,** one seed a side: both arms lie below the baseline against every file, `F1m` by 0.015 to 0.030 and `F1c` by 0.024 to 0.040 (0.133 and 0.130 against 0.163 on the kept file). Section 4.4's rule needs two seeds, and the left copy has one, so this is not a movement by the rule; it is the largest difference in the table, on the copy whose test view (`cam1`) the fit corrected most (section 2.2 here).
+- **The tail does not move** by rule (b): on the centre copy every arm's seeds lie among the baseline's against every file (0.023 to 0.043 against 0.025 to 0.039), the means within 0.005. So `F1c`'s fall against three files lies in the 5 to 25 cm band, which section 2.6 here reads as a change in the method's habit rather than a disagreement removed.
+- **The far share depends on the reference file** by as much as any arm moves it: the baseline's seed 0 reads 0.132 to 0.172 over the five files, and both corrected-pairing files read 0.01 to 0.04 higher than the others for every run, since they lack most of `cam2`–`cam8`'s points (above).
+
+**The other shell measures** (against the kept file, whole model / near side) change little. The under-two-frames share is 0.443 to 0.460 / 0.583 to 0.599 for the arms, against 0.449 to 0.459 / 0.579 to 0.595 for the plain draws. The near side's far-10 cm share is 0.058 to 0.073, against 0.058 to 0.081. The far side's far-5 cm share rises, 0.555 to 0.581 on the centre copy and 0.627 and 0.636 on the left copy, against 0.535 to 0.541: the far side's points from the corrected cameras lie farther from the kept file's, which the manifest's cameras triangulated.
+
+**The test-view scores, the sharpness ratio and the tiles' coverage.** As section 3 here takes them, at both poses of the test view: the manifest's (`mpose`: the notes' request unchanged for the held-out camera; E16 by `ftgs eval` on the copy's train-only manifest) and the corrected one (`cpose`: the corrected manifest's pose; E16 is the run's METRICS.json). In both requests the training-camera items take the corrected poses the arm trained on. The baseline has one pose, the manifest's. Kept-pixel PSNR is Q-233's, on the centre copy alone; the rule matched the stored mask on every pixel again.
+
+| Run | Pose | Crop PSNR | Crop SSIM₁ | Sharpness ratio | Late | Training cameras: PSNR / ratio | E16 PSNR / SSIM₁ / ꟻLIP | Kept-pixel PSNR | Coverage: between cameras, `sC00`, ±30°, ±45°; ±60°, ±90° |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| `A_h0_s0` | manifest | 24.36 | 0.8149 | 0.7262 | 0.7504 | 32.90 / 0.7755 | 24.79 / 0.8187 / 0.1531 | 25.52 | 0.84 to 1.00; 0.50 to 0.90 |
+| `A_h0_s1` | manifest | 24.31 | 0.8153 | 0.7249 | 0.7467 | 32.79 / 0.7742 | 24.75 / 0.8189 / 0.1545 | 25.47 | 0.80 to 1.00; 0.50 to 1.00 |
+| `F1m_h0_s0` | manifest | 24.27 | 0.8165 | 0.7117 | 0.7379 | 33.46 / 0.7745 | 24.36 / 0.8080 / 0.1556 | 25.03 | 0.90 to 1.00; 0.50 to 1.00 |
+| | corrected | 24.50 | 0.8227 | 0.7122 | 0.7389 | | 24.61 / 0.8164 / 0.1523 | 25.32 | |
+| `F1m_h0_s1` | manifest | 24.28 | 0.8163 | 0.7091 | 0.7398 | 33.15 / 0.7718 | 24.44 / 0.8079 / 0.1563 | 25.12 | 0.79 to 1.00; 0.45 to 0.94 |
+| | corrected | 24.50 | 0.8224 | 0.7093 | 0.7404 | | 24.67 / 0.8157 / 0.1532 | 25.40 | |
+| `F1c_h0_s0` | manifest | 24.27 | 0.8147 | 0.7102 | 0.7422 | 33.31 / 0.7748 | 24.31 / 0.8063 / 0.1565 | 24.97 | 0.84 to 1.00; 0.59 to 1.00 |
+| | corrected | 24.48 | 0.8207 | 0.7106 | 0.7430 | | 24.57 / 0.8153 / 0.1532 | 25.28 | |
+| `F1c_h0_s1` | manifest | 24.22 | 0.8149 | 0.7100 | 0.7370 | 33.34 / 0.7715 | 24.24 / 0.8059 / 0.1566 | 24.89 | 0.80 to 1.00; 0.44 to 0.90 |
+| | corrected | 24.44 | 0.8210 | 0.7104 | 0.7378 | | 24.50 / 0.8148 / 0.1533 | 25.20 | |
+| `A_h1_s0` | manifest | 23.90 | 0.7473 | 0.7403 | 0.7938 | 31.31 / 0.7719 | 21.92 / 0.7392 / 0.1951 | (`cam1`: not applied) | 0.78 to 1.00; 0.55 to 1.00 |
+| `F1m_h1_s0` | manifest | 23.51 | 0.7421 | 0.7384 | 0.7949 | 31.93 / 0.7751 | 21.60 / 0.7331 / 0.1965 | | 0.80 to 1.00; 0.48 to 0.96 |
+| | corrected | 24.75 | 0.7793 | 0.7376 | 0.7947 | | 22.07 / 0.7606 / 0.1872 | | |
+| `F1c_h1_s0` | manifest | 23.45 | 0.7410 | 0.7441 | 0.8026 | 31.62 / 0.7750 | 21.41 / 0.7317 / 0.1985 | | 0.79 to 1.00; 0.49 to 0.89 |
+| | corrected | 24.70 | 0.7785 | 0.7431 | 0.8016 | | 21.86 / 0.7602 / 0.1889 | | |
+
+Every rendered value is finite. Against section 4.4's guard, a fall of more than 0.3 dB in a test-view score counts as harm:
+
+- **At the manifest's pose, harm on both copies.** E16 PSNR falls by 0.31 to 0.55 dB on the centre copy (24.24 to 24.44 against 24.75 and 24.79), and by 0.32 to 0.51 dB on the left copy (21.41 to 21.60 against 21.92). The kept-pixel PSNR falls by 0.35 to 0.63 dB, and the left copy's crop PSNR by 0.39 and 0.45 dB. The centre copy's crop PSNR falls by 0.03 to 0.14 dB only. Section 2.2 here foresaw this: the manifest's pose of the test view no longer agrees with the corrected training cameras.
+- **At the corrected pose, no harm by the guard,** with one value at its edge. The crop PSNR rises, by 0.08 to 0.19 dB on the centre copy and by 0.80 and 0.85 dB on the left copy, and the crop SSIM₁ with it. E16 PSNR lies within 0.08 to 0.29 dB below the centre baseline and 0.06 below to 0.15 dB above the left one. The kept-pixel PSNR of `F1c_h0_s1`, 25.20 dB, is 0.32 dB below `A_h0_s0`'s and 0.27 dB below `A_h0_s1`'s.
+- **The training cameras' PSNR rises** by 0.1 to 0.7 dB on every run, as the cameras agree better with each other.
+- **The sharpness ratio falls on the centre copy** at both poses: 0.709 to 0.712 for both arms, against 0.725 and 0.726 for the baseline's seeds and 0.730 for the third plain draw. That is 0.013 to 0.017 below the baseline, beyond what two seeds give (0.0013) and what three plain draws give (0.0054; section 3 here). The late ratio falls with it (0.737 to 0.743 against 0.747 to 0.754). On the left copy it does not fall: 0.738 and 0.744 against 0.740. The training cameras' ratio is unchanged (0.772 to 0.775 against 0.774 to 0.776).
+- **The tiles' coverage** stays within the baseline's ranges: 0.79 to 1.00 and 0.44 to 1.00 on the side tiles, against 0.78 to 1.00 and 0.49 to 1.00. No tile collapses.
+
+**The sheets, for judging with their labels hidden.** Each set holds the baseline and both arms for one copy and seed, in a seeded order, labelled `set<n>-A` to `-C` only: set 1 the centre copy at seed 0, set 2 at seed 1, set 3 the left copy. They are `<surface-runs>/ticket-25/sheets/blind/set<n>-<letter>.jpg`, from section 2.6's fixed request, with the key apart in `KEY.json` beside them. Nobody here has looked at them; the owner's judgement is the criterion, and it is open (question 2 below).
+
+**The pairing's effect, apart from the correction's.** `F1c` against `F1m`, same corrected cameras, other pairs:
+
+- **On the named measure,** `F1c` lies below `F1m` against the kept file and `MM` (by 0.016 and 0.018, both seeds), and not against the files made on the corrected cameras (`CM`, `MC`, `CC`), where their seeds overlap. Against those files the pairing's effect is within the seeds' spread; against the manifest-camera files it is as large as section 4.4's margin.
+- **On the scores** the two arms are alike: crop PSNR within 0.06 dB, E16 within 0.2 dB, the sharpness ratio within 0.003, at both poses. On the left copy `F1c` scores 0.05 to 0.2 dB below `F1m`.
+- **So the correction's effect** (`F1m` against the baseline) is: the named measure unmoved on the centre copy, the tail unmoved, the sharpness ratio down by 0.014, the test-view scores up at the corrected pose and down at the manifest's. The pairing adds a fall of the named measure that only the manifest-camera references show.
+
+**The control on `kitchen`** (section 5.3, cleared by the owner): openftgs-synth's exact cameras, the same turned by a seeded 0.1° to 0.4°, and those corrected by check (c)'s tool (row T25.3).
+
+- **The turned manifest.** Each of the 20 cameras turned about its own centre by an axis uniform on the sphere and an angle uniform in [0.1°, 0.4°], from NumPy's `default_rng(25)` in the manifest's camera order: 0.12° to 0.38°. Their mean turn over the 19 training cameras is 0.11°, the common part the tool holds at zero (section 2.2 here) and cannot take out.
+- **The tool, on `kitchen`.** Ticket #19's fit, copied, with three of private scene A's constants made arguments: every match in front of both cameras counts (`kitchen`'s cameras agree, so nothing is set aside as the person is), f·b = 1170.9 px × 0.232 = 271.6, and frames 0, 20, …, 280. D-22's pairs on `kitchen` form six separate groups of two to four cameras, each of which the hold at zero would leave its own common turn, so the fit reads each training camera with its two nearest by axis, on both manifests: 25 pairs, one connected set, and 45 pairs of partners; `cam00`, the test view, then with its three nearest. The 28 pairs were matched by ticket #12's script, 15 frames each.
+- **On the exact cameras, the corrections stay at the fit's floor.** The 19 training cameras turn by 0.002° to 0.012° (median 0.005°) and `cam00` by 0.012°, against the 0.0035° by which section 2.2 here took a known turn back out; the background's epipolar residual is 0.023 to 0.034 px at the median per pair before and after, and the depth agreement 0.05% to 0.13% before and after. This is the acceptance criterion's check, and it holds.
+- **On the turned cameras, the residual returns to the floor but the poses do not.** The residual goes from 0.50 to 7.96 px at the median per pair to 0.025 to 0.042 px, and the depth agreement from 0.9% to 9.9% to 0.05% to 0.12%. But each corrected camera still lies 0.106° to 0.120° from the exact one: 0.10° of it is the common turn, and what remains after removing it is 0.010° to 0.073° (median 0.041°), in the directions the fit's three smallest singular values (86 to 198 px per degree, against up to 8,519) say the matches barely fix. `cam00` lies 0.116° from the exact pose. D-22's pairs are the exact manifest's on all three manifests, so the control has no pairing effect. S changes by 1·10⁻⁷.
+- **The inits:** plain `ftgs init roma` at its default stride, as M17's `kitchen` init, on each manifest: 32 min 1 s and 30 min 52 s.
+- **The runs:** `ftgs train` at seeds 0 and 1 on each manifest, from its own init.
+
+| Run | E16 at its own manifest's pose: PSNR / SSIM₁ | E16 at the exact pose: PSNR / SSIM₁ / ꟻLIP | Kept-pixel PSNR, own pose; exact pose | Residual, all pixels: in front / behind | Dynamic pixels: in front / behind | Expected depth, median error, all / dynamic | Far share at 0.12·S, against M17's init: whole / dynamic | Beyond 25 cm | Under two frames |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| `kitchen_s0`, baseline | 29.25 / 0.8787 | the same | 30.42 | 0.041 / 0.291 | 0.015 / 0.613 | 251 / 56 mm | 0.036 / 0.002 | 0.023 / 0.001 | 0.381 / 0.660 |
+| `kitchen_s1`, baseline | 30.11 / 0.8803 | the same | 31.34 | 0.039 / 0.297 | 0.015 / 0.612 | 448 / 304 mm | 0.035 / 0.003 | 0.022 / 0.001 | 0.377 / 0.662 |
+| `kitchen_s2`, baseline | 29.25 / 0.8800 | the same | 31.15 | 0.040 / 0.295 | 0.015 / 0.618 | 277 / 102 mm | 0.036 / 0.002 | 0.023 / 0.001 | 0.385 / 0.661 |
+| `K_turned_s0` | 21.80 / 0.6296 | 21.37 / 0.6201 / 0.2203 | 23.11; 22.55 | 0.175 / 0.556 | 0.066 / 0.709 | 808 / 599 mm | 0.075 / 0.012 | 0.050 / 0.005 | 0.407 / 0.577 |
+| `K_turned_s1` | 22.00 / 0.6302 | 21.59 / 0.6214 / 0.2160 | 23.16; 22.65 | 0.171 / 0.564 | 0.062 / 0.720 | 519 / 279 mm | 0.075 / 0.012 | 0.049 / 0.005 | 0.404 / 0.580 |
+| `K_corrected_s0` | 27.82 / 0.8743 | 23.19 / 0.6216 / 0.1598 | 30.41; 24.47 | 0.042 / 0.317 | 0.016 / 0.642 | 182 / 43 mm | 0.036 / 0.002 | 0.023 / 0.001 | 0.382 / 0.654 |
+| `K_corrected_s1` | 28.25 / 0.8718 | 23.37 / 0.6231 / 0.1596 | 30.58; 24.57 | 0.040 / 0.320 | 0.015 / 0.644 | 181 / 42 mm | 0.036 / 0.003 | 0.023 / 0.001 | 0.381 / 0.656 |
+
+The residual's shares and expected depth are `scripts/gt_depth.py`'s at the exact cameras, the only ones it accepts (it refuses a pose that differs from the ground truth's), at δ = 0.02·S. The far shares and the under-two-frames share are section 2.1 here's, against M17's init file of the exact cameras; against each run's own init the far share at 0.12·S is 0.032 for the turned runs and 0.035 for the corrected ones, the baseline's 0.035 to 0.036. The four runs took 16 min 25 s to 17 min 2 s, their caps fell at 2,300 and 2,400 (turned) and 2,100 (corrected), against 2,100 for the baseline.
+
+What the control shows:
+
+- **The turned cameras do what private scene A's are suspected of, and the measures see it.** Against M17's init of the exact cameras, the far share at 0.12·S doubles (0.075 against 0.035 to 0.036) and the share beyond 25 cm with it (0.049 and 0.050 against 0.022 and 0.023); the residual's share behind the surface rises from 0.291 to 0.297 to 0.556 and 0.564; E16 falls by 7 to 8 dB. Against the runs' own init the far share stays at the baseline's (0.032): measured against an init made on the same wrong cameras, it does not see them.
+- **The corrected cameras bring the notes' measures back to the baseline's:** the far share at 0.12·S 0.036, beyond 25 cm 0.023, the under-two-frames share 0.381 and 0.382, all within the three exact runs' ranges.
+- **They do not bring back everything.** The residual's share behind the surface is 0.317 and 0.320, 0.020 to 0.029 above the exact runs', beyond section 4.4's 0.005, and on dynamic pixels 0.642 and 0.644 against 0.612 to 0.618; the share in front is unchanged. SSIM₁ at the runs' own pose is 0.8743 and 0.8718, 0.005 to 0.008 below the exact runs' 0.8787 to 0.8803, beyond the 0.002 guard; the kept-pixel PSNR at their own pose, 30.41 and 30.58 dB, is at the bottom of the exact runs' 30.42 to 31.34. At the exact pose of `cam00`, which the corrected `cam00` misses by 0.116°, E16 is 23.2 and 23.4 dB. The median error of expected depth is lower, 181 and 182 mm against 251 to 448, but section 4.4 counts it only where three-seed ranges part, and here there are two.
+- **So on `kitchen` the tool takes back most of a 0.1° to 0.4° error but leaves about 0.1°,** the rig's common turn and the directions the background barely fixes, and that remainder costs SSIM₁ and the residual behind the surface what section 4.4 calls harm. Private scene A's corrections were of the same size (0.05° to 0.45°; section 2.2 here), with the common turn held at zero there too.
+
+**Against the ticket's acceptance criteria.**
+
+- **Three runs on the corrected manifests, each from an init made on its own manifest.** Done, twice: arm `F1m` from the scratch init with the manifest's pairs, arm `F1c` from plain `ftgs init roma`, each on its copy's corrected manifest.
+- **The near-side far-5 cm share against both reference files,** by section 4.4's rule. Done, against the ticket's two files per arm and the owner's two more: neither arm is lower against both of its files.
+- **The other criteria of section 4.4.** The sharpness ratio, the coverage and the test-view scores at both poses: done (above). The sheets with their labels hidden: made and keyed, not judged (question 2).
+- **The control on `kitchen`.** Done, with the tool's corrections at the fit's floor on the exact cameras.
+- **The reading by section 7.2's row for finalist 1.** Below. The owner's answer: not yet given.
+- **Sources, commands, files changed, privacy:** rows T25.1, T25.2 and T25.3; the commands below; only this document and the source log change; nothing names private scene A or shows its images.
+
+**The reading by section 7.2's row for finalist 1.**
+
+- **Adopt when** check (c) lowers the background's residual for every pair on held-out frames (it did not: section 2.2 here), the named measure is lower against both reference files (it is not, for either arm), and no other criterion shows harm at either pose (the manifest's pose shows harm of 0.31 to 0.63 dB, and the sharpness ratio falls on the centre copy beyond two seeds). **Not met, on all three counts.**
+- **Drop when** check (c) does not lower the background's residual on held-out frames (it did lower it, over the seven pairs), **or the share does not move.** The share did not move for `F1m`, the correction's own arm, nor for `F1c` against its two files. **The drop clause is met by its second branch.**
+- **"A correction that holds on held-out frames is still a better manifest, and keeping it for that is the owner's call."** What argues for that: the background's residual halves (section 2.2 here); the training cameras' PSNR rises; at the corrected pose the crop PSNR rises, by 0.8 dB on the left copy; the control shows the tool takes 0.1° to 0.4° turns back to the residual's floor. What argues against it: the sharpness ratio falls by 0.014 on the centre copy, beyond the plain runs' spread; the named measure, the tail and the under-two-frames share are unmoved; the manifest's pose of the test view scores worse; the corrected pairing loses most of `cam2`–`cam8`; and the control shows the tool leaves each camera 0.1° from the truth, which on `kitchen` still costs 0.005 to 0.008 of SSIM₁ and 0.02 to 0.03 of the residual's share behind the surface.
+- **Recommended:** drop finalist 1 as a technique against the shell, and do not make the corrected manifests the ones finalists 2 to 4 train on: the correction moves no measure the finalists are judged by, it lowers the sharpness ratio, which finalist 2 and the surface finalists are read against, and it would carry the changed pairing into every later init. Keep the corrected manifests on file, as section 2.6 here recommended.
+
+**The questions for the owner.**
+
+1. **Finalist 1: kept or dropped, and is the correction kept** as the manifests every later arm trains on?
+   - (a) Drop the finalist and keep the manifest's cameras for finalists 2 to 4; their off arm is the script's v2 at weight 0 on the manifest's cameras (section 3 here, question 3).
+   - (b) Drop the finalist as a technique against the shell, but keep the corrected manifests as a better manifest for later arms. These runs then become finalists 2 to 4's baseline, but only as plain runs: the off arm the owner chose for them is through the script, so it would have to be run again on the corrected manifests (about 27 minutes per scene set), and the pairing chosen with it (`F1m`'s or `F1c`'s).
+   - (c) Keep finalist 1 for a combined arm later.
+
+   **Recommended: (a).**
+2. **The sheets** (`<surface-runs>/ticket-25/sheets/blind`, key apart): the owner's judgement with the labels hidden, which this ticket cannot give. It decides no other criterion, and under (a) it is recorded only.
+3. **The left copy's single seed.** Both arms lie 0.015 to 0.040 below the baseline there, the largest differences of the step, and section 4.4's rule cannot read them with one seed a side. A second seed on the left copy for the baseline and one arm (about 30 minutes) would settle whether they are a movement. Recommended: not run under (a), since the centre copy's two seeds show no movement for `F1m` and the corrected-camera files none for `F1c`; run it under (b) or (c).
+4. **The baseline's init sample.** The baseline trained from the kept stride-4 files, which current code does not reproduce, and both arms from fresh inits (section 3 here). Against `MM`, a fresh init of the manifest's cameras, the comparison is like for like in the reference but not in the training init. A baseline retrained from `MM` (about 40 minutes for three runs) would remove that. Recommended: not needed under (a); needed under (b) if these runs become a baseline.
+
+**What blocks what.** Question 1 blocks step 4: under (a) finalist 2 runs on the manifest's cameras, as section 3 here's off arm does; under (b) the off arm through the script is run again on the corrected manifests first. Questions 2 to 4 block nothing under (a).
+
+**The commands.** Each ran with `OMP_NUM_THREADS`, `MKL_NUM_THREADS` and `OPENBLAS_NUM_THREADS` at the thread count given, `PYTHONPATH=<worktree>/src:<worktree>/harness/src` and the shared `.venv`'s Python, the CPU ones with `CUDA_VISIBLE_DEVICES=` empty and the GPU ones under the shared lock. The inits and the matcher add ticket #18's `env-init` to `PYTHONPATH`, with `PYTHONDONTWRITEBYTECODE=1`. Every training ran under `/usr/bin/time -v`, with `nvidia-smi` sampling memory once a second. `$T` is `<scratch>/ticket-25`, `$O` is `<surface-runs>/ticket-25`, `$X` is `<private-scene-A-exp>`, `$K` is `<m15-runs>/kitchen`, `$M` is `<m17-runs>`, `$G` is `$OPENFTGS_DATASETS/synth/ground_truth`, `$S` is `<surface-runs>/ticket-5/side_request.json`. The scripts are not committed.
+
+| Command | Threads; device | Time | Note |
+| --- | --- | --- | --- |
+| `cp` of `<surface-runs>/ticket-19/manifests/P/h<c>` and `P/h<c>-train-only` (`scene.json`) into `$O/manifests/`, each with a link `images` to its copy's images | –; CPU | seconds | byte for byte (`cmp`), so that the frame caches are written beside these copies and nowhere in ticket #19's folders or `<private-scene-A-exp>` |
+| `python $T/init_pairs.py <manifest> $O/init/<name>.safetensors --pairs-from <manifest whose pairing is used> --counts $O/init/<name>.counts.json --stride 4` | 16; GPU | 1 min 24 s each | `ftgs init roma --stride 4` by `openftgs.cli.main`, with `openftgs.init._pairs` replaced by the package's own pairing on the other manifest's cameras and `_triangulated` counted per pair: `MM` (`$X/scene_h<c>` with its own pairs), `CM` (`$O/manifests/h<c>` with `$X/scene_h<c>`'s pairs), `MC` (`$X/scene_h<c>` with `$O/manifests/h<c>`'s pairs), `CC_counts` (`$O/manifests/h<c>` with its own) |
+| `ftgs init roma $O/manifests/h<c>/scene.json $O/init/CC_h<c>.safetensors --stride 4` | 16; GPU | 1 min 24 s each | the second arm's init, by the CLI unchanged; equal bit for bit to `CC_h<c>_counts` |
+| `python $T/same_init.py <a> <b>` | 1; CPU | seconds | the equality checks: `MM_h0` against ticket #24's `regen_h0_s4`, `CC_h<c>` against `CC_h<c>_counts` |
+| `python $T/build_requests.py $X/requests/heldout_novel.json $X/scene_h0/scene.json $O/manifests/h0/scene.json $O/requests/score_h0 --heldout cam0` (the left copy: `heldout1_novel.json`, `cam1`) | 1; CPU | seconds | the notes' scoring request at both poses of the test view, the training-camera items at the corrected poses |
+| `bash $T/run_train.sh <run> plain $O/manifests/h<c>/scene.json $O/init/<CM or CC>_h<c>.safetensors <seed>`, i.e. `ftgs train $O/manifests/h<c>/scene.json --init … --out $O/runs/<run> --seed <seed>` | 16; GPU | 13 min each | ticket #24's script, repointed |
+| `bash $T/post_a.sh <run> h<c>`: `ftgs render <checkpoint> --request $S`; `ftgs render <checkpoint> --request $O/requests/score_h<c>_<mpose or cpose>.json`; `python $T/score_a.py <renders> $X/scene_h<c>/scene.json --heldout <cam> --crop <rect> --stored-masks <surface-runs>/ticket-4/private-scene-A/placeholder_masks.npz`; `ftgs eval <checkpoint> $O/manifests/h<c>-train-only/scene.json --out $O/metrics/<run>_mpose.json`; `python $T/side_sheet.py …`; `python scripts/run_summary.py …` | 16; GPU, then CPU | about 2 min | the sheet, the scores at both poses, E16 at the manifest's pose (the run's METRICS.json is the corrected pose) |
+| `bash $T/measures.sh <runs>`: `python $T/measures_a.py $X/scene_h0/scene.json --out $O/measures/a_<ref>.json <run>=<checkpoint>=<reference file>` for the five references | 8; CPU | 2 to 4 s each | the shell's measures; the baseline's checkpoints under `<surface-runs>/ticket-24/runs`, read only |
+| `python $T/kfit/turn_manifest.py $K/scene.json $O/kitchen/manifests/turned --seed 25` | 1; CPU | seconds | the control's turned manifest |
+| `python $T/kfit/knn_pairs.py <manifest> --k 2 --test cam00 --ktest 3` | 1; CPU | seconds | the fit's pairs on `kitchen` |
+| `flock <lock> bash $T/kfit/queue_match_body.sh`: `python $T/kfit/match_pair.py $K/scene.json $O/kitchen/matches --label kitchen --tag <pair> --pair <A>:<B> --frames 0:300:20` for 28 pairs | 8; GPU | 15 s each | ticket #12's script, unchanged; one lock for all, after one pair per lock lost every race to the trainings |
+| `bash $T/kfit/run_kfit.sh <exact or turned> <manifest> <the 25 pairs> <their 45 pairs of partners>`: `python $T/kfit/fit.py <manifest> … --far 1e-9 --fb 271.6 --frame-list 0:300:20 --free <the 19 training cameras>`, then `--free cam00 --fixed <the first step>` on `cam00`'s three pairs | 8 processes of 1 thread; CPU | 2 min 40 s to 4 min 17 s, then 11 to 13 s | the floor check (exact) and the correction (turned) |
+| `python $T/kfit/write_manifest.py $O/kitchen/manifests/turned/scene.json $O/kitchen/fits/turned.json $O/kitchen/manifests/corrected --train-fit … --label kitchen-turned`; `python $T/kfit/compare.py $K/scene.json <turned> <corrected>` | 4; CPU | seconds | the corrected manifest, read back by the package, and each camera's turn from the exact one |
+| `bash $T/queue_kitchen.sh`: `ftgs init roma $O/kitchen/manifests/<turned or corrected>/scene.json $O/init/kitchen_<…>.safetensors` | 16; GPU | 32 min 1 s, 30 min 52 s | the control's inits, at the default stride as M17's |
+| `bash $T/run_train.sh K_<turned or corrected>_s<n> plain $O/kitchen/manifests/<…>/scene.json $O/init/kitchen_<…>.safetensors <n>`, n = 0, 1 | 16; GPU | 16 min 25 s to 17 min 2 s | the control's runs; peak 21,822 to 23,838 MiB |
+| `bash $T/post_synth.sh <run> <manifest> <init>`: `python scripts/gt_depth.py <checkpoint> $K/scene.json $G/kitchen --out …` (with the run's own manifest it stops: the pose differs from the ground truth's); `python scripts/reference_flaws.py run <checkpoint> <own manifest or $K/scene.json> $M/reference/kitchen/flags --out …`; `ftgs eval <checkpoint> $K/scene.json --out …`; `python $T/synth_measures.py <checkpoint> <own init or $M/kitchen/init.safetensors> $G/kitchen --scene-name kitchen --out …` | 16; GPU, then CPU | about 4 min | ticket #24's diagnostics, at the exact cameras and at the run's own |
+| `bash $T/blind.sh` | 4; CPU | seconds | the nine sheets with their labels hidden, in an order from Python's `random.Random(25)`, and their key |
+| `python $T/tables.py`, `python $T/judge.py`, `python $T/ktables.py` | 1; CPU | seconds | the tables of this section |
+
+The private scene's folders, `<m15-runs>` and `<m17-runs>` were read and never written. The scene is named in no output file; the corrected manifests, which hold the copies' own metadata, and the runs' METRICS.json, which hold their manifests' paths, stay in `<surface-runs>`.
+
 **The owner's answer on step 3** (the go for step 4 or a stop): *not yet given.* **Date:** *not yet given.*
 
 ## 5. Step 4: finalist 2, the alignment-tolerant pixel loss
