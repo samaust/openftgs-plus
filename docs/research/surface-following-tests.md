@@ -1326,6 +1326,26 @@ What the control shows:
 - **They do not bring back everything.** The residual's share behind the surface is 0.317 and 0.320, 0.020 to 0.029 above the exact runs', beyond section 4.4's 0.005, and on dynamic pixels 0.642 and 0.644 against 0.612 to 0.618; the share in front is unchanged. SSIM₁ at the runs' own pose is 0.8743 and 0.8718, 0.005 to 0.008 below the exact runs' 0.8787 to 0.8803, beyond the 0.002 guard; the kept-pixel PSNR at their own pose, 30.41 and 30.58 dB, is at the bottom of the exact runs' 30.42 to 31.34. At the exact pose of `cam00`, which the corrected `cam00` misses by 0.116°, E16 is 23.2 and 23.4 dB. The median error of expected depth is lower, 181 and 182 mm against 251 to 448, but section 4.4 counts it only where three-seed ranges part, and here there are two.
 - **So on `kitchen` the tool takes back most of a 0.1° to 0.4° error but leaves about 0.1°,** the rig's common turn and the directions the background barely fixes. The corrected runs fall short of the exact runs by what section 4.4 calls harm in SSIM₁ and in the residual behind the surface, but those deficits are read, not attributed: the corrected runs also differ from the baseline in their init (a fresh one, where the baseline's is M17's), `gt_depth.py` scores a model whose frame is about 0.1° off at the exact cameras, and the own-pose scores are at a fitted `cam00` pose. Private scene A's corrections were of the same size (0.05° to 0.45°; section 2.2 here), with the common turn held at zero there too.
 
+**The left copy's second seed** (at the owner's answer of 2026-11-17, question 1 below). The baseline (`A_h1_s1`: the copy's manifest, the kept stride-4 file) and arm `F1m` (`F1m_h1_s1`: the corrected manifest, `CM_h1`) were trained again at seed 1, by the same commands (`run_train.sh`, then `post_base.sh`, a copy of `post_a.sh` that scores the baseline at its one pose as section 3 here did, and `post_a.sh`), and measured and scored as above, in about 29 minutes of GPU (13 min 33 s and 13 min 15 s of training; caps at 9,900 and 9,900; peaks 23,970 and 23,504 MiB; row T25.4).
+
+| Run | `kept` | `MM` | `CM` | `MC` | `CC` |
+| --- | --- | --- | --- | --- | --- |
+| `A_h1_s0`, baseline | 0.1632 / 0.0438 | 0.1541 / 0.0440 | 0.1546 / 0.0436 | 0.1768 / 0.0538 | 0.1699 / 0.0451 |
+| `A_h1_s1`, baseline | 0.1526 / 0.0366 | 0.1429 / 0.0365 | 0.1500 / 0.0366 | 0.1724 / 0.0487 | 0.1695 / 0.0412 |
+| `F1m_h1_s0` | 0.1333 / 0.0381 | 0.1302 / 0.0386 | 0.1277 / 0.0390 | 0.1561 / 0.0490 | 0.1475 / 0.0405 |
+| `F1m_h1_s1` | 0.1398 / 0.0389 | 0.1269 / 0.0391 | 0.1322 / 0.0389 | 0.1553 / 0.0493 | 0.1450 / 0.0416 |
+
+| Run | Pose | Crop PSNR | Crop SSIM₁ | Sharpness ratio | Late | Training cameras: PSNR / ratio | E16 PSNR / SSIM₁ / ꟻLIP | Coverage |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| `A_h1_s1` | manifest | 23.71 | 0.7472 | 0.7457 | 0.7969 | 31.59 / 0.7686 | 21.66 / 0.7384 / 0.1976 | 0.82 to 1.00; 0.49 to 0.86 |
+| `F1m_h1_s1` | manifest | 23.61 | 0.7421 | 0.7397 | 0.7840 | 31.70 / 0.7726 | 21.66 / 0.7325 / 0.1963 | 0.80 to 1.00; 0.49 to 0.89 |
+| | corrected | 24.76 | 0.7792 | 0.7388 | 0.7832 | | 22.10 / 0.7604 / 0.1871 | |
+
+- **On the left copy the named measure has moved, by section 4.4's rule.** Both of `F1m`'s seeds lie below both of the baseline's against every one of the five files, and the means differ by 0.019 to 0.023: 0.021 on the kept file (0.137 against 0.158), 0.020 on `MM` and 0.022 on `CM`, `F1m`'s two references from the same matches, so it counts as lower against both. The baseline's two seeds lie 0.0004 to 0.011 apart.
+- **The tail does not move** there (`F1m` 0.038 and 0.039 against 0.044 and 0.037 on the kept file), so by section 2.6 here's reading the fall lies in the 5 to 25 cm band.
+- **The other criteria on the left copy, two seeds a side.** At the manifest's pose the means fall by 0.16 dB in E16 PSNR and 0.25 dB in crop PSNR, within the 0.3 dB guard; at the corrected pose crop PSNR rises by 0.95 dB and E16 PSNR by 0.30 dB. The sharpness ratio falls by 0.004 (0.739 against 0.743), within the baseline's two seeds' 0.005.
+- **This changes the reading of section 7.2's row for finalist 1** (below): the share moved on the left copy and did not on the centre copy, so the drop clause's "the share does not move" no longer holds on both copies. The arm still carries the init's sample (the baseline trained from the kept file, the arm from `CM_h1`), and the adopt clause stays unmet (check (c)'s "every pair", and on the centre copy the manifest-pose harm and the unmoved share). The owner's drop of 2026-11-17 was given before this result and stands unless the owner changes it.
+
 **Against the ticket's acceptance criteria.**
 
 - **Three runs on the corrected manifests, each from an init made on its own manifest.** Done, twice: arm `F1m` from the scratch init with the manifest's pairs, arm `F1c` from plain `ftgs init roma`, each on its copy's corrected manifest.
@@ -1338,7 +1358,7 @@ What the control shows:
 **The reading by section 7.2's row for finalist 1.**
 
 - **Adopt when** check (c) lowers the background's residual for every pair on held-out frames (it did not: section 2.2 here), the named measure is lower against both reference files (it is not, for either arm), and no other criterion shows harm at either pose (the manifest's pose shows harm of 0.31 to 0.63 dB, and the sharpness ratio falls on the centre copy beyond two seeds). **Not met, on all three counts.**
-- **Drop when** check (c) does not lower the background's residual on held-out frames (it did lower it, over the seven pairs), **or the share does not move.** The share did not move for `F1m`, the correction's own arm, nor for `F1c` against its two files. **The drop clause is met by its second branch.**
+- **Drop when** check (c) does not lower the background's residual on held-out frames (it did lower it, over the seven pairs), **or the share does not move.** The share did not move for `F1m`, the correction's own arm, nor for `F1c` against its two files. **The drop clause is met by its second branch.** **With the left copy's second seed (above), this holds on the centre copy only:** on the left copy `F1m`'s share is lower against both its references by the rule. Neither clause of the row is then met on both copies; the reading is split by copy, and the decision is the owner's.
 - **"A correction that holds on held-out frames is still a better manifest, and keeping it for that is the owner's call."** What argues for that: the background's residual halves (section 2.2 here); the training cameras' PSNR rises; at the corrected pose the crop PSNR rises, by 0.8 dB on the left copy; the control shows the tool takes 0.1° to 0.4° turns back to the residual's floor. What argues against it: the sharpness ratio falls by 0.015 on the centre copy, beyond the plain runs' spread, though not separated from the fresh init's sample; the named measure, the tail and the under-two-frames share are unmoved; the manifest's pose of the test view scores worse; the corrected pairing loses most of `cam2`–`cam8`; and the control shows the tool leaves each camera 0.1° from the truth, and on `kitchen` the corrected runs fall 0.005 to 0.008 short in SSIM₁ and 0.02 to 0.03 in the residual's share behind the surface, which this control does not separate from its fresh inits and its scoring at the exact cameras.
 - **Recommended:** drop finalist 1 as a technique against the shell, and do not make the corrected manifests the ones finalists 2 to 4 train on: by the rule the correction moves none of the measures the finalists are judged by, the left copy's fall rests on one seed a side, and it would carry the changed pairing into every later init. Keep the corrected manifests on file, as section 2.6 here recommended. This leans on the drop clause's second branch, not on the sharpness fall, which is not separated from the init's sample.
 
@@ -1381,7 +1401,13 @@ What the control shows:
 
 The private scene's folders, `<m15-runs>` and `<m17-runs>` were read and never written. The scene is named in no output file; the corrected manifests, which hold the copies' own metadata, and the runs' METRICS.json, which hold their manifests' paths, stay in `<surface-runs>`.
 
-**The owner's answer on step 3** (the go for step 4 or a stop): *not yet given.* **Date:** *not yet given.*
+**The owner's answer on step 3** (the go for step 4 or a stop), given in session:
+- **Finalist 1** (question 2): option (a). Finalist 1 is dropped. The corrected manifests stay on file, and finalists 2 to 4 train on the manifest's cameras.
+- **The left copy's second seed** (question 1): run, at seed 1 for the baseline and `F1m`; its result is above ("The left copy's second seed"). It moved the named measure on the left copy by the rule, after the answer was given; the drop stands unless the owner changes it.
+- **The sheets** (question 3) await the owner's judgement with their labels hidden; question 4 was not taken up.
+- **Step 4: go.**
+
+**Date:** 2026-11-17.
 
 ## 5. Step 4: finalist 2, the alignment-tolerant pixel loss
 
