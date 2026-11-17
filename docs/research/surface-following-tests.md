@@ -1403,7 +1403,7 @@ The private scene's folders, `<m15-runs>` and `<m17-runs>` were read and never w
 
 **The owner's answer on step 3** (the go for step 4 or a stop), given in session:
 - **Finalist 1** (question 2): option (a). Finalist 1 is dropped. The corrected manifests stay on file, and finalists 2 to 4 train on the manifest's cameras.
-- **The left copy's second seed** (question 1): run, at seed 1 for the baseline and `F1m`; its result is above ("The left copy's second seed"). It moved the named measure on the left copy by the rule, after the answer was given; the drop stands unless the owner changes it.
+- **The left copy's second seed** (question 1): run, at seed 1 for the baseline and `F1m`; its result is above ("The left copy's second seed"). It moved the named measure on the left copy by the rule, after the answer was given. Asked again with that result in hand, the owner confirmed the drop (2026-11-17, in session): finalist 1 stays dropped, and finalists 2 to 4 train on the manifest's cameras.
 - **The sheets** (question 3) await the owner's judgement with their labels hidden; question 4 was not taken up.
 - **Step 4: go.**
 
