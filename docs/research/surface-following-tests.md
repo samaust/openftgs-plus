@@ -814,6 +814,103 @@ The finalists' tests go through the device, as section 5.1 says, and did not wai
 
 *Ticket #23's section.* Every result of step 1 read against section 5.1's last column, a recommendation per finalist, keep or drop, and the ask for step 2.
 
+Written on 2026-11-16 from sections 2.1 to 2.5 here and the research document's sections 4.4 to 4.6, 5.1 to 5.7 and 7.2; review 2's answers are cited as section 1 here records them. Nothing was trained, run or measured for it, and it opened no source outside this repository, so it adds no source-log row.
+
+**Each result against section 5.1's last column.**
+
+| Check | What section 5.1 said its result would change | What step 1 found | The reading |
+| --- | --- | --- | --- |
+| (a) | Whether the shell's measures stand as criteria, or are the method's habit on cameras that agree. The latter takes away finalists 1 and 2's reason as tests of H2 by removal | Split by measure (section 2.1 here). The under-two-frames share on openftgs-synth's moving parts is 0.49 to 0.71, against 0.647 on private scene A's near side. The far share in multiples of S is 0.000 to 0.003 on the dynamic side, against 0.12 to 0.13. In metres it is 0.23 to 0.46 at 5 cm and 0.03 to 0.08 at 10 cm, as high as private scene A's. Only beyond 25 cm do the two differ: 0.035 to 0.047 against 0.001 | **The under-two-frames share is the method's habit** on moving content. It falls under the row's branch in which the shares are like private scene A's, and finalist 2's named measure goes with it. **The far share stands in S and not in metres.** Its tail beyond 25 cm separates the two scenes under both rulers (below, "The far share's ruler") |
+| (b) | Whether the shell follows the disagreement in time. A share no higher after frame 80 weakens finalist 2 most | The near side's under-two-frames share is higher after frame 80 in 44 of the 45 checkpoints (median +0.096), but by 20-frame bins it climbs with the person's approach from the first frames. The split cannot read the near side's far-5 cm share, because the clip's ends bias it (section 2.1 here) | **Neither branch.** The rise is as well explained by the person's approach as by the disagreement, and it is a rise in a measure check (a) found to be the method's habit. It neither weakens nor supports finalist 2 |
+| (c) | What finalist 1 tests, by section 5.3's two cases | Section 5.3's **second case** (section 2.2 here). Over the seven pairs on held-out frames, the background's residual falls from 0.87 px to 0.43 and 0.55 px, but not in every pair: within the seven, `cam3`–`cam5` and `cam6`–`cam8` stay; of the held-out camera's pairs on the centre copy, `cam0`–`cam2` and `cam0`–`cam6` rise (0.42 to 0.76 px, 0.43 to 0.63 px). The person's residual stays at 2.29 to 2.35 px against 2.37 px. Its 4.0 % between pairs becomes 3.0 % and 3.8 %, not 1.0 % to 1.6 %: the turns reach section 2.7's shift b and not its scale a. Moving the centres gives the same case and moves S. The corrections also flip D-22's pairs at the 15.0° ties | **Finalist 1 would test the background's part of the disagreement alone,** and little change is expected on the person. By section 7.2, the drop clause is not triggered, since the background fell on held-out frames. The adopt clause's "for every pair" is not met. That leaves the owner's call of sections 4.5 and 5.7 |
+| (d) | Whether rows E11 and E22 come back | The first case for the shell's far-from-init primitives. The two seeds place them differently (0.62 and 0.60 beyond 1 cm, against 0.025 for the rest). The primitives under two frames are placed alike. The far side is placed differently too, and the renders do not localize the shell (section 2.3 here) | **E11 and E22 come back** as companions to test after finalist 2, on unequal evidence: E22's co-pruning has direct evidence and E11's is weak. This is no arm of this PRD (section 1 here) |
+| (e) | Whether row E27 comes back | Between neighbouring cameras, shifts of up to 5 levels on the person and 10 on the background, beyond `kitchen`'s floor. They are mostly an offset, not one per camera, and on the background they change with the frame (section 2.3 here) | **E27 comes back** as a test of its own, after the finalists or beside finalist 2. It changes no finalist's place. It does qualify finalist 2: part of what that loss sees between cameras is colour, which a shift does not absorb |
+| (f) | Whether the adopted form of finalists 3 and 4 can rest on a depth output of the colour pass | Within U-12's bounds on every stored tensor at Q-227's cut. One figure at the cut 0.1 lies outside them. Against float64 it is one float32 computation against another (section 2.4 here) | **Passed**, which is ticket #21's reading and is put to the owner below. The adopted form can be a fourth channel without a second pass. Normals as channels, and the reference backend's side, stay open |
+| Reads | FreeTimeGS++ on check (a)'s reading, and on a velocity row. SparseCam4D as an alternative to finalist 2. SSA-3DGS on the placeholder pixels | Section 2.5 here | **FreeTimeGS++ agrees with (a)'s reading** in kind: it expects short-lived primitives wherever something moves. Its lifetime is not the under-two-frames share, though. Its velocity from flow gets its row and waits. **SparseCam4D** is rows E8 and E10's mechanism and changes no finalist. **SSA-3DGS** does not fit the placeholder pixels, and row E13 stays. No read removes a finalist |
+| Model | The nine-camera default's row, and section 4.2's reading at stride 1 | The under-two-frames share is the same with `cam0` in training (0.518, against 0.517 and 0.519). The far-5 cm share is 0.012 to 0.014 lower, just beyond the seeds' 0.01. Its share against its own init stays empty (section 2.1 here) | **Section 4.2's reading holds for the under-two-frames share.** For the far share it holds only with a qualification. No finalist's place changes |
+
+**The far share's ruler, for the criteria finalists 1, 3 and 4 name.** All three name the near-side far-5 cm share (sections 5.3, 5.5 and 5.6).
+
+- **What the ruler changes, and what it doesn't.** On private scene A the two rulers give the same figures, in section 2.1 here's table of other thresholds, so a run there reads the same number either way. The ruler matters in two places. One is how a fall is read: most of the 5 cm share on the near side lies in the 5 to 25 cm band, which openftgs-synth fills as fully with cameras that agree. A fall there may be a change in the method's habit rather than a disagreement removed. Finalist 3 is most exposed, since flattening could thin that band on any scene. The other place is openftgs-synth, finalist 1's control on `kitchen`: in S its baseline is near 0, in metres it is not.
+- **The tail beyond 25 cm** is the one part of the share that separates the two scenes under both rulers: 0.035 to 0.047 of the near side's opacity against 0.001. It is thin evidence for a criterion:
+  - It rests on three checkpoints of private scene A, `A_default_s0`, `c3_s4` and the fourth model.
+  - Its spread between seeds was not measured (`A_default_s1`'s cells are blank).
+  - At 0.035 to 0.047, section 4.4's margin of 0.01 asks it to fall by a quarter or more.
+  - openftgs-synth's dynamic side is not private scene A's near side.
+- **Recommended:**
+  - Keep the near-side far-5 cm share as the named measure, with the threshold and seed rule that review 1 accepted.
+  - Report the near-side far share beyond 25 cm beside it for every run, its spread between seeds taken from the baseline's two seeds on the centre copy, as the sharpness ratio's is. Read a fall in the 5 cm share that the tail does not share as a change in the method's habit, not as a disagreement removed. What counts as the tail sharing a fall is fixed at step 2 from the baseline's two seeds, before any arm runs.
+  - On openftgs-synth, take the share at 0.12·S and at 25 cm.
+
+  This changes how a confirmed criterion is read, so it is the owner's (question 5).
+
+**A recommendation per finalist.**
+
+| Finalist | Recommended | Why | What another answer would change |
+| --- | --- | --- | --- |
+| 1. The cameras corrected once | **Drop its runs, and keep the corrected manifests on file.** The correction does not become the manifest later arms train on | Check (c) gave section 5.3's second case. The named measure, on the near side, is not expected to move when the person's part is left in place. The adopt clause's "every pair" is not met, and on the centre copy the held-out camera agrees worse with two partners than at the manifest's pose. Kept, it would also carry D-22's changed pairs into every later arm's init (question 1) | **Kept:** step 3 runs (2 GPU hours, 2 more with `kitchen`'s control), reading the background's part alone, with question 1 to answer first. Finalist 2 then trains on the corrected manifests (section 5.7). The documents name no baseline for it there: section 5.2's baseline is on the manifest's cameras, so a finalist-2 arm on corrected cameras would differ from it in two things. That comparison would have to be fixed at step 4's go. **Dropped:** the cameras' background part stays in every result (section 4.6, line F1), and `kitchen`'s control goes with it |
+| 2. The alignment-tolerant pixel loss | **Keep, with its named measure changed before step 4** to the near-side far-5 cm share, read as for finalists 1 and 3. The under-two-frames share is reported but is not its criterion | Check (a) found its named measure, the near-side under-two-frames share, to be the method's habit on moving content. Section 7.2's adopt rule rests on that measure, so as it stands, its moving would not show a disagreement removed. Section 2.1 here reads finalists 1 and 2 as keeping their reason through the far share and the sheet. It is still the one finalist that acts on the person's part, which check (c) left untouched | **Kept as it stands:** its result could speak against H1, but a fall in its measure could not be read as removal. **Dropped:** no finalist acts on the person's part (section 4.6, line F2), and rows E11, E22 and E27, which come back beside it, lose their anchor. Changing a named measure is the owner's (question 6) |
+| 3. Surface terms without a prior | **Keep** | Check (f) passed, so its adopted form can rest on a depth channel of the colour pass. Its named measure stands in S, and its openftgs-synth criterion, the share behind the surface, is untouched by (a) | **Dropped:** a result of finalist 4 could not be split between the constraint and the prior (section 4.6, line F3). With the ruler left as it is, a fall in its measure could be flattening's habit and not H1's outcome |
+| 4. A normal prior | **Keep, decided after finalist 3** (section 4.6, line F4) | Check (f) bears on it as on finalist 3. No check of step 1 touches its prior | **Dropped:** H1 as the owner worded it, with prior maps, is not tested |
+
+**The ask for step 2.** The owner's go for section 3 here: the baseline and the script's parity runs, **2.5 GPU hours** as section 4.5 counts them, more if a run on private scene A takes twice the notes' median (section 1 here).
+
+- **The runs** are section 5.2's seven, by plain `ftgs train` at the default training configuration and 30,000 iterations:
+  - on private scene A, the centre copy at seeds 0 and 1 and the left copy at seed 0, from a stride-4 init on the manifest's cameras;
+  - on openftgs-synth, `kitchen` at seeds 0, 1 and 2 and `studio` at seed 0, from M17's init files.
+
+  Then two parity runs of the wrapper script with every added weight at 0, one on private scene A and one on `kitchen`, held to section 4.5's tolerance.
+- **What the baseline records, after checks (a) and (b):**
+  - section 4.4's measures, with the near-side far share at 5 cm, 10 cm and 25 cm;
+  - on openftgs-synth, the dynamic side at 0.12·S and 25 cm;
+  - the under-two-frames share, reported apart, for the near side and for the whole model;
+  - the sharpness ratio, the tiles' coverage and the test-view scores.
+
+  All of these are CPU work on the runs' checkpoints. The one fixed reference init points file, against which every arm's far share is taken (section 5.2), is fixed at step 2: proposed, the baseline's own stride-4 init of each copy.
+- **Due at step 2 from the owner:** the sharpness ratio's definition (section 1 here, item 1). The owner points to the notes' scorer in session and this document writes it down. Its spread between seeds comes from the baseline's two seeds on the centre copy, so it is needed before the baseline is scored, not before it trains.
+- **What blocks step 2:**
+  - Nothing among the questions below blocks its training. Question 5 decides what its scoring reports, and recording every figure listed above keeps both answers open.
+  - Questions 1 and 6 block later steps: step 3 if finalist 1 is kept, and step 4.
+  - Questions 2 to 4 block no step.
+
+**The questions for the owner.**
+
+1. **Finalist 1's pairs (from section 2.2 here; only if finalist 1 is kept).** The corrections break D-22's exact 15.0° ties. A corrected manifest's init would then take `cam2`'s person from `cam2`–`cam8`, where D-22's filters keep 0.8 % to 2.1 % of it, so finalist 1's init would differ from the baseline's in its pairs as well as its cameras.
+   - (a) Accept the new pairing as part of finalist 1.
+   - (b) Keep the manifest's pairs for finalist 1's inits. This needs a scratch init or a pair override, since `ftgs init roma` unchanged cannot do it.
+   - (c) Both, reporting the pairing's effect apart.
+
+   **Recommended: (b),** with (c) as a side run if the hours allow (ticket #19's recommendation). Under (a), a result could not be split between the cameras and the pairs.
+2. **The fourth model's far share against its own init (from section 2.1 here).** It stays empty, because the regenerated init gave 0.23559 against the score file's 0.23426.
+   - (a) Leave it empty.
+   - (b) The owner supplies the original file, if it is kept anywhere.
+   - (c) Accept the regenerated file as a stand-in, labelled so.
+
+   **Recommended: (a),** or (b) if the file exists. Nothing depends on the figure, and (c) would break the owner's condition that it reproduce.
+3. **Four marks in section 1 here.** The gates, no combined arm, the order, and the device's terms outside E10's g are marked "Confirmed" because review 2 accepted section 5's plan.
+   - (a) Keep "Confirmed".
+   - (b) Relabel them "Default".
+
+   **Recommended: (a).** Review 2 accepted the plan that states them (section 7.7). Under (b) they hold all the same until the owner speaks.
+4. **Check (f)'s "passed" (from section 2.4 here).** One figure at the cut 0.1 lies outside U-12's bounds, but it is one float32 computation held against another. Against a float64 device, the channel and both float32 devices lie within the bounds, and ticket #21 attributes the figure to float32 rounding.
+   - (a) Confirm "passed".
+   - (b) "Passed at Q-227's cut": a U-12 line for an adopted depth output is then held at that cut.
+   - (c) Not passed: the adopted form keeps a second pass (section 5.1).
+
+   **Recommended: (a).** All three float32 gradients lie within bounds against float64. The tests go through the device either way, so no step waits on it.
+5. **The far share's ruler (from section 2.1 here, check (a)).**
+   - (a) Keep the near-side far-5 cm share as the named measure of finalists 1, 3 and 4, and report the share beyond 25 cm beside it, as above.
+   - (b) Make the share beyond 25 cm the named measure, with a margin set from the baseline's seeds.
+   - (c) Leave the criteria as they are.
+
+   **Recommended: (a).** (b) rests on three checkpoints and an unmeasured spread. Under (c), a fall in the 5 to 25 cm band could not be told from a change in the method's habit. It decides what step 2's scoring reports.
+6. **Finalist 2's named measure (from section 2.1 here, check (a)).**
+   - (a) Name the near-side far-5 cm share, with the tail beside it as in question 5, before step 4, keeping the under-two-frames share as a reported figure.
+   - (b) Keep the under-two-frames share, with the reading limited to "speaks against H1, cannot show removal".
+   - (c) Drop finalist 2.
+
+   **Recommended: (a),** on section 2.1 here's reading that finalists 1 and 2 keep their reason through the far share and the sheet. It blocks step 4.
+
 **The owner's answer on step 1** (each finalist kept or dropped, and the go for step 2 or a stop): *not yet given.* **Date:** *not yet given.*
 
 ## 3. Step 2: the baseline, the wrapper script and its parity runs
