@@ -924,6 +924,215 @@ Written on 2026-11-16 from sections 2.1 to 2.5 here and the research document's 
 
 *Ticket #24's section.* The seven baseline runs by plain `ftgs train`, each with its measures, its sheet or `scripts/gt_depth.py`; and the scratch script's runs with every added weight at 0 against a plain run, on private scene A and on `kitchen`, within openftgs issue 395's tolerance.
 
+Run on 2026-11-16, at the owner's go of that day (section 2.6 here), with this branch's code at 163bd39 (`src/` and `scripts/` as `main`'s), Python 3.14.10, torch 2.15.0+cu132, gsplat 1.5.3, NumPy 2.5.4, SciPy 1.18.1 and Pillow 13.0.0 from the shared `.venv`. The hardware was one RTX 4090 (driver 595.99.02), alone on the machine, under the shared GPU lock, with 16 CPU threads. Scripts read tensors, JSON, images and mask files and wrote numbers and files. No image, render or sheet of private scene A was looked at. Every existing frame-cache file beside the scenes' manifests passed the package's own validity check before training, so the runs read them and wrote nothing beside a manifest. A search afterwards found no file under `<private-scene-A-exp>`, `<m15-runs>/kitchen` or `<m17-runs>` newer than the first run. In all, about 3.6 GPU hours: the nine full runs took 2.4, the parity control's 25 short runs about 1.1, and the renders, scores and diagnostics the rest. "The commands", at the end, lists every run.
+
+**The owner's answers during this step** (2026-11-16, in session, relayed by the orchestrating session):
+
+- **The sharpness ratio** (section 1 here, item 1). It is the notes' scorer's `crop.sharp`, with its `crop_late.sharp` and `train.sharp` reported beside it (row T24.1). The owner named it after a summary of what the scorer computes; this section writes the definition down, below.
+- **Parity.** The PRD's criterion cannot be met by two plain runs, so it is replaced by the form of (a) below, judged with wrapper v2. When v2 failed that form on both scenes, the owner chose three diagnostics on `kitchen`: plain runs from the wrapper's own entry script with the wrappers not installed, four more plain repeats, and plain and v2 runs with `perf.frame_cache` set explicitly.
+
+**The sharpness ratio, defined.** It comes from the notes' scorer, and the scorer was not run. A scratch script `score_a.py` computes it anew, and its figures equal the score files the notes keep beside `c3_s4` and `h1_init_s4` in every printed digit (row T24.5).
+
+- For each of the 120 frames of the held-out camera, take the render clamped to [0, 1] and the ground-truth image, both cut to the person's crop (`cam0`'s rectangle (96, 256, 640, 1280) on the centre copy, `cam1`'s (0, 256, 640, 1280) on the left copy; section 2.5).
+- Turn each into luma, Y = 0.299 R + 0.587 G + 0.114 B. Take the forward differences across and down, cut to a common grid one pixel smaller each way. The image's gradient energy G is the mean over pixels of √(Δx² + Δy²).
+- The frame's ratio is G(render) / G(ground truth): 1 means as sharp as the source, and below 1 softer. **The sharpness ratio** is its mean over the 120 frames. Beside it, `crop_late` is the mean over frames 80 to 119, and `train` the same ratio on whole frames of the training cameras in the notes' request: `cam1` and `cam2` on the centre copy, `cam0` and `cam2` on the left copy, at frames 0, 30, 60, 90 and 119.
+- The notes give its seed noise on the centre copy as ±0.003.
+
+**The wrapper script** (`<scratch>/ticket-24/wrap_train.py`, not committed) is the seam of section 1 here.
+
+- **How it runs.** It calls `openftgs.cli.main(["train", …])` in its own process, so the seed, `train_log.jsonl`, the checkpoint and METRICS.json are `ftgs train`'s own. Before that call it puts two wrappers in place of the names `render` and `total_loss` in `openftgs.train`.
+- **The `render` wrapper** calls the package's `render` unchanged and keeps the iteration's camera and time for Q-226's device.
+- **The `total_loss` wrapper** calls the package's `total_loss` unchanged. It checks that its time is the render's, then adds weight × term for every registered term whose weight is not 0. With every weight at 0 it returns the package's own `(loss, terms)` objects with no key added.
+- **The check that the patch took effect.** Both wrappers count their calls, and the script fails unless each count equals the iterations logged: 30,000 in every full run.
+- **The two versions.** Version 1 kept the iteration's render output until the next render. Version 2, used from the control on, drops it as soon as the loss is taken, so the wrapper keeps nothing alive that `Trainer.step` would have freed. A `--no-patch` switch runs the same script with no wrapper installed, for diagnostic (ii).
+
+**Parity: the PRD's criterion, and why no two runs meet it.** The criterion has three parts (section 4.5; openftgs issue 395):
+
+- the mean losses over iterations 1 to 1,000 equal to four figures;
+- N at iteration 500 within 0.01 %;
+- the cap reached at the same iteration.
+
+"Four figures" is read here as a difference under one unit of the fourth significant figure. That is the reading issue 395's own example fits (L1 0.11465 against 0.11460); the rounded form was checked beside it, and every result below is the same under both. The plain side of each pair is the baseline's seed-0 run on that scene, trained by plain `ftgs train`.
+
+| Scene, seed 0 | L1, 1–1,000 | 1 − SSIM | ꟻLIP | Total | N at 500 | Cap reached at | Final E16 PSNR / SSIM₁ on the test view |
+| --- | --- | --- | --- | --- | --- | --- | --- |
+| `kitchen`, plain | 0.114396 | 0.416321 | 0.415922 | 0.347409 | 401,567 | 2,100 | 29.25 dB / 0.8787 |
+| `kitchen`, wrapper v1 | 0.114580 | 0.416406 | 0.416155 | 0.347670 | 401,572 | 2,100 | 27.68 dB / 0.8794 |
+| Centre copy, plain | 0.072663 | 0.250741 | 0.289568 | 0.228677 | 127,684 | 10,800 | 24.79 dB / 0.8187 |
+| Centre copy, wrapper v1 | 0.073090 | 0.251104 | 0.290836 | 0.229615 | 127,680 | 10,800 | 24.78 dB / 0.8187 |
+
+- **Both pairs miss "four figures" and meet the other two parts.** On `kitchen` L1 differs by 1.6·10⁻³ of its value, and on the centre copy by 5.9·10⁻³.
+- **The rows before the first growth event agree.** The rows at iterations 100 to 500 agree within 4·10⁻⁶ of their values on `kitchen`, and 6·10⁻⁵ at most on the centre copy. The runs part after the event at the end of iteration 500, where N differs by 5 and 4 primitives.
+- **Two plain runs miss by as much.** M17's `default-395`, another plain run of the same configuration (at openftgs's eaeb791), misses today's plain `kitchen` run by 2.2·10⁻³ in L1. Three plain repeats stopped after iteration 2,200 miss it too.
+- **The control's figures.** Over 8 plain runs of `kitchen` (the baseline's and 7 repeats), L1's mean over iterations 1 to 1,000 runs from 0.114345 to 0.114576. None of the 28 pairs among the first 8 runs examined (4 plain, 4 v1) agrees to four figures, and 6 of those pairs are plain against plain. The cap falls at 2,000 in 2 of the 8 plain runs and at 2,100 in the other 6: in the plain runs that have not reached it by 2,000, N stands at 2,984,252 to 2,999,631 there.
+- **The reason.** gsplat's backward is not bit-repeatable (Q-220), and growth's choices amplify the difference from the first event on. The final `kitchen` PSNRs, 29.25 against 27.68 dB, are seed-0 runs that differ only by this. They lie inside the spread #374 recorded, a standard deviation of 0.55 to 1.54 dB (section 4.4), with SSIM₁ 0.0007 apart.
+
+**Parity (a), the owner's replacement** (answered 2026-11-16, in session):
+
+1. the rows before the first growth event (iterations 100 to 500) equal to five figures, read as a difference under one unit of the fifth significant figure;
+2. every term's mean over iterations 1 to 1,000 inside the plain runs' range on that scene;
+3. N at iteration 500 within 0.01 %;
+4. the cap within one growth event, 100 iterations, where a run reaches it.
+
+The plain ranges are 8 runs on `kitchen`, stopped after 2,200, and 4 on the centre copy: the baseline's run and 3 repeats stopped after 1,100, which do not reach the cap.
+
+| Arm | Runs | Part 1 | Part 2 | Part 3 | Part 4 | (a) |
+| --- | --- | --- | --- | --- | --- | --- |
+| `kitchen`, v2 | 3 | 3 of 3 | 2 of 3 (r3 above the range in L1 0.114608, ꟻLIP 0.416342 and total 0.347771) | 3 of 3 | 3 of 3 | **fails**, 2 of 3 runs pass |
+| Centre copy, v2 | 3 | 1 of 3 (row gaps up to 6.8·10⁻⁵) | 0 of 3 (all above the range in L1, 0.072964 to 0.073038 against 0.072663 to 0.072902) | 3 of 3 | not reached | **fails** |
+| `kitchen`, each plain run against the other 7 | 8 | 8 of 8 | 3 of 8 | 8 of 8 | 8 of 8 | 3 of 8 pass |
+| Centre copy, each plain run against the other 3 | 4 | 2 of 4 (gaps up to 5.2·10⁻⁵) | 0 of 4 | 4 of 4 | not reached | 0 of 4 pass |
+
+**v2 fails (a) on both scenes, and plain runs fail it against each other as often.** A run drawn like the others falls outside the range of n others in a term with chance 2/(n + 1), and outside on any of five correlated terms more often. On the centre copy, part 1 fails between plain runs too. Whether v2 is accepted is the owner's, and it is not recorded here.
+
+**The diagnostics: which one finds the shift.** Each arm is a set of `kitchen` seed-0 runs stopped after 2,200. The table gives the arm's mean, over its runs, of the 1–1,000 loss means, against the 8 plain runs in units of their standard deviation, with a two-sided Mann–Whitney test against them (SciPy):
+
+| Arm | Runs | L1 | 1 − SSIM | ꟻLIP | Total | Cap at |
+| --- | --- | --- | --- | --- | --- | --- |
+| Plain `ftgs train` | 8 | 0.114475 | 0.416362 | 0.416009 | 0.347516 | 2,100 (6), 2,000 (2) |
+| (ii) The wrapper's script, nothing installed | 3 | +0.49 SD, p = 0.50 | +0.78, 0.38 | +0.16, 0.78 | +0.39, 0.63 | 2,000 (3) |
+| Wrapper v1 | 4 | +1.33 SD, p = 0.004 | +0.69, 0.15 | +1.78, 0.03 | +1.52, 0.02 | 2,100 (1), 2,000 (3) |
+| Wrapper v2 | 3 | +0.95 SD, p = 0.19 | +0.60, 0.28 | +1.14, 0.28 | +1.03, 0.28 | 2,100 (2), 2,000 (1) |
+| (iii) Plain, `perf.frame_cache` "mmap" | 3 | +0.59 SD, p = 0.28 | +0.40, 0.63 | +0.65, 0.50 | +0.62, 0.38 | 2,100 (3) |
+| (iii) v2, `perf.frame_cache` "mmap" | 3 | −0.61 SD, p = 0.63 | −0.68, 0.38 | −0.70, 0.28 | −0.68, 0.38 | 2,100 (2), 2,000 (1) |
+
+- **The one shift located is version 1's.** Keeping the previous render output alive moved the losses up: L1 by 1.3 standard deviations of the plain runs, p = 0.004.
+- **What is not the cause.** The entry script, with nothing installed (ii), moves nothing distinguishable from noise. Neither does the frame cache's automatic placement (iii): with it fixed at "mmap", v2 lies below the plain mean.
+- **Version 2 on `kitchen`** is not distinguishable from plain runs on these samples.
+- **On the centre copy** v2 lies 1.7 to 2.2 plain standard deviations high on four plain runs (p = 0.057 with 3 runs against 4). That is not settled at this size, and no diagnostic ran there.
+- **The final scores of the one full wrapper run there (v1)** differ from plain about as much as two seeds do. E16 PSNR on `cam0` is 24.78 against 24.79 dB, the crop's PSNR 24.36 against 24.36, the sharpness ratio 0.732 against 0.726. The near-side far-5 cm share is 0.126 against 0.140 (below).
+
+**The reference init points files, fixed for every later arm** (section 4.4's line on the far-5 cm share). The files are the copies' kept stride-4 inits from `<private-scene-A-exp>`, D-21's stride, which `c3_s4` and `h1_init_s4` trained from (row T24.3). Copied unchanged to `<surface-runs>/ticket-24/init/`, they are the files the baseline trained from:
+
+| Copy | File | Points | SHA-256 |
+| --- | --- | --- | --- |
+| Centre camera held out | `ref_h0_s4.safetensors` | 120,000 | `dc61ffbe…1522c3e3` |
+| Camera left of it held out | `ref_h1_s4.safetensors` | 120,000 | `0c7528c7…c5d51eb5` |
+
+**They do not reproduce at this commit.** `ftgs init roma --stride 4` on the centre copy (with ticket #18's scratch folder for the `[init]` extra, row 849) gave 120,000 points with the same frames, times and durations but other positions: its points lie 8.4 mm from the kept file's at the median, about the points' own spacing. Measured against it rather than the kept file, `c3_s4`'s near-side far-5 cm share is 0.112 instead of 0.124, a change beyond section 4.4's margin of 0.01. Its share beyond 25 cm is 0.0436 against 0.0435. So every later arm is measured against these two files, never against an init of its own, and a finalist-1 arm initialised by current code differs from the baseline in its init's sample as well as its cameras (question 2 below).
+
+**Private scene A: the shell's measures**, taken as section 2.1 here takes them (`measures_a.py`, after ticket #18's `split80.py`), against the copy's reference file. Each pair of cells is whole model / near side. The near side holds 78 % to 79 % of the opacity in every run. The scripts reproduce section 2.6's figures for `c3_s4` (0.213 / 0.124 at 5 cm) against its own file.
+
+| Run | N | Far share, 5 cm | 10 cm | 25 cm | Under two frames | Median duration, frames | Mean σ | σ < 0.05 | σ > 0.5 | Far side: far-5 cm share | Cap at |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| `A_h0_s0`, centre copy, seed 0 | 3,000,000 | 0.224 / 0.140 | 0.131 / 0.063 | 0.072 / 0.035 | 0.452 / 0.586 | 2.27 / 1.69 | 0.356 / 0.371 | 0.303 | 0.312 | 0.535 | 10,800 |
+| `A_h0_s1`, centre copy, seed 1 | 3,000,000 | 0.229 / 0.141 | 0.132 / 0.058 | 0.073 / 0.027 | 0.459 / 0.594 | 2.23 / 1.66 | 0.358 / 0.374 | 0.301 | 0.315 | 0.541 | 11,100 |
+| `A_h1_s0`, left copy, seed 0 | 3,000,000 | 0.246 / 0.163 | 0.144 / 0.075 | 0.085 / 0.044 | 0.449 / 0.585 | 2.29 / 1.69 | 0.349 / 0.365 | 0.309 | 0.306 | 0.541 | 9,700 |
+| Centre copy, seed 0, wrapper v1 (the parity run; not a baseline run) | 3,000,000 | 0.214 / 0.126 | 0.135 / 0.066 | 0.081 / 0.040 | 0.444 / 0.577 | 2.31 / 1.72 | 0.353 / 0.370 | 0.304 | 0.309 | 0.533 | 10,800 |
+
+**Private scene A: the test-view scores, the sharpness ratio and the tiles' coverage.**
+
+- **Crop** is the notes' scorer's: PSNR, SSIM₁ and ꟻLIP on the person's crop, by `openftgs.eval.Evaluator`, averaged over the 120 frames.
+- **E16** is METRICS.json's, over the whole test view.
+- **Kept-pixel PSNR** is Q-233's, on the centre copy alone, whose test view is `cam0`. It leaves out the placeholder pixels by section 2.5's loose rule, rebuilt from `cam0`'s images; the rule equals ticket #4's stored mask on every pixel of the 120 frames and finds 0.300 % of them (0.507 % of the crop's).
+- **Coverage** is each sheet tile's share of pixels with alpha ≥ 0.5, from section 2.6's fixed request `<surface-runs>/ticket-5/side_request.json`. The sheets are `<surface-runs>/ticket-24/sheets/side_<run>.jpg`, with their coverage files beside them. Every rendered value is finite.
+
+| Run | Crop PSNR | Crop SSIM₁ | Crop ꟻLIP | Sharpness ratio | Late | Training cameras: PSNR / ratio | E16 PSNR / SSIM₁ / ꟻLIP | Kept-pixel PSNR | Coverage: between cameras, `sC00`, ±30°, ±45° | Coverage: ±60°, ±90° |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| `A_h0_s0` | 24.36 | 0.8149 | 0.1656 | 0.7262 | 0.7504 | 32.90 / 0.7755 | 24.79 / 0.8187 / 0.1531 | 25.52 | 0.84 to 1.00 | 0.50 to 0.90 |
+| `A_h0_s1` | 24.31 | 0.8153 | 0.1668 | 0.7249 | 0.7467 | 32.79 / 0.7742 | 24.75 / 0.8189 / 0.1545 | 25.47 | 0.80 to 1.00 | 0.50 to 1.00 |
+| `A_h1_s0` | 23.90 | 0.7473 | 0.1790 | 0.7403 | 0.7938 | 31.31 / 0.7719 | 21.92 / 0.7392 / 0.1951 | (`cam1`: not applied) | 0.78 to 1.00 | 0.55 to 1.00 |
+| Centre copy, seed 0, wrapper v1 | 24.36 | 0.8157 | 0.1656 | 0.7319 | 0.7540 | 33.19 / 0.7773 | 24.78 / 0.8187 / 0.1529 | 25.53 | 0.78 to 1.00 | 0.42 to 0.87 |
+
+The notes' runs closest to these were trained by openftgs 0.1.0 with LPIPS, before revision 549o. `c3_s4` (the same copy, init and configuration then) scores 24.40 dB on the crop with a sharpness ratio of 0.7235, and its near-side far-5 cm share is 0.124 against 0.140 and 0.141 here.
+
+**The spread between the centre copy's two seeds,** for every near-side measure and the sharpness ratio (section 4.4). The last column is the wrapper's seed-0 run: a third draw of the same seed. It is not a baseline run, and its wrapper is version 1, whose losses ran slightly high.
+
+| Measure | Seed 0 | Seed 1 | Seeds 0 and 1 differ by | The notes' seed noise | Seed 0 under wrapper v1 |
+| --- | --- | --- | --- | --- | --- |
+| Near side: far share at 5 cm (the named measure) | 0.1401 | 0.1409 | 0.0008 | 0.003 (section 2.6, one pair) | 0.1257 |
+| Near side: far share at 10 cm | 0.0634 | 0.0583 | 0.0051 | | 0.0660 |
+| Near side: far share beyond 25 cm (the tail) | 0.0349 | 0.0267 | 0.0082 | | 0.0404 |
+| Near side: under two frames | 0.5856 | 0.5945 | 0.0089 | | 0.5772 |
+| Whole model: far share at 5 cm | 0.224 | 0.229 | 0.004 | 0.001 to 0.010 (section 2.6) | 0.214 |
+| Whole model: under two frames | 0.452 | 0.459 | 0.007 | 0.002 to 0.004 | 0.444 |
+| Sharpness ratio | 0.7262 | 0.7249 | 0.0013 | ±0.003 | 0.7319 |
+| Late sharpness ratio | 0.7504 | 0.7467 | 0.0037 | | 0.7540 |
+| Training cameras' sharpness ratio | 0.7755 | 0.7742 | 0.0013 | | 0.7773 |
+| Crop PSNR | 24.358 dB | 24.305 dB | 0.053 dB | ±0.01 dB | 24.357 dB |
+
+What the spread shows:
+
+- **The two seeds agree on the named measure** within 0.0008, but the third draw lies 0.015 below them. On these three runs, two seeds can understate the measure's spread, and 0.015 is more than section 4.4's margin of 0.01.
+- **The tail's spread** is 0.008 between seeds, a quarter of its level, so a fall of 0.01, which section 4.4 would ask of it, is barely beyond two seeds.
+- **The sharpness ratio's spread**, 0.0013, is within the notes' ±0.003. The crop PSNR's, 0.053 dB, is five times the notes' ±0.01 dB, though still far inside section 4.4's 0.3 dB guard.
+
+**The tail's reading rule, proposed and not fixed.** Section 2.6 here asks it to be fixed from these seeds before any arm runs. Three options, put to the owner (question 1 below):
+
+- (a) the tail shares a fall when both of the arm's seeds lie below both of the baseline's (below 0.0267), with no margin;
+- (b) as (a), and the means differ by more than the baseline seeds' difference, 0.008;
+- (c) section 4.4's rule unchanged, a margin of 0.01.
+
+Recommended: (b). Its margin is the tail's own spread, measured here, where (c)'s is the far-5 cm share's. On the third draw above, a single run moved by 0.0055 to 0.014 from the seeds' figures, so (a) could pass by chance.
+
+**openftgs-synth.** The runs start from M17's init files (`<m17-runs>/kitchen/init.safetensors` on M15's conversion of `kitchen`, `<m17-runs>/studio/init.safetensors`).
+
+- **E16** is METRICS.json's on the test view (`cam00` × 300, and `0007` × 60).
+- **Kept-pixel PSNR** is `scripts/reference_flaws.py`'s `overall.union.kept_psnr` against #329's flags, as M17 takes it.
+- **The residual's shares** are `scripts/gt_depth.py`'s in front of and behind the surface at δ = 0.02·S, by σ_eff, on all pixels and on dynamic pixels.
+- **The error of expected depth** is the median of its absolute value.
+- **The far shares and the under-two-frames share** are section 2.1 here's, by ticket #18's `synth_measures.py` copied unchanged, against the scene's init file. They are given whole model / dynamic side by the majority rule, at 0.12·S and beyond 25 cm, with two frames at 2/fps.
+
+| Run | E16 PSNR / SSIM₁ / ꟻLIP | Kept-pixel PSNR | Residual, all pixels: in front / behind | Dynamic pixels: in front / behind | Expected depth, median error, all / dynamic | Far share at 0.12·S | Beyond 25 cm | Under two frames | Cap at |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| `kitchen_s0` | 29.25 / 0.8787 / 0.0881 | 30.42 | 0.041 / 0.291 | 0.015 / 0.613 | 252 / 57 mm | 0.036 / 0.002 | 0.023 / 0.001 | 0.381 / 0.660 | 2,100 |
+| `kitchen_s1` | 30.11 / 0.8803 / 0.0856 | 31.34 | 0.039 / 0.297 | 0.015 / 0.612 | 448 / 304 mm | 0.035 / 0.003 | 0.022 / 0.001 | 0.377 / 0.662 | 2,100 |
+| `kitchen_s2` | 29.25 / 0.8800 / 0.0885 | 31.15 | 0.040 / 0.295 | 0.015 / 0.618 | 277 / 103 mm | 0.036 / 0.002 | 0.023 / 0.001 | 0.385 / 0.661 | 2,100 |
+| `studio_s0` | 22.24 / 0.7991 / 0.1928; dynamic 24.85 / 0.9219 / 0.1290 | 22.30 | 0.014 / 0.412 | 0.007 / 0.647 | 144 / 87 mm | 0.041 / 0.001 | 0.068 / 0.001 | 0.387 / 0.710 | 6,800 |
+| `kitchen`, seed 0, wrapper v1 (not a baseline run) | 27.68 / 0.8794 / 0.0907 | 30.97 | 0.041 / 0.296 | 0.015 / 0.620 | 205 / 51 mm | 0.036 / 0.002 | 0.024 / 0.001 | 0.381 / 0.660 | 2,100 |
+
+What these runs give the criteria (section 4.4):
+
+- **SSIM₁ over the three seeds** runs from 0.8787 to 0.8803, inside #374's at most 0.0023.
+- **PSNR** runs from 29.25 to 30.11 dB, and the kept-pixel PSNR from 30.42 to 31.34.
+- **The residual's share behind the surface** runs from 0.291 to 0.297 over all pixels. Its spread, 0.006, is wider than section 4.4's 0.003 between trainings on `kitchen`, and wider than the 0.005 by which section 4.4 calls a share worse. In front the spread is 0.002, on dynamic pixels 0.006 behind and 0.0003 in front.
+- **The median error of expected depth** runs from 252 to 448 mm, as unsteady as section 4.4 found it.
+- **The dynamic side** is near 0 at 0.12·S and beyond 25 cm, as in section 2.1 here.
+- **`studio`'s dynamic-region PSNR** is 24.85 dB, against 25.19 dB for M17's `default-395` (at openftgs's eaeb791): 0.34 dB apart. Section 4.4's flag on `studio` is a fall of more than 0.1 dB, and two trainings of the default configuration are already 0.34 dB apart.
+
+**Against the ticket's acceptance criteria.**
+
+- **Parity on both scenes.** Not met as the PRD wrote it, and not met by the owner's replacement (a). Plain runs meet neither reliably, so the call is the owner's (above).
+- **The seven baseline runs, each with its measures.** Done: the tables above, from the files under `<surface-runs>/ticket-24/`.
+- **One reference init points file per copy.** Fixed and recorded above.
+- **The sharpness ratio and its spread.** Defined above, at the owner's answer, with its spread between the centre copy's two seeds beside every near-side measure's.
+- **Placeholder pixels.** Left out only where `cam0` is the test view, by the loose rule, checked against the stored mask first.
+- **The owner's go or stop.** Below, not yet given.
+
+**What is open, for the owner.**
+
+1. **The tail's reading rule:** the options (a) to (c) above. It blocks reading finalists 1, 3 and 4's named measure.
+2. **Finalist 1's init and the reference files.** Current code does not reproduce the kept stride-4 file, and a fresh sample alone moves `c3_s4`'s near-side far-5 cm share by 0.012. Options:
+   - (a) also measure finalist 1 against a fresh init of the manifest's cameras, made by this commit, beside the kept file;
+   - (b) measure against the kept file alone;
+   - (c) also retrain the baseline from fresh inits.
+
+   Recommended: (a). It is section 4.4's two-reference rule for finalist 1 with a fresh manifest-camera file, and costs one init.
+3. **Parity.** Whether wrapper v2 is accepted, on the evidence above, or a further check runs on the centre copy, where v2 sits 2 plain standard deviations high on four plain runs. It blocks every arm through the script, finalists 2 to 4.
+4. **Two seeds and the named measure.** A third draw moved the near-side far-5 cm share by 0.015. Whether section 4.4's two seeds per arm stand is for the owner, and nothing here changes them.
+
+**The commands.** Each ran with `OMP_NUM_THREADS=16 MKL_NUM_THREADS=16 OPENBLAS_NUM_THREADS=16`, `PYTHONPATH=<worktree>/src:<worktree>/harness/src` and the shared `.venv`'s Python, the CPU ones with `CUDA_VISIBLE_DEVICES=` empty and the GPU ones under the shared lock. Every timed training ran under `/usr/bin/time -v`, with `nvidia-smi` sampling memory once a second. `$T` is `<scratch>/ticket-24`, `$O` is `<surface-runs>/ticket-24`, `$X` is `<private-scene-A-exp>`, `$K` is `<m15-runs>/kitchen`, `$M` is `<m17-runs>`, `$G` is `$OPENFTGS_DATASETS/synth/ground_truth`, `$S` is `<surface-runs>/ticket-5/side_request.json`. The scripts are not committed.
+
+| Command | Where | Time | Note |
+| --- | --- | --- | --- |
+| `ftgs train $K/scene.json --init $M/kitchen/init.safetensors --out $O/runs/kitchen_s<n> --seed <n>`, n = 0, 1, 2 | GPU | 16 min 51 s, 16 min 56 s, 16 min 51 s | The baseline on `kitchen`; peak 21,474 to 21,814 MiB |
+| `ftgs train $M/studio/scene/scene.json --init $M/studio/init.safetensors --out $O/runs/studio_s0 --seed 0` | GPU | 23 min 45 s | The baseline on `studio`; peak 23,868 MiB |
+| `ftgs train $X/scene_h<c>/scene.json --init $O/init/ref_h<c>_s4.safetensors --out $O/runs/A_h<c>_s<n> --seed <n>`, for (c, n) = (0, 0), (0, 1), (1, 0) | GPU | 13 min 9 s, 13 min 12 s, 13 min 24 s | The baseline on private scene A, the copies' manifests as `<private-scene-A-exp>` holds them; peak 23,394 to 23,982 MiB |
+| `python $T/wrap_train.py --stats … -- <the same arguments>`, for `kitchen` and the centre copy at seed 0 | GPU | 17 min 20 s, 13 min 29 s | The parity runs, wrapper v1, every weight at 0, 30,000 calls of each wrapper |
+| `python $T/short_run.sh`-driven repeats of the same commands, stopped by SIGTERM once the log passed iteration 2,200 (`kitchen`) or 1,100 (the centre copy): 7 plain, 3 v1, 3 v2, 3 `--no-patch`, 3 plain and 3 v2 with `--config` holding `{"perf": {"frame_cache": "mmap"}}` on `kitchen`; 3 plain and 3 v2 on the centre copy | GPU | about 2.5 and 1.5 min each | The parity control and the diagnostics; each saved its checkpoint and exited 143 |
+| `python $T/parity.py`, `python $T/parity2.py`, `python $T/arms.py` on the runs' `train_log.jsonl` | CPU | under 1 s each | The tables of parity, of (a) and of the diagnostics |
+| `ftgs init roma $X/scene_h0/scene.json $O/init/regen_h0_s4.safetensors --stride 4`, with `PYTHONPATH` adding ticket #18's `env-init` | GPU | 1 min 23 s | The reproduction check: 120,000 points, other positions |
+| `ftgs render <checkpoint> --request $S`; `ftgs render <checkpoint> --request $X/requests/heldout_novel.json` (the left copy: `heldout1_novel.json`) | GPU | seconds each | The sheet's 39 renders and the scorer's 142 |
+| `python $T/score_a.py <renders> $X/scene_h<c>/scene.json --heldout cam0 --crop 96,256,640,1280 --stored-masks <surface-runs>/ticket-4/private-scene-A/placeholder_masks.npz --out $O/scores/<run>.json` (the left copy: `--heldout cam1 --crop 0,256,640,1280`) | GPU (the evaluator) | about 30 s | The test-view scores, the sharpness ratio and the kept-pixel PSNR; first run on `c3_s4` and `h1_init_s4`, equal to their score files |
+| `python $T/measures_a.py $X/scene_h0/scene.json --out $O/measures/a_runs.json <run>=<checkpoint>=$O/init/ref_h<c>_s4.safetensors` | CPU | 2 to 4 s | The shell's measures; first on `c3_s4`, `h1_init_s4` and `h1_init_s4_seed1`, equal to section 2.6's |
+| `python $T/side_sheet.py <renders> $S $O/sheets/side_<run>.jpg --label <run> --stats $O/sheets/side_<run>.coverage.json` | CPU | about 1 s | Ticket #5's sheet script, copied unchanged |
+| `python scripts/gt_depth.py $O/runs/<run>/checkpoint <scene.json> $G/<scene> --out $O/gt_depth/<run>.json` | GPU | 60 to 65 s on `kitchen`, 24 s on `studio` | The geometry residual and expected depth |
+| `python scripts/reference_flaws.py run $O/runs/<run>/checkpoint <scene.json> $M/reference/<scene>/flags --out $O/runs/<run>/REFERENCE_PSNR.json` | GPU | 20 to 21 s, 11 s | The kept-pixel PSNR |
+| `python $T/synth_measures.py $O/runs/<run>/checkpoint <init> $G/<scene> --scene-name <scene> --out $O/measures/synth_<run>.json` | CPU | 42 to 45 s, 24 s | Section 2.1 here's measures, by ticket #18's script copied unchanged |
+| `python scripts/run_summary.py $O/runs/<run> --time … --gpu-log …` | CPU | under 1 s | `SUMMARY.json` beside each run |
+
+The private scene's folders, `<m15-runs>` and `<m17-runs>` were read and never written.
+
 **The owner's answer on step 2** (the go for step 3 or a stop): *not yet given.* **Date:** *not yet given.*
 
 ## 4. Step 3: finalist 1, the cameras corrected once
