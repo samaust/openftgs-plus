@@ -924,12 +924,13 @@ Written on 2026-11-16 from sections 2.1 to 2.5 here and the research document's 
 
 *Ticket #24's section.* The seven baseline runs by plain `ftgs train`, each with its measures, its sheet or `scripts/gt_depth.py`; and the scratch script's runs with every added weight at 0 against a plain run, on private scene A and on `kitchen`, within openftgs issue 395's tolerance.
 
-Run on 2026-11-16, at the owner's go of that day (section 2.6 here), with this branch's code at 163bd39 (`src/` and `scripts/` as `main`'s), Python 3.14.10, torch 2.15.0+cu132, gsplat 1.5.3, NumPy 2.5.4, SciPy 1.18.1 and Pillow 13.0.0 from the shared `.venv`. The hardware was one RTX 4090 (driver 595.99.02), alone on the machine, under the shared GPU lock, with 16 CPU threads. Scripts read tensors, JSON, images and mask files and wrote numbers and files. No image, render or sheet of private scene A was looked at. Every existing frame-cache file beside the scenes' manifests passed the package's own validity check before training, so the runs read them and wrote nothing beside a manifest. A search afterwards found no file under `<private-scene-A-exp>`, `<m15-runs>/kitchen`, or `<m17-runs>`'s `kitchen`, `studio` and `reference` newer than the first run. In all, about 3.8 GPU hours: the nine full runs took 2.4, the parity control's 35 short runs about 1.3, and the renders, scores and diagnostics the rest. "The commands", at the end, lists every run.
+Run on 2026-11-16, at the owner's go of that day (section 2.6 here), with this branch's code at 163bd39 (`src/` and `scripts/` as `main`'s), Python 3.14.10, torch 2.15.0+cu132, gsplat 1.5.3, NumPy 2.5.4, SciPy 1.18.1 and Pillow 13.0.0 from the shared `.venv`. The hardware was one RTX 4090 (driver 595.99.02), alone on the machine, under the shared GPU lock, with 16 CPU threads. Scripts read tensors, JSON, images and mask files and wrote numbers and files. No image, render or sheet of private scene A was looked at. Every existing frame-cache file beside the scenes' manifests passed the package's own validity check before training, so the runs read them and wrote nothing beside a manifest. A search afterwards found no file under `<private-scene-A-exp>`, `<m15-runs>/kitchen`, or `<m17-runs>`'s `kitchen`, `studio` and `reference` newer than the first run. In all, about 4.3 GPU hours: the eleven full runs took 2.9, the parity control's 35 short runs about 1.3, and the renders, scores and diagnostics the rest. "The commands", at the end, lists every run.
 
 **The owner's answers during this step** (2026-11-16, in session, relayed by the orchestrating session):
 
 - **The sharpness ratio** (section 1 here, item 1). It is the notes' scorer's `crop.sharp`, with its `crop_late.sharp` and `train.sharp` reported beside it (row T24.1). The owner named it after a summary of what the scorer computes; this section writes the definition down, below.
-- **Parity.** The PRD's criterion cannot be met by two plain runs, so it is replaced by the form of (a) below, judged with wrapper v2. When v2 failed that form on both scenes, the owner chose three diagnostics on `kitchen`: plain runs from the wrapper's own entry script with the wrappers not installed, four more plain repeats, and plain and v2 runs with `perf.frame_cache` set explicitly. Then, having seen them, the owner asked for four more plain and three more v2 repeats on the centre copy, and gave the rule for accepting v2: v2 is accepted if, on the centre copy's 8 plain runs, it is indistinguishable from plain as it is on `kitchen`, by the same comparison as the diagnostics (each arm's shift in plain standard deviations and a two-sided Mann–Whitney test, on the 1–1,000 means of L1, ꟻLIP and total).
+- **Parity.** The PRD's criterion cannot be met by two plain runs, so it is replaced by the form of (a) below, judged with wrapper v2. When v2 failed that form on both scenes, the owner chose three diagnostics on `kitchen`: plain runs from the wrapper's own entry script with the wrappers not installed, four more plain repeats, and plain and v2 runs with `perf.frame_cache` set explicitly. Then, having seen them, the owner asked for four more plain and three more v2 repeats on the centre copy, and gave the rule for accepting v2: v2 is accepted if, on the centre copy's 8 plain runs, it is indistinguishable from plain as it is on `kitchen`, by the same comparison as the diagnostics (each arm's shift in plain standard deviations and a two-sided Mann–Whitney test, on the 1–1,000 means of L1, ꟻLIP and total). The reading of "indistinguishable" as p ≥ 0.05 is this section's, put to the owner by the orchestrating session.
+- **Two more full runs on the centre copy** at seed 0, one through wrapper v2 and one plain, measured like the baseline, to tell the wrapper's effect on the named measure from its spread. The GPU time beyond the 2.5 hours was cleared for them and for the short repeats. Whether finalists 2 to 4 are compared with an off arm through the script (question 3) is decided at step 3's go.
 
 **The sharpness ratio, defined.** It comes from the notes' scorer, and the scorer was not run. A scratch script `score_a.py` computes it anew, and its figures equal the score files the notes keep beside `c3_s4` and `h1_init_s4` in every printed digit (row T24.5).
 
@@ -1008,7 +1009,7 @@ The plain ranges are 8 runs on `kitchen`, stopped after 2,200, and 4 on the cent
   | Wrapper v2 | 6 | 0.072985 (0.072912 to 0.073080): +0.70 SD, p = 0.08 | 0.290653 (0.290310 to 0.290918): +0.60 SD, p = 0.18 | 0.229479 (0.229252 to 0.229683): +0.62 SD, p = 0.14 |
 
   On `kitchen` v2 lay +0.95 to +1.14 SD high, p = 0.19 to 0.28. **By the owner's rule, v2 is accepted:** on both scenes no test reaches p < 0.05, and the shifts are under 1.2 plain standard deviations. "Indistinguishable" is read here as p ≥ 0.05 in each of the three terms; the rule names no threshold, so that reading is this section's. Two facts sit beside the acceptance. All six v2 runs lie above the plain median in L1, and L1's p = 0.08 is close to the threshold. No v2 run went to 30,000 iterations on either scene, and no diagnostic ran on the centre copy.
-- **The final scores of the one full wrapper run there (v1)** differ from plain about as much as two seeds do. E16 PSNR on `cam0` is 24.78 against 24.79 dB, the crop's PSNR 24.36 against 24.36, the sharpness ratio 0.732 against 0.726. The near-side far-5 cm share is 0.126 against 0.140 and 0.141 (below): either a third draw of the measure's spread or the wrapper's own effect. The question is put below (question 3).
+- **The final scores of the full wrapper runs there** (v1, and v2 at the owner's answer) differ from plain about as much as two seeds do. E16 PSNR on `cam0` is 24.78 and 24.80 dB against 24.75 to 24.79, the crop's PSNR 24.36 and 24.35 against 24.31 to 24.36, the sharpness ratio 0.732 and 0.731 against 0.725 to 0.730. The near-side far-5 cm share is not: 0.126 and 0.131 against 0.140 to 0.149 (below, and question 3).
 
 **The reference init points files, fixed for every later arm** (section 4.4's line on the far-5 cm share). The files are the copies' kept stride-4 inits from `<private-scene-A-exp>`, D-21's stride, which `c3_s4` and `h1_init_s4` trained from (row T24.3). Copied unchanged to `<surface-runs>/ticket-24/init/`, they are the files the baseline trained from:
 
@@ -1027,6 +1028,8 @@ The plain ranges are 8 runs on `kitchen`, stopped after 2,200, and 4 on the cent
 | `A_h0_s1`, centre copy, seed 1 | 3,000,000 | 0.229 / 0.141 | 0.132 / 0.058 | 0.073 / 0.027 | 0.459 / 0.594 | 2.23 / 1.66 | 0.358 / 0.374 | 0.301 | 0.315 | 0.541 | 11,100 |
 | `A_h1_s0`, left copy, seed 0 | 3,000,000 | 0.246 / 0.163 | 0.144 / 0.075 | 0.085 / 0.044 | 0.449 / 0.585 | 2.29 / 1.69 | 0.349 / 0.365 | 0.309 | 0.306 | 0.541 | 9,700 |
 | Centre copy, seed 0, wrapper v1 (the parity run; not a baseline run) | 3,000,000 | 0.214 / 0.126 | 0.135 / 0.066 | 0.081 / 0.040 | 0.444 / 0.577 | 2.31 / 1.72 | 0.353 / 0.370 | 0.304 | 0.309 | 0.533 | 10,800 |
+| Centre copy, seed 0, wrapper v2 (at the owner's answer; not a baseline run) | 3,000,000 | 0.218 / 0.131 | 0.141 / 0.075 | 0.081 / 0.046 | 0.454 / 0.586 | 2.26 / 1.69 | 0.358 / 0.374 | 0.302 | 0.315 | 0.537 | 10,900 |
+| Centre copy, seed 0, plain again (at the owner's answer; not a baseline run) | 3,000,000 | 0.233 / 0.148 | 0.147 / 0.081 | 0.085 / 0.047 | 0.450 / 0.579 | 2.29 / 1.71 | 0.359 / 0.375 | 0.302 | 0.315 | 0.537 | 10,700 |
 
 **Private scene A: the test-view scores, the sharpness ratio and the tiles' coverage.**
 
@@ -1041,6 +1044,8 @@ The plain ranges are 8 runs on `kitchen`, stopped after 2,200, and 4 on the cent
 | `A_h0_s1` | 24.31 | 0.8153 | 0.1668 | 0.7249 | 0.7467 | 32.79 / 0.7742 | 24.75 / 0.8189 / 0.1545 | 25.47 | 0.80 to 1.00 | 0.50 to 1.00 |
 | `A_h1_s0` | 23.90 | 0.7473 | 0.1790 | 0.7403 | 0.7938 | 31.31 / 0.7719 | 21.92 / 0.7392 / 0.1951 | (`cam1`: not applied) | 0.78 to 1.00 | 0.55 to 1.00 |
 | Centre copy, seed 0, wrapper v1 | 24.36 | 0.8157 | 0.1656 | 0.7319 | 0.7540 | 33.19 / 0.7773 | 24.78 / 0.8187 / 0.1529 | 25.53 | 0.78 to 1.00 | 0.42 to 0.87 |
+| Centre copy, seed 0, wrapper v2 | 24.35 | 0.8148 | 0.1658 | 0.7313 | 0.7536 | 32.99 / 0.7733 | 24.80 / 0.8180 / 0.1531 | 25.54 | 0.86 to 1.00 | 0.53 to 1.00 |
+| Centre copy, seed 0, plain again | 24.32 | 0.8155 | 0.1658 | 0.7303 | 0.7544 | 33.05 / 0.7743 | 24.75 / 0.8183 / 0.1539 | 25.48 | 0.80 to 1.00 | 0.49 to 0.88 |
 
 The notes' runs closest to these were trained by openftgs 0.1.0 with LPIPS, before revision 549o. `c3_s4` (the same copy, init and configuration then) scores 24.40 dB on the crop with a sharpness ratio of 0.7235, and its near-side far-5 cm share is 0.124 against 0.140 and 0.141 here.
 
@@ -1059,19 +1064,32 @@ The notes' runs closest to these were trained by openftgs 0.1.0 with LPIPS, befo
 | Training cameras' sharpness ratio | 0.7755 | 0.7742 | 0.0013 | | 0.7773 |
 | Crop PSNR | 24.358 dB | 24.305 dB | 0.053 dB | ±0.01 dB | 24.357 dB |
 
+**The two full runs at the owner's answer.** They are a second plain draw of seed 0 and a full v2 run of seed 0; v2's wrappers ran 30,000 times each, and its cap fell at 10,900 against 10,700 and 10,800 for the plain seed-0 runs. With them the centre copy has three plain draws (seed 0 twice, seed 1) and two through the script (v1, v2):
+
+| Measure | Plain draws | Their range | Through the script, v1 / v2 | Where the script's runs lie |
+| --- | --- | --- | --- | --- |
+| Near side: far share at 5 cm (the named measure) | 0.1401, 0.1409, 0.1485 | 0.0084 | 0.1257 / 0.1308 | below all three plain draws, by 0.009 and more |
+| Near side: far share at 10 cm | 0.0634, 0.0583, 0.0811 | 0.023 | 0.0660 / 0.0754 | among them |
+| Near side: far share beyond 25 cm (the tail) | 0.0349, 0.0267, 0.0475 | 0.021 | 0.0404 / 0.0461 | among them |
+| Near side: under two frames | 0.5856, 0.5945, 0.5789 | 0.016 | 0.5772 / 0.5857 | among them |
+| Sharpness ratio | 0.7262, 0.7249, 0.7303 | 0.0054 | 0.7319 / 0.7313 | above all three, by 0.001 |
+| Crop PSNR | 24.358, 24.305, 24.324 dB | 0.053 dB | 24.357 / 24.352 dB | among them |
+
 What the spread shows:
 
-- **The two seeds agree on the named measure** within 0.0008, but the wrapper's seed-0 run lies 0.015 below them, more than section 4.4's margin of 0.01. That run has two readings, and these runs cannot separate them. (i) It is a third draw, and two seeds understate the measure's spread. (ii) The wrapper at weight 0 moved the measure, as the centre copy's v2 repeats, above every plain run in their losses, would suggest. Under (ii), an arm through the script with no term at all would pass section 4.4's rule against the plain baseline.
-- **The tail's spread** is 0.008 between seeds, a quarter of its level, so a fall of 0.01, which section 4.4 would ask of it, is barely beyond two seeds.
-- **The sharpness ratio's spread**, 0.0013, is within the notes' ±0.003. The crop PSNR's, 0.053 dB, is five times the notes' ±0.01 dB, though still far inside section 4.4's 0.3 dB guard.
+- **The named measure's spread is wider than two seeds say.** Seeds 0 and 1 agree within 0.0008, but the second draw of seed 0 lies 0.008 above them.
+- **The two runs through the script both lie below every plain draw** in the near-side far-5 cm share: 0.126 and 0.131 against 0.140 to 0.149. Their mean is 0.128 against the two plain seeds' 0.1405, 0.012 lower. By section 4.4's rule, both of an arm's seeds beyond both of the baseline's and the means more than 0.01 apart, the script with every weight at 0 would count as having lowered the named measure against the plain baseline. On these few runs (two against three), that cannot be told from chance. Mann–Whitney's smallest p at 2 against 3 is 0.2. It is the measure each finalist through the script names, though, so question 3's off arm through the script (v2 at weight 0) is the comparison that removes it.
+- **The other near-side measures** show no such split; the tail, the 10 cm share and the under-two-frames share of the script's runs lie among the plain draws.
+- **The tail's spread** over the three plain draws is 0.021, more than half its level (0.027 to 0.048). The seeds' 0.008 understates it.
+- **The sharpness ratio's spread** is 0.0054 over the three plain draws, 0.0013 between the seeds, against the notes' ±0.003. The two script runs lie 0.001 above the highest plain draw. The crop PSNR's spread, 0.053 dB, is five times the notes' ±0.01 dB, though still far inside section 4.4's 0.3 dB guard.
 
 **The tail's reading rule, proposed and not fixed.** Section 2.6 here asks it to be fixed from these seeds before any arm runs. Three options, put to the owner (question 1 below):
 
 - (a) the tail shares a fall when both of the arm's seeds lie below both of the baseline's (below 0.0267), with no margin;
-- (b) as (a), and the means differ by more than the baseline seeds' difference, 0.008;
+- (b) as (a), and the means differ by more than the plain draws' range, 0.021;
 - (c) section 4.4's rule unchanged, a margin of 0.01.
 
-Recommended: (b). Its margin is the tail's own spread, measured here, where (c)'s is the far-5 cm share's. On the third draw above, a single run moved by 0.0055 to 0.014 from the seeds' figures, so (a) could pass by chance.
+Recommended: (b). Its margin is the tail's own spread over three draws of the baseline, where (c)'s is the far-5 cm share's and the seeds' 0.008 understates it. Under (b) the tail can show only a large fall, about half its level; a fall in the 5 cm share that the tail does not share then reads as section 2.6 here says, as a change in the method's habit.
 
 **openftgs-synth.** The runs start from M17's init files (`<m17-runs>/kitchen/init.safetensors` on M15's conversion of `kitchen`, `<m17-runs>/studio/init.safetensors`).
 
@@ -1116,13 +1134,13 @@ What these runs give the criteria (section 4.4):
    - (c) also retrain the baseline from fresh inits.
 
    Recommended: (a). It is section 4.4's two-reference rule for finalist 1 with a fresh manifest-camera file, and costs one init.
-3. **The wrapper's effect on the named measure.** v2 is accepted on its losses. The one full wrapper run on the centre copy, though, was v1, and its near-side far-5 cm share lies 0.015 below the plain seeds'. Whether that is v1's shift or the measure's own spread is not settled. Options:
-   - (a) nothing more, with v2 accepted;
-   - (b) run a full v2 seed-0 run and another plain seed-0 run on the centre copy, measured like the baseline (about 27 minutes of GPU);
-   - (c) compare finalists 2 to 4 with an off arm through the script, v2 at weight 0 at two seeds, instead of the plain baseline, so that the script's own effect cancels out of the comparison.
+3. **The off arm for finalists 2 to 4, decided at step 3's go** (the owner's answer of 2026-11-16). Both runs through the script, v1 and v2 at every weight 0, lie below all three plain draws in the named measure, by 0.009 and more (above). Options:
+   - (a) compare finalists 2 to 4 with the plain baseline, as section 5.2 plans;
+   - (b) compare them with an off arm through the script, v2 at weight 0 at two seeds, so that the script's own effect cancels out of the comparison (about 27 minutes more of GPU per scene set);
+   - (c) both, reporting the difference.
 
-   Recommended: (b) before step 4, then (c) if v2's share also lies apart from plain's. It bears on finalists 2 to 4's readings, not on step 3, finalist 1, which needs no script.
-4. **Two seeds and the named measure.** A third draw moved the near-side far-5 cm share by 0.015. Whether section 4.4's two seeds per arm stand is for the owner, and nothing here changes them.
+   Recommended: (b). Under (a) the script alone moves the named measure by about section 4.4's margin. Finalist 1, which needs no script, is not affected.
+4. **Two seeds and the named measure.** A second draw of seed 0 moved the near-side far-5 cm share by 0.008, and the tail by 0.013. Whether section 4.4's two seeds per arm stand is for the owner, and nothing here changes them.
 
 **The commands.** Each ran with `OMP_NUM_THREADS=16 MKL_NUM_THREADS=16 OPENBLAS_NUM_THREADS=16`, `PYTHONPATH=<worktree>/src:<worktree>/harness/src` and the shared `.venv`'s Python, the CPU ones with `CUDA_VISIBLE_DEVICES=` empty and the GPU ones under the shared lock. Every timed training ran under `/usr/bin/time -v`, with `nvidia-smi` sampling memory once a second. `$T` is `<scratch>/ticket-24`, `$O` is `<surface-runs>/ticket-24`, `$X` is `<private-scene-A-exp>`, `$K` is `<m15-runs>/kitchen`, `$M` is `<m17-runs>`, `$G` is `$OPENFTGS_DATASETS/synth/ground_truth`, `$S` is `<surface-runs>/ticket-5/side_request.json`. The scripts are not committed.
 
@@ -1131,6 +1149,7 @@ What these runs give the criteria (section 4.4):
 | `ftgs train $K/scene.json --init $M/kitchen/init.safetensors --out $O/runs/kitchen_s<n> --seed <n>`, n = 0, 1, 2 | GPU | 16 min 51 s, 16 min 56 s, 16 min 51 s | The baseline on `kitchen`; peak 21,474 to 21,814 MiB |
 | `ftgs train $M/studio/scene/scene.json --init $M/studio/init.safetensors --out $O/runs/studio_s0 --seed 0` | GPU | 23 min 45 s | The baseline on `studio`; peak 23,868 MiB |
 | `ftgs train $X/scene_h<c>/scene.json --init $O/init/ref_h<c>_s4.safetensors --out $O/runs/A_h<c>_s<n> --seed <n>`, for (c, n) = (0, 0), (0, 1), (1, 0) | GPU | 13 min 9 s, 13 min 12 s, 13 min 24 s | The baseline on private scene A, the copies' manifests as `<private-scene-A-exp>` holds them; peak 23,394 to 23,982 MiB |
+| The same for (0, 0) into `$O/runs/A_h0_s0_rep`, and `python $T/wrap_train.py --stats … -- <the same arguments>` into `$O/runs/A_h0_s0_v2` | GPU | 13 min 9 s, 13 min 29 s | The two full runs at the owner's answer, measured, scored and sheeted as the baseline |
 | `python $T/wrap_train_v1.py --stats … -- <the same arguments>`, for `kitchen` and the centre copy at seed 0 | GPU | 17 min 20 s, 13 min 29 s | The parity runs, wrapper v1, every weight at 0, 30,000 calls of each wrapper |
 | `bash $T/short_run.sh`-driven repeats of the same commands (`wrap_train.py` for v2 and `--no-patch`), stopped by SIGTERM once the log passed iteration 2,200 (`kitchen`) or 1,100 (the centre copy): 7 plain, 3 v1, 3 v2, 3 `--no-patch`, 3 plain and 3 v2 with `--config` holding `{"perf": {"frame_cache": "mmap"}}` on `kitchen`; 7 plain and 6 v2 on the centre copy | GPU | about 2.5 and 1.5 min each | The parity control and the diagnostics; each saved its checkpoint and exited 143 |
 | `python $T/parity.py`, `python $T/parity2.py`, `python $T/arms.py` on the runs' `train_log.jsonl` | CPU | under 1 s each | The tables of parity, of (a) and of the diagnostics |
