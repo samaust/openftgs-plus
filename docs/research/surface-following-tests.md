@@ -1744,6 +1744,22 @@ The diagnosis ran first, then the staged arm, both on 2026-11-18, with this bran
   - **Undetermined:** the same as a low draw for the five seeds, with the effect stated as open.
   - The staged arm is judged against the off arm's seeds 0 to 2, as the other arms were, with the five seeds beside.
 
+**The staged arm, `align_stg`: the design.**
+
+- **The switch-on iteration comes from AligNeRF's staging** (row T26.4). Its pre-training stage is standard per-pixel training "with 60% as many iterations". Its alignment stage follows with 32 patches of 32 × 32 per batch, twice the rays of a standard batch, for "20% as many" iterations, so that both stages together cost about one standard training. The split is therefore 60 % to 40 % of the rays seen. A training iteration here renders one whole training image, so the rays per iteration are constant, and 60 % of the 30,000 iterations is **18,000**.
+  - **This is a reading,** since AligNeRF counts a NeRF's rays and this arm counts whole images. Counting iterations instead of rays, the stages are 60 and 20, three quarters to one quarter, which would put the switch at 22,500. That alternative was not run.
+  - The total stays at 30,000 iterations, the default, as in every other arm.
+- **The arm.** It is `align_rel`'s run with the term gated: window 8 px, patch side 32 px, penalty 0.01 / 3,072 against the patch's mean L1, weight 1. The term acts only at iterations it > 18,000, through the wrapper's own path for an inactive term, so iterations 1 to 18,000 run the off arm's code exactly. The switch falls on a boundary of the log's 100-iteration windows, so every logged mean covers a single stage. The wrapper copy takes a new flag, `--align-start 18000`, and nothing else in it changed.
+- **What the default schedule has done by iteration 18,000.**
+  - Growth stops at 15,000 (`growth.stop`), and its cap is reached between 2,100 (`kitchen`) and about 11,000 (private scene A) in the off arm. The staged term therefore cannot delay the cap, as `align_rel` did, nor change growth's test against τ_pos.
+  - Relocation runs to 25,000, so its score reads the new loss for 7,000 iterations.
+  - The means' learning rate has decayed exponentially to 0.01^0.6 ≈ 6 % of its start.
+  - AligNeRF's fine-tuning stage also adds convolutional layers and a feature loss. Neither is part of this arm, as in `align_rel`.
+- **The smoke run.** A 300-iteration run on `kitchen` at seed 0, with the switch moved to 200, ran to the end with each wrapper's count equal to 300. Its logged rows at iterations 100 and 200 equal the off arm's smoke run to six figures and carry no alignment keys. The keys appear at 300, where 99.9 % of pixels moved by 9.8 px on that still-blurred render, as in `align_rel`'s own smoke run.
+- **The runs** are the other arms' eight, in one queue after the diagnosis: `STG_A_h0_s0`, `STG_A_h0_s1`, `STG_A_h1_s0` and `STG_A_h1_s1` from the kept stride-4 files, then `STG_kitchen_s0` to `s2` and `STG_studio_s0` from M17's init files.
+- **The measures** are the same, by the same copied scripts, against the off arm (section 4.4's rule) with the plain baseline and `align_rel` beside. The blind sheets pair the off arm and the staged arm for each copy and seed, in an order from `random.Random(2602)`, with the key apart.
+- **Estimate.** At the off arm's speed for 60 % of each run and `align_rel`'s for 40 %, the runs take about 15, 19 and 28 minutes each on private scene A, `kitchen` and `studio`, so about 2.4 GPU hours. Post-processing adds about 0.3. With the diagnosis that is about 3.9 of the 4 hours cleared.
+
 ## 6. Step 5: finalist 3, surface terms without a prior
 
 *Ticket #27's section.* Row A5's plane-distance depth checked on one flat, slanted primitive, then finalist 3's arms, flattening, then depth–normal consistency, run as the research document's section 5.5 says and judged by section 4.4's criteria.
