@@ -1413,6 +1413,311 @@ The private scene's folders, `<m15-runs>` and `<m17-runs>` were read and never w
 
 *Ticket #26's section.* Finalist 2's patch search, timed on one training image, then its arms, run as the research document's section 5.4 says and judged by section 4.4's criteria.
 
+**The first step** was run on 2026-11-17, at the owner's go of that day (section 4 here), before any arm or off-arm run, with this branch's code at ef7864b (`src/` and `scripts/` as `main`'s), Python 3.14.10, torch 2.15.0+cu132, gsplat 1.5.3, NumPy 2.5.4 and Pillow 13.0.0 from the shared `.venv`. The hardware was one RTX 4090 (driver 595.99.02), under the shared GPU lock, with 16 CPU threads. During every timing no other compute process held the GPU: `nvidia-smi` listed one desktop application holding 384 MiB, at 0 % utilization. Scripts read tensors, JSON and images and wrote numbers. No image or render of private scene A was looked at.
+
+**The owner's answers at step 4's go** (the ends of sections 2.6, 3 and 4 here):
+
+- **The named measure** is the near-side far-5 cm share, with the tail beyond 25 cm beside it, read by rule (b) with the margin 0.021. The under-two-frames share is reported but is not the criterion (section 2.6 here, question 6, option (a); section 3 here, question 1).
+- **Finalist 1 is dropped,** so the arm trains on the manifest's cameras (section 4 here, question 2, option (a)).
+- **The off arm** is wrapper v2 with every added weight at 0, at two seeds per copy of private scene A and on `kitchen` (seeds 0 to 2) and `studio` (seed 0), as the baseline is. It is run once, here, and reused by finalists 3 and 4. Section 3 here's plain baseline is reported beside it (section 3 here, question 3, option (b)).
+- **Two seeds per arm** stand.
+
+**The patch side** (the PRD's owner item 2). AligNeRF's paper gives it, re-read on arXiv (v1; row 865): a rendered patch of 32 × 32 is matched against every sub-patch of a 48 × 48 patch of the training image, "in all of our experiments", so the shift reaches 8 px each way, the window section 5.4 names. **The arm's patch side is 32 px.**
+
+**The term, as the arm runs it** (`<scratch>/ticket-26/align_term.py`, not committed). The paper's Eq. 4 is the minimum over sub-patches of D + λ·√(Δx² + Δy²), with D the squared L2 norm of the patch's difference and λ = 0.01 (row 865). E7's L1 replaces D here, as section 5.4 asks:
+
+| | AligNeRF (row 865) | The arm |
+| --- | --- | --- |
+| Patches | 32 × 32, 32 per batch, sampled anew each iteration, in a fine-tuning stage after a plain pre-training stage | The whole render tiled by 32 × 32 from its top-left corner at every iteration, from the first. Private scene A's 736 × 1280 tiles exactly; on `kitchen` (1352 × 1014) the last row of patches is 22 px high and the last column 8 px wide, and on `studio` (1920 × 1080) the last row is 24 px high |
+| The shifts | Every sub-patch of the 48 × 48 patch, which lies inside the image | Every shift with \|Δy\|, \|Δx\| ≤ 8 px, 289, for which the patch's whole target lies inside the image. A patch at an edge shifts inwards only, so every cost is a mean over a whole patch |
+| The distance | Squared L2, its normalization not stated | E7's L1: the mean over the patch's pixels and channels |
+| The penalty | 0.01 · √(Δx² + Δy²) | The same, added to that mean (but see question 1 below) |
+| The choice | The minimum, inside the loss, at every iteration | The same: per patch at every iteration, without a gradient; ties go to the smaller shift, the zero shift first |
+| The value | L_PM, with a feature loss on VGG-19's first block that reads the aligned patch, weight 0.05 | The patches' costs at their shifts, averaged with weights equal to their pixel counts. At window 0 it is E7's L1 itself, and nothing else is computed (section 5.4) |
+| SSIM and the perceptual term | – | Unchanged: D-8's SSIM and D-89's ꟻLIP read the unshifted image |
+
+- **In the wrapper.** It is ticket #24's wrapper v2 copied (`<scratch>/ticket-26/wrap_train.py`), with one term, `align`, registered: λ_img · (L_align − L1), at weight 1. The total is then E7 with L_img's L1 replaced by the aligned one, and the package's own logged `l1` stays the plain L1. With the weight at 0, the off arm, nothing of the term runs. In both arms, the off arm included, the copy also records where D-51's `auto` placed the frame cache, through a pass-through wrapper of a private method called once per run.
+- **E10's g.** The term is on the colour render, so its gradient reaches the 2D means through `out.image` before `Trainer.step` reads their gradient. Growth's test against τ_pos and relocation's score read the new loss with no further step, as section 5.4 says.
+- **What the test settles for a revision.** SSIM and ꟻLIP do not read the shifted target in this arm. A shift is chosen per patch at every iteration, as the paper does, and is not held.
+
+**The scratch check** (`check_term.py`, on the CPU and on the GPU). It passes:
+
+- **A render that is the image shifted by k pixels costs k times the penalty.** The check covers k = 1 to 8 down, and k = 1, 4 and 8 up, left and right. The diagonals (1, 1), (3, 3) and (5, 5) cost k√2 times it, AligNeRF's Euclidean offset. It holds within 10⁻⁶ on random images of 1280 × 736 and 301 × 247, the second with partial patches. It holds for every patch whose target at the true shift lies inside the image, which then takes that shift: 858 to 897 of the 920 patches, and 63 to 72 of the 80. The patches at the edge the shift points to cannot take it, and cost more. Beyond the window (k = 10) no patch costs k times the penalty, and no shift exceeds the window.
+- **On a real frame it holds as a bound.** On a frame of `kitchen`, every patch that can reach the true shift costs at most k times the penalty. The minimum can take a smaller shift where a patch is smooth: at a shift of 8 px, only 13 % to 20 % of those patches cost exactly k times the penalty, and at (5, 5) 22 %. At the paper's relative scale (question 1), all of them do.
+- **A window of 0 gives E7's L1.** The short cut returns `l1_loss`'s value exactly. The search forced at window 0 equals it within 10⁻⁷ relative, with the same gradient. The wrapped term λ_img · (L_align − L1) is 0 with a zero gradient.
+- **The batched search that the arm runs** makes the same choice per patch as a plain loop over the 289 shifts, on all 12 baseline renders below, at both scales, and on two random pairs. Its costs agree within 2·10⁻⁶ relative. Replayed as a CUDA graph, it gives the same values bit for bit, but the graph saves only 0.8 to 1.4 ms and has never run inside `Trainer.step`, so the arm runs the batched search without it.
+
+**The term on the baseline's own renders of training cameras.** Each render is the baseline checkpoint at a training camera's pose and time, against that camera's training image: `A_h0_s0` at `cam1`, frames 0, 30, 60, 90 and 119; `kitchen_s0` at `cam05`, frames 0, 100, 200 and 299; `studio_s0` at `0003`, frames 149, 179 and 208 (row 866). The table gives the share of pixels whose patch takes a shift other than 0, their mean shift, and how much the term's L1 part lies below E7's L1. Two scales of the penalty are shown: the ticket's, 0.01 against the patch's mean L1, and the paper's relative scale, 0.01 against a sum over the patch's 32 × 32 × 3 values, that is 0.01 / 3,072 ≈ 3.3·10⁻⁶ against the mean.
+
+| Run, frames | E7's L1 | Ticket's scale: pixels moved / mean shift / L1 lower by | Paper's relative scale: pixels moved / mean shift / L1 lower by | Paper's scale: share of all patches shifted by more than 3.5 px |
+| --- | --- | --- | --- | --- |
+| `A_h0_s0`, `cam1`, 5 frames | 0.0098 to 0.0126 | 0.000 to 0.001 / 0.00 px / 0.1 % at most | 0.38 to 0.57 / 1.1 to 2.1 px / 2.4 % to 6.4 % | 15.6 % |
+| `kitchen_s0`, `cam05`, 4 frames | 0.0127 to 0.0131 | 0 / 0 / 0 | 0.07 to 0.14 / 0.1 to 0.3 px / 0.2 % to 0.9 % | 2.3 % |
+| `studio_s0`, `0003`, 3 frames | 0.0138 to 0.0153 | 0 / 0 / 0 | 0.02 to 0.04 / 0.04 to 0.07 px / 0.1 % to 0.2 % | 0.3 % |
+
+- **At the ticket's scale nothing moves at the end of training.** A trained model's L1 at a training camera is about 0.01 per patch, so a shift of one pixel costs as much as the whole patch's error. A run at this scale can choose shifts only while its renders are far from the images, early in training, and these renders cannot say how long that lasts.
+- **At the paper's relative scale, private scene A stands apart from openftgs-synth.** Between 38 % and 57 % of its pixels' patches take a shift, and 15.6 % of all its patches shift by 3.5 px or more. On `kitchen` the figures are 7 % to 14 % and 2.3 %, and on `studio` 2 % to 4 % and 0.3 %, although nothing is misaligned there. The gain is small: the L1 part lies 2.4 % to 6.4 % below E7's L1 on private scene A. These are renders against the same camera's own image, which the baseline has learnt to fit (the shell), so they are no measure of the disagreement between cameras that section 2.5 measured. They show only that at this scale the term finds shifts where the images and the model disagree, more on private scene A than where the cameras agree.
+- **An edge effect, removed.** A first form let a patch at an edge shift outwards and compared it on its remaining pixels, down to 1 of 8 columns on `kitchen`'s last column. At the paper's scale, the edge patches then moved two to four times as often as the interior ones on `kitchen` (25 % to 39 % against 7 % to 13 %). With the target kept inside the image they move 23 % to 33 %, and the interior figures are unchanged.
+
+**The search, timed on one training image.** It was timed on the first frame of each set above, synchronized, after 5 warm-up calls, as the median of 100 calls. The term's time includes its value and its backward to a render that requires a gradient, against E7's L1 and its backward:
+
+| Image | The term (median; 90th percentile) | Of which the search | Graphed, for comparison | E7's L1 | Extra memory at peak | A baseline iteration (30,000 in the run's time) | The term's share of it |
+| --- | --- | --- | --- | --- | --- | --- | --- |
+| Private scene A, 736 × 1280 | 9.0 ms; 9.1 ms | 8.8 ms | 8.1 ms | 0.06 ms | 69 MiB | 26 ms | +34 % |
+| `kitchen`, 1352 × 1014 | 12.9 ms; 12.9 ms | 12.5 ms | 11.5 ms | 0.12 ms | 102 MiB | 34 ms | +38 % |
+| `studio`, 1920 × 1080 | 22.5 ms; 22.7 ms | 22.0 ms | 21.8 ms | 0.19 ms | 154 MiB | 48 ms | +47 % |
+
+- **The first form was slower.** A loop over the 289 shifts took 120 ms, 141 ms and 160 ms on the same images. Batching the shifts by threes along x brought it to the figures above, which are bound by memory traffic. A CUDA graph, which removes the kernel launches, saves 0.8 to 1.4 ms more and is not used (above).
+- **What this time is.** It is a one-line note, not a benchmark, and it is the term timed alone, not inside a training run. Section 5.4's assumption of 1 to 2 times a default run holds: the arm's runs should take 1.3 to 1.5 times the baseline's.
+- **Memory.** The baseline's runs on private scene A peaked at 23,394 to 23,982 MiB of the card's 24,564 MiB in `nvidia-smi` (section 3 here). The term adds up to 70 MiB there, and it may change where D-51's `auto` puts the frame cache. Both arms record the placement.
+
+**The owner's answers at the first step** (2026-11-17, in session, relayed by the orchestrating session, after the first step's report):
+
+- **The penalty's scale** (question 1 below): option (c), both. Two arms, window 8 px and patch side 32 px each: `align_rel` at the paper's relative scale as this section translates it (0.01 / 3,072 against the patch's mean L1), and `align_abs` at the ticket's (0.01 against it). The 300-iteration probes at both scales are cleared, as the smoke run.
+- **The hours** (questions 2 and 3): about 8.5 GPU hours cleared in all, for the off arm and both arms on both copies of private scene A at seeds 0 and 1, the left copy's second seed included, `kitchen` at seeds 0 to 2 and `studio` at seed 0. Ticket #24's `A_h0_s0_v2` is reused as the off arm's run on the centre copy at seed 0, since it is wrapper v2 at every weight 0 on the same manifest, init and seed. Past about 9.5 hours, the work stops and reports first.
+- **The frame-cache record** on the off arm is accepted: it records only.
+
+**The arm and the off arm, as planned for the owner's go.**
+
+- **The arm.** The default training configuration, 30,000 iterations, through the wrapper copy with `--term align=1`: window 8 px, patch side 32 px, penalty 0.01 at the scale question 1 settles. Nothing else differs.
+- **The off arm.** The same script with `--term align=0`, which is wrapper v2 with the frame-cache record.
+- **First, a smoke run.** The wrapper copy has not run end to end: a 300-iteration run on `kitchen` at weight 0 and at weight 1 comes first, after the go.
+- **The runs, eight per arm, mirrored.**
+  - On private scene A: the centre copy and the left copy at seeds 0 and 1, from the kept stride-4 files `ref_h0_s4` and `ref_h1_s4` (section 3 here).
+  - On openftgs-synth: `kitchen` at seeds 0, 1 and 2, and `studio` at seed 0, from M17's init files.
+  - The left copy's second seed is one run more than section 5.2's three per arm. The owner's off arm has it, and section 4.4's rule needs two seeds a side to read the left copy.
+- **The measures** are section 3 here's, by ticket #24's scripts copied unchanged:
+  - the named measure against the kept files, with the tail beside it;
+  - the under-two-frames share, near side and whole model;
+  - the sharpness ratio and the tiles' coverage;
+  - the test-view scores with Q-233's kept-pixel PSNR on the centre copy;
+  - on openftgs-synth, `scripts/gt_depth.py`'s shares, `scripts/reference_flaws.py`'s kept-pixel PSNR and the far shares.
+
+  The arm's logs also carry, every 100 iterations, the share of pixels whose patch moved and the mean shift. The sheets of each copy and seed, off arm and arm, are relabelled blind as in section 4 here.
+- **GPU hours, estimated from the baseline's times and the term's timing.**
+
+  | Part | Estimate |
+  | --- | --- |
+  | The off arm: 4 runs on private scene A, 3 on `kitchen`, 1 on `studio` | 54 min + 51 min + 24 min, about 2.1 hours |
+  | The arm, at 1.34, 1.38 and 1.47 times those | 71 min + 70 min + 35 min, about 2.9 hours |
+  | Renders, scores, `gt_depth.py` and `reference_flaws.py`, about 16 runs | about 0.6 hours |
+  | In all | **about 5.6 hours** |
+
+  That is beyond the ticket's 2 to 4 hours, which counted no off arm through the script. The off arm alone is 2.1 hours, and finalists 3 and 4 reuse it.
+
+  Two ways to save time, neither assumed: ticket #24's `A_h0_s0_v2` is already a full v2 run of the centre copy at seed 0, and reusing it as the off arm's run saves 13 minutes. Running the arm on the left copy at one seed, as section 5.2 plans, saves 17 minutes more, but leaves the left copy unreadable by the rule.
+
+**The questions for the owner at the first step.**
+
+1. **The penalty's scale.** The paper's 0.01 is set against a sum of squared differences over a patch, with no normalization stated (row 865). The ticket's check, "a shift of k pixels costs k times the penalty, and a window of 0 gives E7's L1", puts the same 0.01 against the patch's mean L1. Against the mean, one pixel of shift costs about as much as a trained model's whole error in a patch.
+   - (a) The ticket's scale: 0.01 against the patch's mean L1. On the baseline's renders nothing moves (above). The arm can then differ from the off arm only early in training. If it ends near the off arm, that cannot be told from section 7.2's drop clause, "the share does not move".
+   - (b) The paper's relative scale, as this section translates it: 0.01 against the patch's sum over its 32 × 32 × 3 values, 3.3·10⁻⁶ against the mean. This assumes the paper's sum is unnormalized, and it puts L1 where the paper has squared L2, so it is a reading, not the paper's number. The penalty is then what the paper calls it, a tie-breaker for blurry patches. On the baseline's renders 38 % to 57 % of private scene A's pixels move, against 2 % to 14 % on openftgs-synth. The check holds as stated, with the penalty in the mean's units.
+   - (c) Both, as two arms: about 2.9 GPU hours more.
+
+   **Recommended: (b).** It is the nearest reading of the paper's setting (section 1 here: one arm per finalist at its paper's settings), and at the end of training it is the only one of the two at which the term acts at all. Either way, the penalty's unit is a thing a revision would have to word, beside section 5.4's list. A 300-iteration run of each scale on `kitchen` would show how early (a) stops choosing shifts. It takes about 2 minutes and was not run before the go.
+2. **The hours:** about 5.6 GPU hours (above), or less by the two savings.
+3. **The left copy's second seed for the arm** (above): run it, recommended, or keep section 5.2's one seed.
+
+**The first step's commands.** Each ran with `OMP_NUM_THREADS=16 MKL_NUM_THREADS=16 OPENBLAS_NUM_THREADS=16`, `PYTHONPATH=<worktree>/src:<worktree>/harness/src` and the shared `.venv`'s Python. The CPU ones ran with `CUDA_VISIBLE_DEVICES=` empty, the GPU ones under the shared lock. `$T` is `<scratch>/ticket-26`, `$O` is `<surface-runs>/ticket-26`, `$B` is `<surface-runs>/ticket-24/runs`, `$X` is `<private-scene-A-exp>`, `$K` is `<m15-runs>/kitchen`, `$M` is `<m17-runs>`. The scripts are not committed.
+
+| Command | Device | Time | Note |
+| --- | --- | --- | --- |
+| `curl -sSL -o $T/dl/aligner.html https://arxiv.org/html/2211.09682`, then a text extraction | CPU | seconds | AligNeRF re-read (row 865) |
+| `python $T/check_term.py --penalty <0.01 or 0.01/3072> --image $K/images/cam05/000100.png` | CPU, and GPU with `--device cuda` | 20 to 50 s | The scratch check; passes at both scales |
+| `python $T/probe.py request <manifest> <camera> <frames> $O/probe/req_<set>.json` | CPU | seconds | Requests at training cameras' poses and times: `$X/scene_h0` `cam1`, `$K` `cam05`, `$M/studio/scene` `0003` |
+| `ftgs render $B/<run>/checkpoint --request $O/probe/req_<set>.json --out $O/probe/render_<set>.safetensors`, for `A_h0_s0`, `kitchen_s0`, `studio_s0` | GPU | seconds each | The baseline's renders of training images |
+| `python $T/probe.py measure $O/probe/req_<set>.json $O/probe/render_<set>.safetensors $O/probe/probe_<set>.json` | GPU | about 1 min each | The shares moved at both scales; run first with the first form (its timing, 120 to 160 ms, and the edge effect), then again with the arm's |
+| `python $T/equiv.py <the three pairs of request and renders>` | GPU | about 1 min | The batched and graphed searches against the loop |
+| `python $T/border.py <the same>` | GPU | about 1 min | The edge patches against the interior ones, with the target kept inside the image and without |
+| `python $T/prof.py <the same>` | GPU | about 1 min | The table of times |
+
+**The runs** were made on 2026-11-17 and 2026-11-18, at the owner's answers above, with the same code, versions and hardware as the first step. Everything ran under the shared GPU lock with 16 CPU threads, one training at a time. They took about 8.2 GPU hours, from the smoke runs to the last diagnostic, and the first step about 0.3: about 8.5 in all, the hours cleared. Scripts read tensors, JSON, images and mask files and wrote numbers and files, and no image, render or sheet of private scene A was looked at (row 867). Every run wrote only under `<surface-runs>/ticket-26`: a search afterwards found no file newer than the first step under `<private-scene-A-exp>`, `<m15-runs>/kitchen`, `<m17-runs>`'s `kitchen` and `studio`, or tickets #24's and #25's folders.
+
+- **The runs, 23 of them.**
+  - The off arm: 7 runs, with `A_h0_s0_v2` reused as the eighth.
+  - `align_rel` (runs `REL_…`) and `align_abs` (runs `ABS_…`): 8 runs each.
+  - All are 30,000 iterations of the default training configuration, from the kept stride-4 files on private scene A and M17's init files on openftgs-synth.
+- **Every run's wrappers** ran 30,000 times each.
+- **D-51's `auto` placed the frame cache alike in all three arms,** in the 23 runs made here. It went on the GPU on private scene A and was memory-mapped on `kitchen` and `studio`, so the term's extra memory changed no placement. The reused `A_h0_s0_v2` recorded none.
+- **GPU memory** peaked at 23,391 to 23,985 MiB on private scene A, the same as the baseline's 23,394 to 23,982 MiB.
+- **Times.**
+
+  | Arm | Private scene A | `kitchen` | `studio` |
+  | --- | --- | --- | --- |
+  | The off arm | 13 min 2 s to 13 min 29 s | 16 min 38 s to 17 min 3 s | 23 min 16 s |
+  | `align_rel` | 17 min 25 s to 17 min 52 s | 23 min 9 s to 23 min 37 s | 34 min 36 s |
+  | `align_abs` | 17 min 34 s to 18 min 56 s | 23 min 7 s to 23 min 25 s | 34 min 44 s |
+
+  That is 1.3 to 1.5 times the off arm, as the first step estimated.
+
+**The smoke runs** were 300 iterations on `kitchen` at seed 0 in each arm, with `--config` holding `{"optim": {"iterations": 300}}`. All three ran to the end, with each wrapper's count equal to the iterations. They also showed what each scale does at the start, and the full runs logged it every 100 iterations:
+
+| Iteration | `align_rel`, private scene A: pixels moved / mean shift / L1 lower by | `align_rel`, `kitchen` | `align_rel`, `studio` | `align_abs`, private scene A | `align_abs`, `kitchen` | `align_abs`, `studio` |
+| --- | --- | --- | --- | --- | --- | --- |
+| 100 | 0.997 / 9.8 to 9.9 px / 14 % | 0.999 / 10.0 px / 14 % | 0.998 / 9.9 px / 11 % | 0.022 to 0.024 / 0.13 to 0.15 px / 0.3 % | 0.018 / 0.11 px / 0.1 % | 0.015 / 0.10 px / 0.2 % |
+| 1,000 | 0.99 / 8.4 to 8.7 px / 24 % | 1.00 / 9.4 to 9.5 px / 20 % | 1.00 / 9.7 px / 15 % | 0.025 to 0.027 / 0.11 px / 0.6 % | 0.02 / 0.10 to 0.11 px / 0.3 % | 0.016 / 0.10 px / 0.4 % |
+| 3,000 | 0.97 / 6.5 to 6.8 px / 24 % to 27 % | 0.99 / 7.4 to 7.5 px / 19 % | 1.00 / 8.6 px / 18 % | 0.023 to 0.029 / 0.07 to 0.09 px / 0.6 % to 0.7 % | 0.011 / 0.03 px / 0.2 % | 0.013 / 0.07 px / 0.6 % |
+| 10,000 | 0.82 to 0.83 / 3.8 to 4.0 px / 19 % to 21 % | 0.78 to 0.79 / 3.1 to 3.2 px / 7 % | 0.89 / 4.5 px / 11 % | 0.013 to 0.016 / 0.04 px / 0.6 % to 0.7 % | 0.001 to 0.002 / 0.00 px / 0 % | 0.008 / 0.04 px / 0.9 % |
+| 30,000 | 0.52 / 1.8 to 1.9 px / 10 % to 12 % | 0.10 / 0.23 to 0.24 px / 0.6 % to 0.7 % | 0.12 / 0.42 px / 1.5 % | 0.003 to 0.004 / 0.01 px / 0.2 % to 0.3 % | 0 / 0 / 0 % | 0 / 0 / 0 % |
+
+- **`align_rel` starts with arbitrary shifts.** While the renders are blurred, nearly every patch takes a shift near the window's corner, 9.8 to 10.0 px against 8√2 = 11.3 px at most, since a blurred patch matches the image about equally well at any shift. The paper meets this with a stage of plain training first, at 60 % of the iterations (row 865). This arm aligns from the first iteration, the choice the first step stated, and it shifts 97 % to 100 % of the pixels until iteration 3,000.
+- **Later, the two scenes part.** By the end, `kitchen` and `studio` keep 10 % to 12 % of pixels moved, by 0.2 to 0.4 px. Private scene A keeps 52 %, by 1.9 px: the order the first step found on the baseline's renders.
+- **`align_abs` is near the off arm throughout.** It moves 1.5 % to 3 % of the pixels by about 0.1 px at the start, and none on openftgs-synth after iteration 10,000.
+
+**The named measure: the near-side far-5 cm share,** with the tail beyond 25 cm beside it, against the kept stride-4 files (each cell is 5 cm / beyond 25 cm), and the other shell measures. Each pair is near side / whole model where two figures are given. The plain baseline is section 3 here's, with `A_h1_s1` from section 4 here.
+
+| Run | Near side: far-5 cm / beyond 25 cm | Near side: far-10 cm | Under two frames: near / whole | Whole model: far-5 cm | Far side: far-5 cm | Cap reached at |
+| --- | --- | --- | --- | --- | --- | --- |
+| `A_h0_s0`, plain | 0.1401 / 0.0349 | 0.0634 | 0.5856 / 0.452 | 0.224 | 0.535 | 10,800 |
+| `A_h0_s1`, plain | 0.1409 / 0.0267 | 0.0583 | 0.5945 / 0.459 | 0.229 | 0.541 | 11,100 |
+| `OFF_A_h0_s0` (ticket #24's `A_h0_s0_v2`) | 0.1308 / 0.0461 | 0.0754 | 0.5857 / 0.454 | 0.218 | 0.537 | 10,900 |
+| `OFF_A_h0_s1` | 0.1380 / 0.0333 | 0.0644 | 0.5836 / 0.451 | 0.225 | 0.536 | 10,800 |
+| `REL_A_h0_s0` | 0.1339 / 0.0479 | 0.0820 | 0.5857 / 0.449 | 0.220 | 0.536 | 14,200 |
+| `REL_A_h0_s1` | 0.1278 / 0.0367 | 0.0654 | 0.6001 / 0.462 | 0.212 | 0.515 | 14,600 |
+| `ABS_A_h0_s0` | 0.1413 / 0.0349 | 0.0688 | 0.5855 / 0.452 | 0.227 | 0.539 | 11,000 |
+| `ABS_A_h0_s1` | 0.1284 / 0.0296 | 0.0618 | 0.5911 / 0.455 | 0.217 | 0.544 | 11,000 |
+| `A_h1_s0`, plain | 0.1632 / 0.0438 | 0.0746 | 0.5854 / 0.449 | 0.246 | 0.541 | 9,700 |
+| `A_h1_s1`, plain | 0.1526 / 0.0366 | 0.0658 | 0.5882 / 0.448 | 0.239 | 0.540 | 9,900 |
+| `OFF_A_h1_s0` | 0.1411 / 0.0379 | 0.0662 | 0.5808 / 0.445 | 0.227 | 0.536 | 10,000 |
+| `OFF_A_h1_s1` | 0.1337 / 0.0264 | 0.0561 | 0.5893 / 0.449 | 0.225 | 0.540 | 10,000 |
+| `REL_A_h1_s0` | 0.1300 / 0.0235 | 0.0553 | 0.6040 / 0.457 | 0.223 | 0.540 | 12,800 |
+| `REL_A_h1_s1` | 0.1402 / 0.0400 | 0.0674 | 0.6015 / 0.455 | 0.228 | 0.537 | 12,700 |
+| `ABS_A_h1_s0` | 0.1381 / 0.0481 | 0.0730 | 0.5739 / 0.439 | 0.226 | 0.542 | 9,600 |
+| `ABS_A_h1_s1` | 0.1232 / 0.0277 | 0.0538 | 0.5906 / 0.450 | 0.219 | 0.554 | 10,100 |
+
+**Judged by section 4.4's rule** against the off arm, the owner's comparison: both of the arm's seeds beyond both of the off arm's, and the means more than 0.01 apart (0.021 for the tail).
+
+| Copy | `align_rel` against the off arm | `align_abs` against the off arm | The off arm against the plain baseline |
+| --- | --- | --- | --- |
+| Centre, named measure | not moved (seeds 0.134, 0.128 against 0.131, 0.138; mean 0.004 lower) | not moved (0.141, 0.128; mean 0.000) | not moved (0.131, 0.138 against 0.140, 0.141; both below, mean 0.006 lower) |
+| Centre, tail | not moved (mean 0.003 higher) | not moved (mean 0.008 lower) | not moved |
+| Left, named measure | not moved (0.130, 0.140 against 0.141, 0.134; mean 0.002 lower) | not moved (0.138, 0.123; mean 0.007 lower) | **lower** by 0.021 (0.141, 0.134 against 0.163, 0.153) |
+| Left, tail | not moved | not moved | not moved |
+| Under two frames, near side (reported, not the criterion) | centre not moved (mean 0.008 higher); left **higher** by 0.018 | not moved on either copy | not moved |
+
+- **Neither arm moves the named measure,** on either copy, nor the tail.
+- **The off arm was needed.** Against the plain baseline both arms count as lower on the left copy: `align_rel` by 0.023 and `align_abs` by 0.027. But the off arm, the same script with the term at 0, is lower by 0.021 too. That is the script's own effect, which section 3 here found on the centre copy and the off arm takes out. On the left copy it is now measured by the rule, with two seeds a side.
+- **`align_rel` raises the near side's under-two-frames share on the left copy,** by 0.018 by the rule, and by 0.008 on the centre copy. This is the measure section 5.4 first named for finalist 2, and it moves the wrong way for H2's prediction of fewer short-lived primitives.
+- **`align_rel` delays growth's cap,** to 14,200 to 14,600 on the centre copy and 12,700 to 12,800 on the left one, against 10,800 to 10,900 and 10,000 for the off arm. It does the same on `kitchen` (2,300 against 2,100) and `studio` (7,700 against 6,900). The term's gradient reaches E10's g (above), so with the target moved probably fewer primitives pass τ_pos early; that was not measured. `align_abs`'s caps are the off arm's.
+
+**The test-view scores, the sharpness ratio and the tiles' coverage,** as section 3 here takes them. Kept-pixel PSNR is Q-233's, on the centre copy only. Every rendered value is finite.
+
+| Run | Crop PSNR | Crop SSIM₁ | Sharpness ratio | Late | Training cameras: PSNR / ratio | E16 PSNR / SSIM₁ / ꟻLIP | Kept-pixel PSNR | Coverage: between cameras to ±45°; ±60°, ±90° |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| `A_h0_s0`, plain | 24.36 | 0.8149 | 0.7262 | 0.7504 | 32.90 / 0.7755 | 24.79 / 0.8187 / 0.1531 | 25.52 | cap 10800 wall 13:09.38 peak 23895 cache None finite True |
+| `A_h0_s1`, plain | 24.31 | 0.8153 | 0.7249 | 0.7467 | 32.79 / 0.7742 | 24.75 / 0.8189 / 0.1545 | 25.47 | cap 11100 wall 13:11.67 peak 23982 cache None finite True |
+| `OFF_A_h0_s0` (ticket #24's `A_h0_s0_v2`) | 24.35 | 0.8148 | 0.7313 | 0.7536 | 32.99 / 0.7733 | 24.80 / 0.8180 / 0.1531 | 25.54 | cap 10900 wall 13:28.94 peak 23845 cache None finite True |
+| `OFF_A_h0_s1` | 24.36 | 0.8153 | 0.7258 | 0.7497 | 32.84 / 0.7740 | 24.66 / 0.8176 / 0.1538 | 25.37 | cap 10800 wall 13:11.81 peak 23936 cache gpu finite True |
+| `REL_A_h0_s0` | 24.38 | 0.8174 | 0.7220 | 0.7431 | 32.61 / 0.7730 | 24.71 / 0.8196 / 0.1532 | 25.45 | cap 14200 wall 17:24.58 peak 23902 cache gpu finite True |
+| `REL_A_h0_s1` | 24.36 | 0.8182 | 0.7198 | 0.7422 | 32.42 / 0.7678 | 24.61 / 0.8209 / 0.1529 | 25.32 | cap 14600 wall 17:52.33 peak 23920 cache gpu finite True |
+| `ABS_A_h0_s0` | 24.40 | 0.8160 | 0.7293 | 0.7493 | 32.93 / 0.7736 | 24.77 / 0.8189 / 0.1525 | 25.51 | cap 11000 wall 17:34.22 peak 23787 cache gpu finite True |
+| `ABS_A_h0_s1` | 24.40 | 0.8157 | 0.7247 | 0.7469 | 32.78 / 0.7717 | 24.70 / 0.8187 / 0.1539 | 25.42 | cap 11000 wall 18:55.59 peak 23870 cache gpu finite True |
+| `A_h1_s0`, plain | 23.90 | 0.7473 | 0.7403 | 0.7938 | 31.31 / 0.7719 | 21.92 / 0.7392 / 0.1951 | – | cap 9700 wall 13:23.93 peak 23394 cache None finite True |
+| `A_h1_s1`, plain | 23.71 | 0.7472 | 0.7457 | 0.7969 | 31.59 / 0.7686 | 21.66 / 0.7384 / 0.1976 | – | cap 9900 wall 13:32.80 peak 23970 cache None finite True |
+| `OFF_A_h1_s0` | 23.92 | 0.7487 | 0.7323 | 0.7804 | 31.57 / 0.7727 | 21.77 / 0.7403 / 0.1952 | – | cap 10000 wall 13:07.48 peak 23740 cache gpu finite True |
+| `OFF_A_h1_s1` | 23.98 | 0.7489 | 0.7353 | 0.7874 | 31.36 / 0.7706 | 21.89 / 0.7387 / 0.1947 | – | cap 10000 wall 13:01.80 peak 23961 cache gpu finite True |
+| `REL_A_h1_s0` | 24.00 | 0.7502 | 0.7272 | 0.7782 | 31.08 / 0.7682 | 21.83 / 0.7414 / 0.1938 | – | cap 12800 wall 17:28.78 peak 23985 cache gpu finite True |
+| `REL_A_h1_s1` | 24.07 | 0.7512 | 0.7347 | 0.7907 | 31.22 / 0.7672 | 21.96 / 0.7401 / 0.1940 | – | cap 12700 wall 17:29.37 peak 23933 cache gpu finite True |
+| `ABS_A_h1_s0` | 24.07 | 0.7492 | 0.7298 | 0.7857 | 31.31 / 0.7729 | 21.91 / 0.7394 / 0.1959 | – | cap 9600 wall 17:39.32 peak 23391 cache gpu finite True |
+| `ABS_A_h1_s1` | 23.91 | 0.7476 | 0.7422 | 0.7993 | 31.42 / 0.7729 | 21.79 / 0.7405 / 0.1945 | – | cap 10100 wall 17:49.75 peak 23931 cache gpu finite True |
+
+- **No test-view score falls by more than 0.3 dB** against the off arm, in either arm on either copy. For `align_rel`, E16 PSNR's mean is 0.06 dB lower on the centre copy and 0.06 dB higher on the left. The kept-pixel PSNR is 0.07 dB lower, and the crop PSNR 0.01 and 0.08 dB higher. For `align_abs` every mean lies within 0.05 dB. Against the plain baseline, `align_rel`'s E16 PSNR is 0.11 dB lower on the centre copy.
+- **The sharpness ratio falls for `align_rel` on the centre copy,** beyond what two seeds give. Both seeds, 0.722 and 0.720, lie below both of the off arm's, 0.731 and 0.726. The means are 0.008 apart, against the off arm's spread of 0.0055 and the plain seeds' 0.0013. The late ratio falls with it, 0.743 and 0.742 against 0.754 and 0.750. On the left copy it does not separate (0.727, 0.735 against 0.732, 0.735). `align_abs` does not fall on either copy.
+- **The training cameras' PSNR falls for `align_rel`,** by 0.40 dB on the centre copy and 0.31 dB on the left one. That is what the term asks: training images matched up to a shift. It is not a test-view score, so the guard does not apply.
+- **The coverage** stays within the off arm's and the baseline's ranges, 0.80 to 1.00 and 0.44 to 1.00 on the side tiles. No tile collapses.
+
+**The sheets, for judging with their labels hidden.** There are four sets: the centre copy at seeds 0 and 1, then the left copy at seeds 0 and 1. Each holds the off arm and both arms in an order from Python's `random.Random(26)`, labelled `set<n>-A` to `-C` only. They are `<surface-runs>/ticket-26/sheets/blind/set<n>-<letter>.jpg`, from section 2.6's fixed request, with the key apart in `KEY.json` beside them. Nobody here has looked at them. The owner's judgement is the criterion, and it is open (question 2 below).
+
+**openftgs-synth.** The columns are as in section 3 here: E16 on the test view; `scripts/reference_flaws.py`'s kept-pixel PSNR; `scripts/gt_depth.py`'s residual shares at δ = 0.02·S and the median error of expected depth; section 2.1 here's far shares and under-two-frames share against M17's init, whole model / dynamic side.
+
+| Run | E16 PSNR / SSIM₁ / ꟻLIP | Kept-pixel PSNR | Residual, all pixels: in front / behind | Dynamic pixels: in front / behind | Expected depth, median error, all / dynamic | Far share at 0.12·S | Beyond 25 cm | Under two frames | Cap reached at |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| `kitchen_s0`, plain | 29.25 / 0.8787 / 0.0881 | 30.42 | 0.041 / 0.291 | 0.015 / 0.613 | 251 / 56 mm | 0.036 / 0.002 | 0.023 / 0.001 | 0.381 / 0.660 | 2,100 |
+| `kitchen_s1`, plain | 30.11 / 0.8803 / 0.0856 | 31.34 | 0.039 / 0.297 | 0.015 / 0.612 | 448 / 304 mm | 0.035 / 0.003 | 0.022 / 0.001 | 0.377 / 0.662 | 2,100 |
+| `kitchen_s2`, plain | 29.25 / 0.8800 / 0.0885 | 31.15 | 0.040 / 0.295 | 0.015 / 0.618 | 277 / 102 mm | 0.036 / 0.002 | 0.023 / 0.001 | 0.385 / 0.661 | 2,100 |
+| `OFF_kitchen_s0` | 24.88 / 0.8753 / 0.0949 | 29.16 | 0.042 / 0.294 | 0.015 / 0.616 | 247 / 73 mm | 0.035 / 0.002 | 0.023 / 0.001 | 0.382 / 0.662 | 2,100 |
+| `OFF_kitchen_s1` | 26.97 / 0.8753 / 0.0934 | 29.73 | 0.041 / 0.295 | 0.016 / 0.616 | 206 / 58 mm | 0.036 / 0.002 | 0.024 / 0.001 | 0.381 / 0.659 | 2,100 |
+| `OFF_kitchen_s2` | 27.58 / 0.8772 / 0.0910 | 30.08 | 0.041 / 0.294 | 0.016 / 0.615 | 217 / 44 mm | 0.035 / 0.003 | 0.023 / 0.001 | 0.383 / 0.655 | 2,100 |
+| `REL_kitchen_s0` | 30.30 / 0.8801 / 0.0846 | 31.31 | 0.041 / 0.293 | 0.016 / 0.609 | 223 / 56 mm | 0.035 / 0.002 | 0.022 / 0.001 | 0.377 / 0.657 | 2,300 |
+| `REL_kitchen_s1` | 27.93 / 0.8778 / 0.0907 | 29.88 | 0.040 / 0.295 | 0.016 / 0.613 | 257 / 78 mm | 0.035 / 0.003 | 0.023 / 0.001 | 0.376 / 0.655 | 2,300 |
+| `REL_kitchen_s2` | 28.27 / 0.8780 / 0.0905 | 30.59 | 0.041 / 0.295 | 0.016 / 0.611 | 193 / 44 mm | 0.034 / 0.002 | 0.023 / 0.001 | 0.378 / 0.654 | 2,300 |
+| `ABS_kitchen_s0` | 27.45 / 0.8783 / 0.0903 | 30.46 | 0.040 / 0.297 | 0.015 / 0.616 | 179 / 35 mm | 0.037 / 0.002 | 0.024 / 0.001 | 0.381 / 0.659 | 2,100 |
+| `ABS_kitchen_s1` | 26.52 / 0.8765 / 0.0917 | 30.61 | 0.042 / 0.295 | 0.016 / 0.612 | 272 / 126 mm | 0.037 / 0.003 | 0.024 / 0.001 | 0.380 / 0.661 | 2,100 |
+| `ABS_kitchen_s2` | 28.11 / 0.8790 / 0.0891 | 30.62 | 0.041 / 0.293 | 0.015 / 0.614 | 327 / 103 mm | 0.037 / 0.002 | 0.024 / 0.001 | 0.381 / 0.655 | 2,100 |
+| `studio_s0`, plain | 22.24 / 0.7991 / 0.1928; dynamic 24.85 | 22.30 | 0.014 / 0.412 | 0.007 / 0.647 | 144 / 87 mm | 0.041 / 0.001 | 0.068 / 0.001 | 0.387 / 0.710 | 6,800 |
+| `OFF_studio_s0` | 22.83 / 0.7986 / 0.1899; dynamic 25.02 | 23.02 | 0.014 / 0.414 | 0.009 / 0.649 | 172 / 102 mm | 0.044 / 0.001 | 0.071 / 0.001 | 0.384 / 0.707 | 6,900 |
+| `REL_studio_s0` | 22.36 / 0.7945 / 0.1913; dynamic 24.99 | 22.44 | 0.014 / 0.412 | 0.008 / 0.642 | 148 / 86 mm | 0.042 / 0.001 | 0.069 / 0.001 | 0.385 / 0.707 | 7,700 |
+| `ABS_studio_s0` | 22.28 / 0.7991 / 0.1913; dynamic 24.70 | 22.43 | 0.014 / 0.412 | 0.008 / 0.648 | 147 / 87 mm | 0.042 / 0.001 | 0.070 / 0.001 | 0.386 / 0.712 | 6,800 |
+
+- **On `kitchen`, no harm by the guards against the off arm.**
+  - **SSIM₁:** `align_rel`'s mean is 0.0027 above the off arm's, and `align_abs`'s 0.0020 above.
+  - **The residual's shares:** every mean lies within 0.005 of the off arm's. The largest difference is `align_rel`'s share behind the surface on dynamic pixels, 0.0045 lower.
+  - **PSNR, kept-pixel PSNR and ꟻLIP:** no arm has all three seeds below all three of the off arm's.
+- **The off arm's own effect on `kitchen`.** Its SSIM₁ is 0.8753 to 0.8772, against the plain baseline's 0.8787 to 0.8803: a mean 0.0037 lower, beyond the 0.002 guard. Its PSNR is 24.9 to 27.6 dB against 29.3 to 30.1. So the script with the term at 0 is itself what section 4.4 would call harm on `kitchen` against plain `ftgs train`, while section 3 here's acceptance, on loss means up to iteration 2,200, did not see it.
+  - Against the plain baseline, `align_rel`'s SSIM₁ is 0.0010 lower and `align_abs`'s 0.0017 lower, both within the guard.
+  - `align_abs`'s PSNR and ꟻLIP are flagged: all three seeds lie below or above all three plain ones.
+- **On `studio`, one seed.**
+  - `align_rel`'s dynamic-region PSNR is 24.99 dB against the off arm's 25.02 dB, 0.03 lower, within the 0.1 dB flag.
+  - `align_abs`'s is 24.70 dB, 0.31 lower, and is flagged. With one seed, and two plain trainings already 0.34 dB apart (section 3 here), the flag cannot be told from the spread.
+- **The far shares and the under-two-frames share** are the off arm's on both scenes, within 0.003.
+
+**The reading by section 7.2's row for finalist 2,** with its measure as the owner renamed it (section 2.6 here).
+
+- **Adopt when** the named measure moves with no harm by the other criteria. **Not met:** neither arm moves it, on either copy.
+- **Drop when** "the share does not move: the shell is not a reconciliation, or the disagreement is not a shift of a few pixels rigid over a patch". **Met for both arms.** What the drop rests on differs between them:
+  - **`align_abs`, the ticket's scale,** is close to an arm that was never on. Its term shifts under 3 % of the pixels by about 0.1 px early in training, and almost none after. Its result says that this setting does nothing, not that alignment does nothing.
+  - **`align_rel`, the paper's relative scale,** did act. To the end of training it shifts half of private scene A's pixels by about 2 px, five times as many as on openftgs-synth. Its aligned L1 lies a tenth below the plain L1 at the end, and the shell's measure stays where the off arm has it. By the row's letter that is the drop clause's case. It is weaker evidence than the clause's wording, for two reasons:
+    - **Only L1 tolerated the shift.** At iteration 30,000 the L1 term is 16 % to 17 % of the loss on private scene A. SSIM, 23 % to 24 %, and ꟻLIP, 59 %, still read the unshifted image, so most of the loss kept asking for the cameras' versions as they are.
+    - **The start was arbitrary.** Nearly every patch sat near the window's corner until iteration 3,000, and 82 % to 83 % still moved at 10,000, before the cap.
+
+    So it is a null for this form of the loss, not evidence against H2.
+  - **The named measure's spread.** Over the off arm's and `align_abs`'s four runs per copy, which are near-identical arms, the named measure ranges over 0.013 on the centre copy and 0.018 on the left. `align_rel`'s seeds lie inside or at the edge of that range. This supports "not moved", and shows that two seeds understate the off arm's spread against the 0.01 margin.
+  - **The renders turn softer** on the centre copy with `align_rel`: sharpness 0.008 lower, beyond two seeds. The under-two-frames share rises on the left copy. Section 7.2's last column, a measure that moves while the renders turn soft, does not arise, since the measure did not move.
+- **What this test does not cover.**
+  - The paper's staged form, alignment only after a plain pre-training stage. The arm here aligned from the first iteration and spent its first 3,000 iterations shifting nearly every patch to the window's corner.
+  - A shift held for several iterations.
+  - SSIM and ꟻLIP on the shifted target.
+  - A window wider than 8 px.
+- **Recommended: drop this form of finalist 2, by the row.** The named measure did not move at either scale, and the paper's scale softened the centre copy's renders. On openftgs-synth neither arm harmed by the guards, apart from `align_abs`'s one-seed flag on `studio`. What is dropped is L1 alone made shift-tolerant, aligned from the first iteration; the paper's staged form is untested. Rows E11, E22 and E27, which section 2.6 here brought back beside finalist 2, keep their own evidence (sections 2.3 and 2.6 here) and are not tested by this result. Testing the staged form would be a new arm at the owner's call, about 3 GPU hours on both sets.
+
+**Against the ticket's acceptance criteria.**
+
+- **The patch side and the search's time, reported before the arm ran:** done (the first step, above).
+- **The scratch check:** passes (above).
+- **The arm on both sets, against the baseline that matches its manifests.** Finalist 1 was dropped, so it trained on the manifest's cameras. It ran as two arms at the owner's answer, against the off arm, with the plain baseline beside it.
+- **Section 4.4's criteria:**
+  - the named measure by the rule, with the tail and the under-two-frames share beside it, near side and whole model;
+  - the sharpness ratio;
+  - the sheets, keyed but not judged (question 2);
+  - the test-view scores against the 0.3 dB guard;
+  - on openftgs-synth, the residual's shares and SSIM₁ against the off arm.
+- **The reading by section 7.2's row:** above. The owner's go or stop for step 5: below, not yet given.
+- **Sources, commands, files changed, privacy:**
+  - sources: rows 865 to 867;
+  - commands: below;
+  - files changed: only this document and the source log;
+  - privacy: nothing names private scene A or shows its images.
+
+**The questions for the owner at step 4.**
+
+1. **Finalist 2: dropped, as recommended, or kept** for its staged form (alignment after a plain first stage, as the paper trains), as one more arm?
+2. **The sheets** (`<surface-runs>/ticket-26/sheets/blind`, key apart): the owner's judgement with the labels hidden, which this ticket cannot give.
+3. **The off arm's effect on `kitchen`.** Wrapper v2 at weight 0 lowers `kitchen`'s SSIM₁ by 0.0037 against plain `ftgs train` over three seeds, beyond the 0.002 guard. On the left copy it lowers the named measure by 0.021, by the rule. Finalists 3 and 4 reuse this off arm, which cancels the script's effect only as far as the off arm's three seeds are a fair draw of it. They may be a low draw: `align_abs`, close to a second off arm through the same script, lies 0.0020 above it in SSIM₁ and 0.9 dB above in PSNR on `kitchen`, so a finalist could gain that much against it for nothing. The finalists' adopted forms, inside the package, would not have the script's effect. The cause is not found: section 3 here's diagnostics located only version 1's shift.
+
+**The phase's commands** (the same conventions as the first step's table, with `$I` for `<surface-runs>/ticket-24/init`, `$G` for `$OPENFTGS_DATASETS/synth/ground_truth` and `$S` for `<surface-runs>/ticket-5/side_request.json`):
+
+| Command | Device | Time | Note |
+| --- | --- | --- | --- |
+| `bash $T/run_train.sh smoke_kitchen_<off, rel or abs> <arm> $K/scene.json $M/kitchen/init.safetensors 0 --config $O/smoke/cfg300.json` | GPU | 33 to 38 s | The smoke runs |
+| `bash $T/run_train.sh <run> off $X/scene_h<c>/scene.json $I/ref_h<c>_s4.safetensors <seed>`, i.e. `python $T/wrap_train.py --term align=0 --stats … -- <scene> --init <init> --out $O/runs/<run> --seed <seed>`; the same with `$K/scene.json` and `$M/kitchen/init.safetensors`, and `$M/studio/scene/scene.json` and `$M/studio/init.safetensors` | GPU | 13 to 23 min | The off arm, 7 runs; `/usr/bin/time -v` and `nvidia-smi` each second |
+| The same with `rel` (`--term align=1 --align-window 8 --align-patch 32 --align-penalty 3.2552083333333335e-06`) and `abs` (`… --align-penalty 0.01`) | GPU | 17 to 35 min | The two arms, 8 runs each |
+| `bash $T/post_a.sh <run> h<c>`: `ftgs render <checkpoint> --request $S`; `ftgs render <checkpoint> --request $X/requests/heldout_novel.json` (the left copy: `heldout1_novel.json`); `python $T/score_a.py <renders> $X/scene_h<c>/scene.json --heldout <cam0 or cam1> --crop <rect> --stored-masks <surface-runs>/ticket-4/private-scene-A/placeholder_masks.npz`; `python $T/measures_a.py $X/scene_h0/scene.json --out $O/measures/a_runs.json <run>=<checkpoint>=$I/ref_h<c>_s4.safetensors`; `python $T/side_sheet.py …`; `python scripts/run_summary.py …` | GPU, then CPU | about 1.5 min | Ticket #24's post-processing, repointed |
+| `bash $T/post_synth.sh <run> <scene name> <scene.json> <init>`: `python scripts/gt_depth.py <checkpoint> <scene.json> $G/<scene>`; `python scripts/reference_flaws.py run <checkpoint> <scene.json> $M/reference/<scene>/flags`; `python $T/synth_measures.py <checkpoint> <init> $G/<scene> --scene-name <scene>`; `python scripts/run_summary.py …` | GPU, then CPU | 2 to 3 min | The same |
+| `bash $T/blind.sh` | CPU | seconds | The twelve sheets with their labels hidden, and their key |
+| `python $T/tables.py` | CPU | seconds | The tables of this section |
+
+The private scene's folders, `<m15-runs>`, `<m17-runs>` and tickets #24's and #25's folders were read and never written.
+
 **The owner's answer on step 4** (the go for step 5 or a stop): *not yet given.* **Date:** *not yet given.*
 
 ## 6. Step 5: finalist 3, surface terms without a prior
