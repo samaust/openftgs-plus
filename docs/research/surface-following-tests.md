@@ -1538,7 +1538,7 @@ The private scene's folders, `<m15-runs>` and `<m17-runs>` were read and never w
   - `align_rel` (runs `REL_…`) and `align_abs` (runs `ABS_…`): 8 runs each.
   - All are 30,000 iterations of the default training configuration, from the kept stride-4 files on private scene A and M17's init files on openftgs-synth.
 - **Every run's wrappers** ran 30,000 times each.
-- **D-51's `auto` placed the frame cache alike in all three arms.** It went on the GPU on private scene A and was memory-mapped on `kitchen` and `studio`, so the term's extra memory changed no placement.
+- **D-51's `auto` placed the frame cache alike in all three arms,** in the 23 runs made here. It went on the GPU on private scene A and was memory-mapped on `kitchen` and `studio`, so the term's extra memory changed no placement. The reused `A_h0_s0_v2` recorded none.
 - **GPU memory** peaked at 23,391 to 23,985 MiB on private scene A, the same as the baseline's 23,394 to 23,982 MiB.
 - **Times.**
 
@@ -1598,7 +1598,7 @@ The private scene's folders, `<m15-runs>` and `<m17-runs>` were read and never w
 - **Neither arm moves the named measure,** on either copy, nor the tail.
 - **The off arm was needed.** Against the plain baseline both arms count as lower on the left copy: `align_rel` by 0.023 and `align_abs` by 0.027. But the off arm, the same script with the term at 0, is lower by 0.021 too. That is the script's own effect, which section 3 here found on the centre copy and the off arm takes out. On the left copy it is now measured by the rule, with two seeds a side.
 - **`align_rel` raises the near side's under-two-frames share on the left copy,** by 0.018 by the rule, and by 0.008 on the centre copy. This is the measure section 5.4 first named for finalist 2, and it moves the wrong way for H2's prediction of fewer short-lived primitives.
-- **`align_rel` delays growth's cap,** to 14,200 to 14,600 on the centre copy and 12,700 to 12,800 on the left one, against 10,800 to 10,900 and 10,000 for the off arm. It does the same on `kitchen` (2,300 against 2,100) and `studio` (7,700 against 6,900). The term's gradient reaches E10's g (above), and with the target moved, fewer primitives pass τ_pos early. `align_abs`'s caps are the off arm's.
+- **`align_rel` delays growth's cap,** to 14,200 to 14,600 on the centre copy and 12,700 to 12,800 on the left one, against 10,800 to 10,900 and 10,000 for the off arm. It does the same on `kitchen` (2,300 against 2,100) and `studio` (7,700 against 6,900). The term's gradient reaches E10's g (above), so with the target moved probably fewer primitives pass τ_pos early; that was not measured. `align_abs`'s caps are the off arm's.
 
 **The test-view scores, the sharpness ratio and the tiles' coverage,** as section 3 here takes them. Kept-pixel PSNR is Q-233's, on the centre copy only. Every rendered value is finite.
 
@@ -1666,14 +1666,19 @@ The private scene's folders, `<m15-runs>` and `<m17-runs>` were read and never w
 - **Adopt when** the named measure moves with no harm by the other criteria. **Not met:** neither arm moves it, on either copy.
 - **Drop when** "the share does not move: the shell is not a reconciliation, or the disagreement is not a shift of a few pixels rigid over a patch". **Met for both arms.** What the drop rests on differs between them:
   - **`align_abs`, the ticket's scale,** is close to an arm that was never on. Its term shifts under 3 % of the pixels by about 0.1 px early in training, and almost none after. Its result says that this setting does nothing, not that alignment does nothing.
-  - **`align_rel`, the paper's relative scale,** did act. To the end of training it shifts half of private scene A's pixels by about 2 px, five times as many as on openftgs-synth. Its aligned L1 lies a tenth below the plain L1 at the end, and the shell's measure stays where the off arm has it. That is the drop clause's case. Absorbing shifts of a few pixels, rigid over a 32 px patch, does not make the near-side primitives unnecessary. Either they are not a reconciliation of such shifts, or the disagreement is not of that kind.
+  - **`align_rel`, the paper's relative scale,** did act. To the end of training it shifts half of private scene A's pixels by about 2 px, five times as many as on openftgs-synth. Its aligned L1 lies a tenth below the plain L1 at the end, and the shell's measure stays where the off arm has it. By the row's letter that is the drop clause's case. It is weaker evidence than the clause's wording, for two reasons:
+    - **Only L1 tolerated the shift.** At iteration 30,000 the L1 term is 16 % to 17 % of the loss on private scene A. SSIM, 23 % to 24 %, and ꟻLIP, 59 %, still read the unshifted image, so most of the loss kept asking for the cameras' versions as they are.
+    - **The start was arbitrary.** Nearly every patch sat near the window's corner until iteration 3,000, and 82 % to 83 % still moved at 10,000, before the cap.
+
+    So it is a null for this form of the loss, not evidence against H2.
+  - **The named measure's spread.** Over the off arm's and `align_abs`'s four runs per copy, which are near-identical arms, the named measure ranges over 0.013 on the centre copy and 0.018 on the left. `align_rel`'s seeds lie inside or at the edge of that range. This supports "not moved", and shows that two seeds understate the off arm's spread against the 0.01 margin.
   - **The renders turn softer** on the centre copy with `align_rel`: sharpness 0.008 lower, beyond two seeds. The under-two-frames share rises on the left copy. Section 7.2's last column, a measure that moves while the renders turn soft, does not arise, since the measure did not move.
 - **What this test does not cover.**
   - The paper's staged form, alignment only after a plain pre-training stage. The arm here aligned from the first iteration and spent its first 3,000 iterations shifting nearly every patch to the window's corner.
   - A shift held for several iterations.
   - SSIM and ꟻLIP on the shifted target.
   - A window wider than 8 px.
-- **Recommended: drop finalist 2.** The named measure did not move at either scale, the paper's scale softened the centre copy's renders, and on openftgs-synth neither arm harmed by the guards. Rows E11, E22 and E27, which section 2.6 here brought back beside finalist 2, keep their own evidence (sections 2.3 and 2.6 here) and are not tested by this result. Testing the staged form would be a new arm at the owner's call, about 3 GPU hours on both sets.
+- **Recommended: drop this form of finalist 2, by the row.** The named measure did not move at either scale, and the paper's scale softened the centre copy's renders. On openftgs-synth neither arm harmed by the guards, apart from `align_abs`'s one-seed flag on `studio`. What is dropped is L1 alone made shift-tolerant, aligned from the first iteration; the paper's staged form is untested. Rows E11, E22 and E27, which section 2.6 here brought back beside finalist 2, keep their own evidence (sections 2.3 and 2.6 here) and are not tested by this result. Testing the staged form would be a new arm at the owner's call, about 3 GPU hours on both sets.
 
 **Against the ticket's acceptance criteria.**
 
@@ -1697,7 +1702,7 @@ The private scene's folders, `<m15-runs>` and `<m17-runs>` were read and never w
 
 1. **Finalist 2: dropped, as recommended, or kept** for its staged form (alignment after a plain first stage, as the paper trains), as one more arm?
 2. **The sheets** (`<surface-runs>/ticket-26/sheets/blind`, key apart): the owner's judgement with the labels hidden, which this ticket cannot give.
-3. **The off arm's effect on `kitchen`.** Wrapper v2 at weight 0 lowers `kitchen`'s SSIM₁ by 0.0037 against plain `ftgs train` over three seeds, beyond the 0.002 guard. On the left copy it lowers the named measure by 0.021, by the rule. Finalists 3 and 4 reuse this off arm, so their comparisons cancel the effect. Their adopted forms, inside the package, would not have it. The cause is not found: section 3 here's diagnostics located only version 1's shift.
+3. **The off arm's effect on `kitchen`.** Wrapper v2 at weight 0 lowers `kitchen`'s SSIM₁ by 0.0037 against plain `ftgs train` over three seeds, beyond the 0.002 guard. On the left copy it lowers the named measure by 0.021, by the rule. Finalists 3 and 4 reuse this off arm, which cancels the script's effect only as far as the off arm's three seeds are a fair draw of it. They may be a low draw: `align_abs`, close to a second off arm through the same script, lies 0.0020 above it in SSIM₁ and 0.9 dB above in PSNR on `kitchen`, so a finalist could gain that much against it for nothing. The finalists' adopted forms, inside the package, would not have the script's effect. The cause is not found: section 3 here's diagnostics located only version 1's shift.
 
 **The phase's commands** (the same conventions as the first step's table, with `$I` for `<surface-runs>/ticket-24/init`, `$G` for `$OPENFTGS_DATASETS/synth/ground_truth` and `$S` for `<surface-runs>/ticket-5/side_request.json`):
 
