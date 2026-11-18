@@ -1724,6 +1724,183 @@ The private scene's folders, `<m15-runs>`, `<m17-runs>` and tickets #24's and #2
 
 *Ticket #27's section.* Row A5's plane-distance depth checked on one flat, slanted primitive, then finalist 3's arms, flattening, then depth–normal consistency, run as the research document's section 5.5 says and judged by section 4.4's criteria.
 
+**The first step** was run on 2026-11-18, at the owner's go of that day, before any calibration or arm run, with this branch's code at 31b1a2c (`src/` and `scripts/` as `main`'s at a77b838), Python 3.14.10, torch 2.15.0+cu132, gsplat 1.5.3, NumPy 2.5.4 and SciPy 1.18.1 from the shared `.venv`. The hardware was one RTX 4090 (driver 595.99.02), shared under the GPU lock with another ticket's trainings, so every GPU command here waited its turn between them; the CPU work ran on 4 threads. Scripts read tensors, JSON and the scene manifests and wrote numbers. No image or render of private scene A was read or looked at. Neither the calibration nor an arm has run: both wait for the owner's answers below.
+
+**The owner's answers at step 5's go** (2026-11-18, in session, relayed by the orchestrating session; the end of section 5 here):
+
+- **Finalist 1 stays dropped,** so both arms train on the manifest's cameras.
+- **The off arm** is section 5 here's, wrapper v2 at every added weight 0, reused unchanged: its eight runs, with ticket #24's `A_h0_s0_v2` as the centre copy's seed 0. The plain baseline is reported beside it.
+- **The named measure** is the near-side far-5 cm share, with the tail beyond 25 cm beside it, read by section 4.4's rule, the tail with the margin 0.021.
+- **Two seeds per arm** on each copy of private scene A, as section 5 here ran them.
+
+**What the papers give for the settings** (re-read on arXiv; rows T27.1 to T27.4, with CoMVS-GS's row 646 not reopened):
+
+| Setting | PGSR (row T27.1) | 2DGS (row T27.2) | Gaussian Opacity Fields (row T27.3) | RaDe-GS (row T27.4) | CoMVS-GS (row 646) |
+| --- | --- | --- | --- | --- | --- |
+| Flattening | ‖min(s₁, s₂, s₃)‖₁, weight λ₁ = 100. Whether the norm is a sum or a mean over the primitives is not stated | – (disks) | – | – | PGSR's, at the same weight, from the first iteration |
+| The normal | The smallest scale's direction, turned so that its angle with the viewing direction exceeds 90° | The disk's normal, turned to the camera | The ray–Gaussian plane's | A plane per primitive and camera | PGSR's |
+| The depth the term reads | The plane-distance depth, 𝒟 / (N·K⁻¹p̃) (Eqs. 2 to 4) | The median intersection | The intersection depth | Its rasterized depth | PGSR's |
+| The consistency term | An L1 between the composited normal and the depth map's normal, weighted by (1 − the normalized image gradient)², λ₂ = 0.015 | Σᵢ wᵢ(1 − nᵢᵀN), β = 0.05 | 2DGS's, β = 0.05 | w_n = 5 | – |
+| Its start | Not stated | Not stated | Not stated | Iteration 15,000 of 30,000, after a stage of rendering losses alone | Iteration 7,000 |
+
+So section 5.5's range, 7,000 to 15,000 of 30,000, rests on CoMVS-GS and RaDe-GS; PGSR states no start, and its weight of 100 does not say what it multiplies. The consistency weights span 0.015 to 5 between papers whose terms are normalized differently, so the papers fix a form and an order of magnitude, not a number for E7 beside them. That is what the calibration below is for.
+
+**The device for the surface terms** (`<scratch>/ticket-27/surface_device.py`, not committed; Q-226's device as ticket #3's script builds it, copied, with two passes). Per primitive, at the image's time and in the training camera's space:
+
+- **The normal** nᵢ is the column of E5's R(q) on the smallest of the three scales, turned so that nᵢ·xᵢ < 0, xᵢ the primitive's camera-space centre: PGSR's (row T27.1). Ticket #3's carried the rotation's third column, 2DGS's; the smallest scale need not be on it.
+- **The plane distance** is dᵢ = nᵢ·xᵢ, PGSR's dᵢ; with the normal turned to the camera it is never positive.
+- **Pass N** carries the normal coded as (n/1.25 + 1)/2; **pass D** carries (d/s + 1)/2 with s = 1.25·max |d| (a constant per call), the centre's depth z, and a constant. Decoded with the pixel's alpha: N(p) = 1.25·(2·image − α) = Σwn, 𝒟(p) = s·(2·image − α) = Σwd, and Z(p) = Σwz. The plane depth is D(p) = 𝒟(p) / (N(p)·K⁻¹p̃) at the pixel's centre (u + ½, v + ½), and expected depth Z(p)/α(p).
+- **The margin of 1.25** is the one change to section 2.4's code. With the code (v + 1)/2 of a unit value, the primitive whose |d| is the largest, or a normal of −1 in a component, is coded as exactly 0. E2's clamp at 0 passes that value and stops its gradient. The first finite-difference run below used s = max |d| and failed for every tensor that the plane distance reaches (`means` 1.45 relative, `quats` 2.71). With the margin every code lies in [0.1, 0.9], and every tensor passes. The script asserts that no code is at or below 0. Section 2.4's frontal hand case, the normal (0, 0, −1) coded as 0 in z, had the same edge, which a forward check cannot see.
+- **The gradient** is the device's two parts, (i) through the copies' weights and (ii) through the colours, carried back to the model's stored tensors by a scalar on the model's graph whose value is the term's and whose gradient is the two parts' sum. A training step's `backward` then reaches the model, as section 5.2 asks.
+
+**The first step: the plane-distance depth on one flat, slanted primitive.** One opaque primitive at (0.1, −0.05, 4.0) in front of a 160 × 120 camera (f = 100 px), scales (0.6, 0.002, 0.45), so the smallest is on R's second column, the plane turned 40° about x and 25° about y: its camera-space normal is (−0.033, −0.812, −0.583), 54° from the axis. Each depth is held to the depth at which the pixel's ray meets the primitive's plane, at every pixel of the cut, on the gsplat backend and the reference backend in float32 on the GPU and on the reference backend in float64 on the CPU. A second case gives the same primitive an opacity of 0.6, and a control turns the smallest scale to the third column at the identity rotation, facing the camera.
+
+| Case | Alpha cut: pixels, ray–plane depths | Plane depth, largest error: gsplat / reference / float64 | Expected depth, largest error / median (all three alike) |
+| --- | --- | --- | --- |
+| Slanted, opaque | ≥ 0.5: 421 px, 3.59 to 4.49 | 1.44·10⁻⁶ / 1.52·10⁻⁶ / 1.1·10⁻⁹ (3.5·10⁻⁷ relative in float32) | 0.487 / 0.189 |
+| | ≥ 0.1: 1,407 px, 3.29 to 5.07 | 3.1·10⁻⁶ / 3.0·10⁻⁶ / 1.2·10⁻⁹ | 1.067 / 0.348 |
+| | ≥ 0.01: 2,809 px, 3.07 to 5.70 | 2.2·10⁻⁵ / 2.1·10⁻⁵ / 1.4·10⁻⁹ | 1.702 / 0.488 |
+| Slanted, opacity 0.6 (alpha at most 0.600) | ≥ 0.5: 110 px | 1.45·10⁻⁶ / 1.45·10⁻⁶ / 1.0·10⁻⁹ | 0.212 / 0.095 |
+| | ≥ 0.01: 2,500 px | 2.2·10⁻⁵ / 2.2·10⁻⁵ / 1.4·10⁻⁹ | 1.580 / 0.461 |
+| Frontal, opaque (control) | ≥ 0.5: 733 px, 4.0 | 0 / 0 / 0 | 0 |
+| | ≥ 0.01: 4,894 px | 8.1·10⁻⁶ / 7.6·10⁻⁶ / 1.5·10⁻¹⁴ | 0 |
+
+- **The plane-distance depth returns the plane's depth,** at every pixel of the footprint and on both backends: within 1.5·10⁻⁶ at Q-227's cut in float32, the order of float32's rounding at a depth of 4, and within 1.4·10⁻⁹ in float64, where the rest is the float32 of the stored centre. Row A5's depth passes the check section 5.5 set it.
+- **It does not depend on alpha,** as PGSR says (row T27.1): at an opacity of 0.6 its errors are the opaque case's, since 𝒟 and N are both scaled by the accumulated weight and the ratio cancels it.
+- **Expected depth is the centre's depth at every pixel,** E6's one value per primitive, so on this primitive it is wrong by up to 0.49 at Q-227's pixels and 1.7 at the cut 0.01, a quarter and more of the depth. On the frontal control the two depths agree.
+- **The decoded normal over alpha** equals the primitive's normal within 1.6·10⁻⁷ in float32 and 2·10⁻¹⁶ in float64.
+
+**The consistency term on the same primitive.** The term is 2DGS's form on the composited normal: per pixel, Σᵢ wᵢ(1 − nᵢᵀN_d) = α − N(p)·N_d(p), N_d the unit normal of the depth map by the cross product of its central differences, PGSR's four neighbours (Eq. 5), turned to the camera; its mean over the pixels whose alpha and whose four neighbours' alphas are at least 0.5 (Q-227's cut). On the opaque slanted primitive, over 349 such pixels:
+
+- **With the plane depth,** N_d agrees with the primitive's normal at every pixel: cosines at least 1 − 1·10⁻⁷ in float32, 1 in float64; the term is 0 within 2·10⁻⁸.
+- **With expected depth,** N_d is the camera's axis at every pixel, cosine 0.583 with the normal, the cosine of the slant; the term is 0.318, and 0.236 at an opacity of 0.6. Read on expected depth, the term asks a slanted flat primitive to turn to face the camera, or to give up its weight: the technical risk section 4.3 named.
+- **On the frontal control** both forms give 0.
+
+**The term's gradient against finite differences.** On seven flat primitives in front of a 48 × 36 camera, overlapping, at different slants, opacities, times and velocities, in float64 on the reference backend on the CPU: the device's two parts against central differences (step 10⁻⁶) of the whole term, along three random directions per stored tensor, with the term's pixels held fixed. The term's value is 0.315 on the plane depth and 0.468 on expected depth, over 52 pixels.
+
+| Stored tensor | Plane depth: largest relative error / gradient norm | Expected depth: largest relative error / gradient norm |
+| --- | --- | --- |
+| `means` | 1.9·10⁻⁹ / 0.364 | 4.4·10⁻¹⁰ / 0.453 |
+| `times` | 2.5·10⁻⁸ / 0.0103 | 4.6·10⁻⁹ / 0.0127 |
+| `log_durations` | 2.9·10⁻⁵ / 1.0·10⁻⁵ | 5.5·10⁻⁶ / 2.5·10⁻⁵ |
+| `velocities` | 4.5·10⁻⁸ / 0.0195 | 1.4·10⁻⁸ / 0.0237 |
+| `log_scales` | 4.1·10⁻⁹ / 0.100 | 2.7·10⁻⁸ / 0.0609 |
+| `quats` | 1.6·10⁻⁹ / 0.581 | 8.9·10⁻¹⁰ / 0.551 |
+| `opacity_logits` | 3.3·10⁻⁸ / 0.0108 | 2.0·10⁻⁷ / 0.0189 |
+
+The largest figure, `log_durations`' 2.9·10⁻⁵, is on a gradient five orders below the others, where the differences' own rounding is that size. The term's gradient reaches `quats` through the normal and the plane distance, `means`, `velocities` and `times` through the plane distance and z (E1), and the four other tensors through the weights.
+
+**L_flat, and its check** (`check_terms.py`, float64 on the CPU). L_flat is the mean over all N of each primitive's smallest scale, PGSR's Eq. 1 read as a mean, as E8 is one; or, weighted as E8 weights σ, the mean over all N of sg[σt,i(t)]·minₖ sₖ,ᵢ. Both forms equal their hand computation on three primitives exactly, their gradient is λ·σt·s_min/N on the smallest axis's `log_scales` alone within 4·10⁻¹⁸, and every other stored tensor gets none.
+
+**L_flat under Adam** (`adam_check.py`, on the CPU). The package's own optimizer (`build_optimizer` with §1.3's rates, default fused Adam, ε = 10⁻¹⁵) was run for 30,000 steps on L_flat alone, scaled as a mean over 3,000,000 rows. Three primitives get no other gradient: one lives the whole sequence, one a tenth of it, one two frames of 120; t is drawn from the 120 frames. Each starts at a scale of 0.02, a log-scale of −3.9.
+
+| λ_flat | Over all N: log of the smallest scale at the end, the three rows / first step 1 lower | Weighted by σt(t): the same |
+| --- | --- | --- |
+| 100 | −22.0, −22.0, −22.0 / 253 | −22.0, −20.1, −16.5 / 253, 553, 1,223 |
+| 1 | −21.6 for all three / 253 | −21.6, −19.6, −16.4 / 253, 553, 1,223 |
+| 0.01 | −18.9 / 253 | −18.9, −16.8, −14.6 / 253, 553, 1,224 |
+| 10⁻⁴ | −14.9 / 254 | −14.9, −12.9, −11.0 / 254, 555, 1,295 |
+
+- **Where nothing else pulls, the weight does not set the rate.** Adam divides a constant gradient by its own size, so the smallest log-scale falls by about the learning rate, 5·10⁻³, a step, whatever λ_flat is. Six decades of λ move the first unit of fall by one step, and every row ends flat: its smallest scale below 10⁻⁵ of its largest.
+- **What λ_flat does set** is the balance against the rendering gradient on the rows that have one, in Adam's second moment. That balance is what the calibration below has to read, from outcomes (the scales' ratios, the scores), not from the term's magnitude.
+- **Over all N, every row flattens at every iteration,** alive at the image's time or not. Weighted by σt(t), a row flattens only while it is alive, so the short-lived rows of the near side flatten more slowly, as E8 lowers only the opacities of the rows alive at t.
+
+**Today's primitives are not spheres at the end.** In the off arm's two runs of the centre copy (section 5 here), the ratio of the smallest to the largest scale has a median of 0.075 on the near side, and 57 % of the near side's primitives are below 0.1; the smallest to the middle scale has a median of 0.20 (`ratio_stats.py`; the seeds agree within 0.002). Among the near side's primitives farther than 5 cm from the reference file, the shell, the median ratios are 0.051 and 0.166. So the smallest scale is already distinct for most primitives by iteration 30,000 without any term. When it is distinct by iteration 7,000, the earliest start, is not known: no off-arm run kept a checkpoint there.
+
+**The terms in the wrapper** (`<scratch>/ticket-27/wrap_train.py`, ticket #26's copy with two terms registered; its weight-0 path, the frame-cache record included, unchanged):
+
+- **`flat`**, λ_flat · L_flat, with `--flat-weighting all` or `sigma_t`. It reads the stored tensors only.
+- **`nc`**, λ_nc · L_nc through the device's two passes, with `--nc-depth plane` or `expected` and `--nc-from <iteration>`. The passes call the package's `render` directly, not the wrapper's, so the wrappers' call counts stay the iterations'. Before `--nc-from` the term reports 0, so that `train_log.jsonl`'s keys stay fixed for the run, and computes nothing. It also logs the share of the image's pixels it read.
+- **Settings fixed before the smoke runs:** the composited normal unnormalized (Σwn, 2DGS's form, which weights each primitive by its blending weight); the pixel cut alpha ≥ 0.5 on the pixel and its four neighbours; no image-edge weight (PGSR's reads the training image, a step this arm does not take); the term a mean over the cut's pixels.
+- **E10's g.** Neither term enters it (section 5.2): L_flat has no gradient on the 2D means, and L_nc's reaches the device's copies, not the colour pass's 2D means. Growth and relocation read the rendering loss alone, as in the off arm.
+
+**The smoke runs** (300 iterations on `kitchen` at seed 0, `--config` holding `{"optim": {"iterations": 300}}`, as section 5 here ran its own). Each wrapper ran 300 times in every run.
+
+- **At every weight 0** the logged losses equal ticket #26's off-arm smoke run's at iterations 100, 200 and 300 to six figures, one ꟻLIP digit apart at 300 (0.413692 against 0.413693). The rows lie before the first growth event, where section 3 here found two runs of one configuration to agree within rounding. The copy changes nothing at weight 0.
+- **`flat` at λ_flat = 100, σt-weighted:** L_flat 9.96·10⁻⁴ at iteration 100 and 9.79·10⁻⁴ at 300, so the term adds about 0.1 to a total of 0.45; L1 at 300 is 0.1148 against 0.1132.
+- **`flat` with `nc` at λ_nc = 0.05, plane depth, from iteration 100** (moved early so that the term runs in a smoke run): the device's two passes ran at every iteration from 100 to 300 and the run ended normally. L_nc was 0.68 at iterations 101 to 200 and 0.69 at 201 to 300, read on 96 % and 98 % of the pixels: at iteration 300 the primitives are still near D-25's spheres, so their smallest-scale normals do not agree with the depth map, which is why the term starts late. L1 at 300 is 0.1157. The run took 34 s like the others: at 300 iterations `kitchen` holds 300,000 primitives, so the device's cost shows only on a trained model (below). A first try of this run stopped at iteration 100 on the script's own assertion: it counted the depth channel's clamp at 0 for the rows behind the camera, which the depth cull removes before compositing (E6). The assertion now covers the normal's and the plane distance's codes, the two that can reach a rendered row, and the run was repeated.
+
+**The device's cost on a trained model** (`prof_device.py`): ticket #24's trained checkpoints of 3,000,000 primitives at a training camera's size, forward and backward, synchronized, the median of 15 calls after 3 warm-ups, and the peak allocated memory. The device's figure is all of it: the geometry from a second temporal slice, the two passes, L_nc and its two-part gradient brought back to the model. It is a one-line note taken while another ticket's trainings shared the machine between locked commands, not a benchmark.
+
+| Model, camera | The colour pass, as an iteration renders it | The device, plane depth | The device, expected depth | Peak memory: colour pass / with the device |
+| --- | --- | --- | --- | --- |
+| `kitchen_s0`, `cam05`, 1352 × 1014 | 9.5 ms | 38.3 ms | 38.2 ms | 1,626 / 2,334 MiB |
+| `A_h0_s0`, `cam1`, 736 × 1280 | 9.2 ms | 36.0 ms | 35.9 ms | 1,625 / 2,320 MiB |
+
+- **The device costs about 36 to 38 ms an iteration** on these models, about 1.4 times a baseline iteration on private scene A (26 ms, section 5 here) and 1.1 times one on `kitchen` (34 ms): two device passes and the geometry, about four times the colour pass alone. Section 2.4's figure for one pass was 14.8 ms on `kitchen`; two passes and the term's own work come to 38 ms. The choice of depth costs nothing: both read the same two passes.
+- **It adds about 0.7 GiB at peak** (2,320 against 1,625 MiB). The baseline's and the off arm's runs on private scene A peaked at 23,391 to 23,985 MiB of the card's 24,564 MiB in `nvidia-smi`, with the frame cache on the GPU (section 5 here). So arm 2 on private scene A may not fit beside the cache: the margin is 0.6 GiB, and the device's extra memory is about as large. Neither figure is the same kind of count (`nvidia-smi` includes the allocator's reserve), so only a run can tell; question 5 below.
+
+**The calibration, proposed** (the PRD's owner item 3; section 5.5: "a short calibration on one scene before the arms"). It has not run.
+
+- **The scene and the runs.** The centre copy of private scene A, seed 0, from `ref_h0_s4`, through the wrapper, on the default 30,000-iteration schedule, stopped by SIGTERM once the log passes iteration 15,000, as section 3 here stopped its short repeats (the checkpoint is saved at the stop). `--checkpoint-every 7000` keeps checkpoints at 7,000 and 14,000 beside it. A stop at 15,000 is the end of growth (D-18), so flattening is read after every clone, split and relocation of the run; a run with `iterations` set to 15,000 would change every schedule and is not used.
+- **Stage 1, L_flat.** Five runs: λ_flat = 1, 100 and 10⁴ σt-weighted, 100 over all N, and one at every weight 0 to the same stop, the comparison for this stage.
+- **Stage 2, L_nc,** with stage 1's λ_flat and form, plane depth, from stage 1's start: λ_nc = 0.005, 0.05 and 0.5, around 2DGS's 0.05 (rows T27.2, T27.3), and one run of 0.05 on expected depth, the evidence for which depth L_nc reads. If the start is 15,000, these four runs stop at 23,000 instead, so that the term acts for 8,000 iterations in both cases.
+- **What is read,** at 7,000 and at the stop:
+  - the ratio of the smallest to the middle and to the largest scale, near side and its far-5 cm part (`ratio_stats.py`);
+  - the means of L1, 1 − SSIM and ꟻLIP over the last 1,000 iterations, from `train_log.jsonl`;
+  - the crop PSNR and the sharpness ratio on the test view (`score_a.py`), at the stop;
+  - for stage 2, L_nc's logged value over the run and the share of pixels it reads;
+  - the named measure and the tail at the stop, reported but not used to choose: choosing a weight by the measure the arm is then judged on would decide the test in its calibration.
+- **The rules, fixed before any calibration run:**
+  - **λ_flat** is the smallest of the three σt-weighted weights whose near-side median ratio of the smallest to the middle scale at the stop is at most half the weight-0 run's, while its last-1,000 L1 mean lies within 1 % of the weight-0 run's and its crop PSNR within 0.3 dB (section 4.4's harm guard). If none meets it, PGSR's 100 is used and the calibration says so.
+  - **The form** (all N or σt-weighted): the all-N run at 100 against the σt-weighted one at 100, read by the same three figures (the open choices below).
+  - **The start** is 7,000 if the chosen run's near-side median ratio of the smallest to the middle scale is at most 0.1 at iteration 7,000, the level at which the smallest axis is a tenth of the next and its direction defined; otherwise 15,000, RaDe-GS's.
+  - **λ_nc** is the largest of the three whose last-1,000 L1 mean lies within 1 % of stage 1's chosen run at the same stop and whose crop PSNR lies within 0.3 dB of it: the strongest term that does no harm by these guards. If none does, the calibration stops and reports before the arms.
+- **What it costs, estimated** from the off arm's times (13 min 2 s to 13 min 29 s for 30,000 iterations on the centre copy, fewer primitives before the cap) and the device's timing above:
+
+  | Part | Estimate |
+  | --- | --- |
+  | Stage 1: 5 runs of 15,000 iterations | about 35 min |
+  | Stage 2: 4 runs of 15,000 (or 23,000) iterations, 8,000 of them with the device | about 45 min (4 runs of about 11 min: 6 without the device and 8,000 iterations at 36 ms); about 60 min if the start is 15,000 and the runs stop at 23,000 |
+  | Ratios (CPU), the 142 renders and scores of 9 checkpoints | about 10 min |
+  | In all | about 1.5 GPU hours (1.75 if the start is 15,000) |
+
+**The arms, as planned for the owner's go.**
+
+- **Arm 1, `flat`:** the default training configuration, 30,000 iterations, through the wrapper copy with `--term flat=<λ_flat>` and the calibration's form.
+- **Arm 2, `flat_nc`:** the same with `--term nc=<λ_nc> --nc-depth plane --nc-from <start>`.
+- **The off arm** is section 5 here's, reused; the plain baseline beside it.
+- **The runs, eight per arm,** mirrored on section 5 here's: the centre and left copies at seeds 0 and 1 from `ref_h0_s4` and `ref_h1_s4`; `kitchen` at seeds 0 to 2 and `studio` at seed 0 from M17's init files.
+- **The measures** are section 5 here's, by the same copied scripts: the named measure by the rule against the off arm, with the tail by its margin; the under-two-frames share; the sharpness ratio, the tiles' coverage and the sheets, relabelled blind; the test-view scores and Q-233's kept-pixel PSNR on the centre copy; on openftgs-synth, `scripts/gt_depth.py`'s shares behind and in front of the surface, where a surface term is expected to lower the share behind by more than 0.005, SSIM₁ against the 0.002 guard, and `scripts/reference_flaws.py`'s kept-pixel PSNR. Beside them, for row A1, the distribution of the ratios of the smallest scale to the middle and the largest at the end of every run, by `ratio_stats.py`, whole model, near side and its far-5 cm part.
+- **GPU hours, estimated** from the off arm's times and the device's timing:
+
+  | Part | Estimate |
+  | --- | --- |
+  | Arm 1: 4 runs on private scene A, 3 on `kitchen`, 1 on `studio`; L_flat adds no render | 53 + 51 + 23 min, about 2.1 hours |
+  | Arm 2: the same with the device from iteration 7,000 | 4 × (13 + 14) + 3 × (17 + 15) + (23 + about 18) min, about 4.1 hours with the device from 7,000 (36 to 38 ms an iteration over 23,000 iterations; `studio`, 1920 × 1080, estimated at about 48 ms); about 3.4 hours from 15,000 |
+  | Renders, scores, `gt_depth.py`, `reference_flaws.py` and the ratios, 16 runs | about 0.6 hours |
+  | In all, the arms | about 6.8 GPU hours (6.1 with the start at 15,000) |
+
+  That is beyond section 5.5's 6 hours by the device's cost, which section 5.2 says a prototype pays and an adopted form, channels of the colour pass, would not (about 3.2 ms for depth and a normal, section 2.4). With the calibration, about 8.3 hours in all.
+
+**The open choices the ticket lists, with this step's recommendations.**
+
+1. **L_flat over all N, or weighted by σt(t) as E8 is.** Recommended: **σt-weighted.** Under the default Adam the weight does not control how fast a row with no rendering gradient flattens (above): over all N every primitive flattens at about the learning rate at every iteration, whether or not it is alive at the image's time, and the weight then matters only where the rendering gradient competes. Weighted by σt(t), a primitive is flattened while it is alive, the time-local form E8 already has, and a revision would word it as E8 is worded. The calibration's run over all N at λ_flat = 100 is the evidence beside it; if it lowers the ratios as much with no harm, the choice is open again for the revision.
+2. **Which depth L_nc reads.** Recommended: **the plane distance**, row A5. On a slanted flat primitive it returns the plane's depth on both backends, and with it the consistency term is 0 for a lone primitive, so it acts only where neighbouring primitives' planes disagree. Expected depth is the centre's depth across the footprint, so the term on it penalizes every slanted primitive by the cosine of its slant (0.318 on the 54° plane above), pushing primitives to face the camera. The calibration's one expected-depth run measures what that costs.
+3. **An oriented start (row A10), or today's spheres.** Recommended: **no oriented start for these arms.** At the off arm's end the smallest scale is already a fifth of the middle one at the near side's median, with no term, and L_flat sharpens it from the first iteration; the calibration's 7,000-iteration checkpoints show whether it is distinct by the consistency term's start, and the start rule above moves it to 15,000 if not. An oriented start would need normals for the init points, which `roma_init` does not give, a key in `ftgs-init` and a field in `InitPoints` (section 5.5): a step of its own if the arms show that orientations never settle, which the end-of-run ratios and the consistency term's logged value would show.
+
+**The questions for the owner at the first step.**
+
+1. **The calibration** as proposed above: its form, its two stages and nine runs (five, then four), its rules, and about 1.5 GPU hours (1.75 if the start is 15,000). Options: (a) as proposed, recommended; (b) stage 1 alone, with λ_nc set to 2DGS's 0.05 and the start to 7,000 without a stage 2; (c) no calibration, PGSR's 100 and 2DGS's 0.05 from 7,000.
+2. **The arms' hours:** about 6.8 GPU hours (6.1 with the start at 15,000) for both arms on both sets, against section 5.5's 6 hours, the calibration apart.
+3. **The open choices:** the three recommendations above, σt-weighted, the plane distance, and no oriented start, or others.
+4. **Where L_nc's pixels come from:** fixed above before any training (alpha ≥ 0.5 on the pixel and its four neighbours, no edge weight, the unnormalized composited normal). PGSR's image-edge weight is the one setting a paper gives that this arm leaves out; adding it would read the training image in a geometric term.
+5. **Memory for arm 2 on private scene A** (above). Options: (a) keep the frame cache's `auto` placement, as the off arm had it, and let the calibration's stage 2, which runs the device on the centre copy at the cap, show whether it fits; if a run fails for memory, stop and report; (b) set `perf.frame_cache` to `"mmap"` for arm 2 on private scene A from the start, which frees about 2.5 GiB but differs from the off arm in the cache's placement, a change section 3 here's diagnostic (iii) found indistinguishable from noise on `kitchen` and did not test on private scene A. Recommended: (a), with (b) as the fallback the owner clears beforehand, so that a failure does not wait for a second go.
+
+**The first step's commands.** Each ran with `OMP_NUM_THREADS=4 MKL_NUM_THREADS=4 OPENBLAS_NUM_THREADS=4`, `PYTHONPATH=<worktree>/src:<worktree>/harness/src:<worktree>/tests:<scratch>/ticket-27` and the shared `.venv`'s Python, the CPU ones with `CUDA_VISIBLE_DEVICES=` empty and the GPU ones under the shared lock. `$T` is `<scratch>/ticket-27`, `$O` is `<surface-runs>/ticket-27`, `$B` is `<surface-runs>/ticket-24/runs`, `$X` is `<private-scene-A-exp>`, `$K` is `<m15-runs>/kitchen`, `$M` is `<m17-runs>`. The scripts are not committed.
+
+| Command | Device | Time | Note |
+| --- | --- | --- | --- |
+| `curl -sSL -o $T/dl/<paper>/page.html https://arxiv.org/html/<id>`, for 2406.06521, 2403.17888, 2404.10772 and 2406.01467, then a text extraction | CPU | seconds | The four papers re-read (rows T27.1 to T27.4) |
+| `python $T/plane_check.py fd $O/fd.json` | CPU | 1 s | The term's two-part gradient against finite differences, float64; run twice, the first with the code's margin at 1, which failed (above) |
+| `python $T/plane_check.py values $O/values_cpu.json cpu` | CPU | seconds | The flat, slanted primitive in float64 alone; run after a first GPU run that stopped on a device mismatch in the script's own check |
+| `python $T/plane_check.py values $O/values.json` | GPU and CPU | seconds, after the lock | The flat, slanted primitive on both backends in float32, and in float64 |
+| `python $T/check_terms.py $O/check_terms.json` | CPU | seconds | L_flat's value and gradient, and the wrapper's weight-0 path |
+| `python $T/adam_check.py $O/adam_check.json` | CPU, 2 threads | 33 s | L_flat alone under the package's optimizer, 30,000 steps, eight settings |
+| `python $T/ratio_stats.py $X/scene_h0/scene.json <surface-runs>/ticket-24/init/ref_h0_s4.safetensors $O/ratios_off.json OFF_A_h0_s0=$B/A_h0_s0_v2/checkpoint OFF_A_h0_s1=<surface-runs>/ticket-26/runs/OFF_A_h0_s1/checkpoint` | CPU | 11 s | The off arm's scale ratios on the centre copy |
+| `bash $T/run_train.sh smoke_kitchen_<off, flat or nc> $K/scene.json $M/kitchen/init.safetensors 0 <terms> -- --config $O/smoke/cfg300.json`, i.e. `python $T/wrap_train.py <terms> --stats … -- $K/scene.json --init $M/kitchen/init.safetensors --out $O/runs/smoke_kitchen_<…> --seed 0 --config …`, with `<terms>` `--term flat=0 --term nc=0`; `--term flat=100 --flat-weighting sigma_t`; and that with `--term nc=0.05 --nc-from 100 --nc-depth plane` | GPU | 33 to 35 s each | The smoke runs |
+| `python $T/prof_device.py <checkpoint> <scene.json> <camera> $O/prof/<set>.json`, for `$B/kitchen_s0` at `cam05` and `$B/A_h0_s0` at `cam1` | GPU | about 1 min each, most of it loading the checkpoint | The device's timing and memory |
+
 **The owner's answer on step 5** (the go for step 6 or a stop): *not yet given.* **Date:** *not yet given.*
 
 ## 7. Step 6: finalist 4, a normal prior on top of finalist 3's flattening
