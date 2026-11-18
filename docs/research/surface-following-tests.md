@@ -1910,6 +1910,25 @@ The largest figure, `log_durations`' 2.9·10⁻⁵, is on a gradient five orders
 - **All N against σt-weighted at 100:** the same flattening; L1 0.49 % lower and the crop PSNR 0.09 dB higher than the weight-0 run, against +0.48 % and 0.03 dB σt-weighted; the named measure and the tail at 15,000 higher (0.230, 0.104 against 0.207, 0.087). Neither form is harmed by the guards. The arms run σt-weighted, as the owner answered.
 - **At 15,000 every flattening run has a higher named measure than the weight-0 run,** 0.207 to 0.237 against 0.159, one seed each. It was not used to choose, and the arms will read it at 30,000 against the off arm's two seeds.
 
+**Stage 2, L_nc, at iteration 23,000.** Since the start is 15,000, the four runs and the comparison run, λ_flat = 1 alone (`C2_flat_only`), went to 23,000, so that L_nc acted for 8,000 iterations. L1 is the mean over 22,001 to 23,000; L_nc is its logged mean over the same iterations, against 0.70 over iterations 15,001 to 15,100 in each run.
+
+| Run | L1, against `C2_flat_only` | L_nc at the end | Near side min/mid at 23,000 | Crop PSNR | Sharpness ratio (late) | Named measure / tail at 23,000 | Under two frames, near side |
+| --- | --- | --- | --- | --- | --- | --- | --- |
+| `C2_flat_only`, λ_flat = 1 | 0.012007 | – | 0.015 | 24.25 | 0.705 (0.722) | 0.144 / 0.054 | 0.583 |
+| `C2_nc0.005`, plane depth | −0.23 % | 0.590 | 0.015 | 24.29 | 0.697 (0.716) | 0.153 / 0.047 | 0.579 |
+| `C2_nc0.05`, plane depth | **+9.75 %** | 0.210 | 0.012 | 24.31 | 0.674 (0.686) | 0.153 / 0.062 | 0.580 |
+| `C2_nc0.5`, plane depth | **+50.3 %** | 0.039 | 0.011 | 24.03 | 0.594 (0.595) | 0.125 / 0.036 | 0.610 |
+| `C2_exp0.05`, expected depth | +10.2 % | 0.226 | 0.016 | 24.30 | 0.668 (0.684) | 0.128 / 0.046 | 0.601 |
+
+- **The rule picks λ_nc = 0.005.** It is the only weight within the 1.5 % L1 guard; 0.05, 2DGS's weight, raises L1 by 9.75 % and 0.5 by 50 %. The crop PSNR does not fall beyond 0.3 dB at 0.005 or 0.05 (+0.04, +0.06 dB) and falls by 0.22 dB at 0.5. The rule was met, so the work went on to the arms without a stop, as the owner answered.
+- **At the chosen weight the term barely acts.** L_nc falls from 0.70 to 0.59 in 8,000 iterations at 0.005, against 0.21 at 0.05 and 0.04 at 0.5. Arm 2 is therefore a test of a weak consistency term; what the guard rules out is the strength at which the term reshapes the model.
+- **Where it acts, the renders turn soft.** The sharpness ratio falls with λ_nc: 0.705 without the term, 0.697 at 0.005, 0.674 at 0.05, 0.594 at 0.5, with L1 rising as the term fits the depth map's normals instead of the images. That is H2's first outcome, seen here on one seed of one copy.
+- **The two depths at 0.05** behave alike in L1 (+9.75 % and +10.2 %), L_nc (0.210 and 0.226) and sharpness (0.674 and 0.668); the named measure at 23,000 is lower on expected depth (0.128 against 0.153), one seed each. The plane distance stays the arm's, as the owner answered.
+- **Memory.** Every stage-2 run fit beside the frame cache on the GPU at the cap, peaking at 23,662 to 23,978 MiB in `nvidia-smi`, as the weight-0 run's 23,832. So arm 2 on private scene A keeps `auto`.
+- **Times:** 6 min for 15,000 iterations without the device; 10 min for 23,000; 14.5 to 14.8 min for 23,000 with the device from 15,000. Stage 1 and 2 took about 1.7 GPU hours with their scores and ratios, within the 2.0 estimated for the late start.
+
+**The arms' settings, from the calibration:** λ_flat = 1, σt-weighted, in world units, from iteration 1; λ_nc = 0.005 on the plane distance from iteration 15,000 (arm 2 only).
+
 **The arms, as planned for the owner's go.**
 
 - **Arm 1, `flat`:** the default training configuration, 30,000 iterations, through the wrapper copy with `--term flat=<λ_flat>` and the calibration's form.
