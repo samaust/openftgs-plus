@@ -1761,10 +1761,10 @@ The diagnosis ran first, then the staged arm, both on 2026-11-18, with this bran
 - **The measures** are the same, by the same copied scripts, against the off arm (section 4.4's rule) with the plain baseline and `align_rel` beside. The blind sheets pair the off arm and the staged arm for each copy and seed, in an order from `random.Random(2602)`, with the key apart.
 - **Estimate.** At the off arm's speed for 60 % of each run and `align_rel`'s for 40 %, the runs take about 15, 19 and 28 minutes each on private scene A, `kitchen` and `studio`, so about 2.4 GPU hours. Post-processing adds about 0.3. With the diagnosis that is about 3.9 of the 4 hours cleared.
 
-**What ran.** The diagnosis's four runs took 16 min 33 s to 16 min 36 s each, 68 minutes in all from the first start to the last end. The staged arm's queue, its smoke run, eight runs and their post-processing, took 2 hours 36 minutes. That is about 3.7 GPU hours of the 4 cleared. The blind sheets were made afterwards on the CPU from renders already made, so they took no GPU time.
+**What ran.** The diagnosis's four runs took 16 min 33 s to 16 min 36 s each, 68 minutes in all from the first start to the last end. The staged arm's smoke run, 33 s, ran between the diagnosis's first and second runs. Its eight runs and their post-processing then took 2 hours 36 minutes from the diagnosis's end. That is about 3.7 GPU hours of the 4 cleared. The blind sheets were made afterwards on the CPU from renders already made, so they took no GPU time.
 
 - **Every staged run's wrappers** ran 30,000 times each, and each record holds window 8 px, patch 32 px, penalty 0.01 / 3,072 and start 18,000.
-- **The term was off to iteration 18,000.** The logs carry no alignment keys at iterations 17,900 and 18,000, and carry them from 18,100 on.
+- **The term was off to iteration 18,000.** In all eight runs' logs no row up to iteration 18,000 carries the alignment keys, and every row from 18,100 on does, 120 rows each.
 - **D-51's `auto`** put the frame cache on the GPU on private scene A and memory-mapped it on `kitchen` and `studio`, as in the other arms.
 - **Times.** The staged runs took 14 min 50 s to 14 min 55 s on private scene A, 19 min 12 s to 19 min 17 s on `kitchen` and 27 min 54 s on `studio`, the estimate's 15, 19 and 28 minutes.
 - **GPU memory** peaked at 23,446 to 23,948 MiB on private scene A.
@@ -1794,7 +1794,8 @@ The diagnosis ran first, then the staged arm, both on 2026-11-18, with this bran
 | `align_stg` | +0.0028 | +0.0020 | −0.0009 | −0.0001 |
 
 - **No arm breaks the guard** against any of the four references.
-- **No arm's PSNR or ꟻLIP is flagged against the five seeds,** off or plain. `align_abs`'s PSNR and ꟻLIP flags and the staged arm's PSNR flag against plain seeds 0 to 2 (below) do not survive: plain seed 4's 26.48 dB lies below every arm's seeds.
+- **No arm's PSNR or ꟻLIP is flagged against the five seeds,** off or plain. `align_abs`'s PSNR and ꟻLIP flags and the staged arm's PSNR flag against plain seeds 0 to 2 (below) do not survive: plain seed 4's PSNR, 26.48 dB, lies below at least one seed of every arm, and its ꟻLIP, 0.0938, above every arm's seeds.
+- **The reread covers E16's three metrics only.** The new seeds 3 and 4 have `METRICS.json` alone: `post_synth.sh` was not run on them, so they have no kept-pixel PSNR, residual shares or expected depth.
 
 **The staged arm, as it acted.** The log's alignment figures from the switch on, with `align_rel`'s at the same iterations (pixels moved / mean shift / aligned L1 lower than the plain L1 by):
 
@@ -1807,7 +1808,7 @@ The diagnosis ran first, then the staged arm, both on 2026-11-18, with this bran
 
 - **The staged start is not arbitrary.** At the switch the renders are sharp, and the first logged window moves 60 % of private scene A's pixels by 2.2 to 2.4 px, not 99.7 % by 9.9 px as `align_rel` did at its start.
 - **From the switch on, the staged arm moves what `align_rel` moves,** within a few hundredths, and ends where it ends: half of private scene A's pixels by under 2 px, a tenth of `kitchen`'s and `studio`'s by a quarter to half a pixel.
-- **Growth's cap** is reached at the off arm's iterations: 10,700 and 10,900 on the centre copy, 9,900 and 10,000 on the left one, 2,100 on `kitchen` and 6,800 on `studio`. `align_rel` delayed it.
+- **Growth's cap** is reached within 200 iterations of the off arm's: 10,700 and 10,900 on the centre copy (the off arm's 10,900 and 10,800), 9,900 and 10,000 on the left one (10,000), 2,100 on `kitchen` (2,100) and 6,800 on `studio` (6,900). `align_rel` delayed it by 1,900 to 3,700.
 
 **The named measure, the near-side far-5 cm share,** with the tail and the other shell measures, as in the table above. The off arm's and the plain baseline's rows are repeated from it:
 
@@ -1913,7 +1914,7 @@ The private scene's folders, `<m15-runs>`, `<m17-runs>` and tickets #24's, #25's
 
 1. **Finalist 2: dropped, as recommended,** now that both forms have run, or kept for one of the untested variants above?
 2. **The sheets** (`<surface-runs>/ticket-26b/sheets/blind`, key apart), beside the first set (`<surface-runs>/ticket-26/sheets/blind`): the owner's judgement with the labels hidden, which this ticket cannot give.
-3. **The off arm's seeds for finalists 3 and 4.** The owner's answer keeps the off arm as the comparison. The diagnosis's rule, fixed beforehand, said that an undetermined verdict means judging `kitchen`'s guards against all five off-arm seeds. The answer does not say whether finalists 3 and 4 read the off arm's three seeds, as the arms here were, or its five. Reading the five is the rule's consequence, and it costs nothing, since the runs exist. Either way, the guard is also read against the five plain seeds.
+3. **The off arm's seeds for finalists 3 and 4.** The owner's answer keeps the off arm as the comparison. The diagnosis's rule, fixed beforehand, said that an undetermined verdict means judging `kitchen`'s guards against all five off-arm seeds. The answer does not say whether finalists 3 and 4 read the off arm's three seeds, as the arms here were, or its five. Reading the five is the rule's consequence. For SSIM₁, PSNR and ꟻLIP it costs nothing, since the runs exist. For the guards' other columns, kept-pixel PSNR and the residual's shares, seeds 3 and 4 of both arms would first need `post_synth.sh`, a few GPU minutes each, which this ticket did not run. Either way, the guard is also read against the five plain seeds. Recommended: the five off-arm seeds for SSIM₁, PSNR and ꟻLIP, and seeds 0 to 2 for the other columns unless the owner clears the post-processing. This blocks nothing here; it sets how finalists 3 and 4 read `kitchen`.
 
 ## 6. Step 5: finalist 3, surface terms without a prior
 
