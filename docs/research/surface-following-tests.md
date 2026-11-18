@@ -1808,7 +1808,7 @@ The diagnosis ran first, then the staged arm, both on 2026-11-18, with this bran
 
 - **The staged start is not arbitrary.** At the switch the renders are sharp, and the first logged window moves 60 % of private scene A's pixels by 2.2 to 2.4 px, not 99.7 % by 9.9 px as `align_rel` did at its start.
 - **From the switch on, the staged arm moves what `align_rel` moves,** within a few hundredths, and ends where it ends: half of private scene A's pixels by under 2 px, a tenth of `kitchen`'s and `studio`'s by a quarter to half a pixel.
-- **Growth's cap** is reached within 200 iterations of the off arm's: 10,700 and 10,900 on the centre copy (the off arm's 10,900 and 10,800), 9,900 and 10,000 on the left one (10,000), 2,100 on `kitchen` (2,100) and 6,800 on `studio` (6,900). `align_rel` delayed it by 1,900 to 3,700.
+- **Growth's cap** is reached within 200 iterations of the off arm's: 10,700 and 10,900 on the centre copy (the off arm's 10,900 and 10,800), 9,900 and 10,000 on the left one (10,000), 2,100 on `kitchen` (2,100) and 6,800 on `studio` (6,900). `align_rel` delayed it by 200 (`kitchen`) to 3,800 iterations.
 
 **The named measure, the near-side far-5 cm share,** with the tail and the other shell measures, as in the table above. The off arm's and the plain baseline's rows are repeated from it:
 
