@@ -1733,6 +1733,15 @@ The private scene's folders, `<m15-runs>`, `<m17-runs>` and tickets #24's and #2
 - **The named measure** is the near-side far-5 cm share, with the tail beyond 25 cm beside it, read by section 4.4's rule, the tail with the margin 0.021.
 - **Two seeds per arm** on each copy of private scene A, as section 5 here ran them.
 
+**The owner's answers at the first step** (2026-11-18, in session, relayed by the orchestrating session, after the first step's report; questions 1 to 6 below):
+
+- **The calibration:** as proposed, stages 1 and 2 (question 1, option (a)).
+- **The hours:** about 8.5 GPU hours cleared for the calibration and both arms; past about 9.5 the work stops and reports first (question 2).
+- **The settings:** every recommendation taken. L_flat is σt-weighted and in world units (open choice 1; question 6, option (a)); L_nc reads the plane distance (open choice 2); no oriented start (open choice 3); L_nc's pixels as fixed below, with no image-edge weight (question 4).
+- **Memory:** the frame cache's `auto` placement, with the fallbacks cleared in advance if arm 2 does not fit: `perf.frame_cache` `"mmap"` on private scene A, `PYTORCH_CUDA_ALLOC_CONF=expandable_segments:True` on `studio` (question 5, option (a) with (b) and (c)).
+- **The comparison** stays the off arm of section 5 here. On `kitchen`, SSIM₁'s guard is also read against the five plain seeds (section 3 here's three, and `PLAIN_kitchen_s3` and `s4` under `<surface-runs>/ticket-26b/runs`), since the off arm's own effect on SSIM₁ against plain runs came out undetermined at that ticket's diagnosis (−0.0021, p = 0.056).
+- **After the calibration** the work goes on to the arms without a further stop, unless a rule fails to pick a weight.
+
 **What the papers give for the settings** (re-read on arXiv; rows T27.1 to T27.4, with CoMVS-GS's row 646 not reopened):
 
 | Setting | PGSR (row T27.1) | 2DGS (row T27.2) | Gaussian Opacity Fields (row T27.3) | RaDe-GS (row T27.4) | CoMVS-GS (row 646) |
