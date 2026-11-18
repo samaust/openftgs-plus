@@ -1718,7 +1718,31 @@ The private scene's folders, `<m15-runs>` and `<m17-runs>` were read and never w
 
 The private scene's folders, `<m15-runs>`, `<m17-runs>` and tickets #24's and #25's folders were read and never written.
 
-**The owner's answer on step 4** (the go for step 5 or a stop): *not yet given.* **Date:** *not yet given.*
+**The owner's answer on step 4** (2026-11-18, in session, relayed by the orchestrating session):
+
+1. **Finalist 2: test the staged form** as one more arm, before step 5's arms. The alignment term is switched on only after a plain first stage, at the paper's relative scale, with `align_rel`'s settings otherwise. The switch-on iteration comes from AligNeRF's own staging if it gives one, or is proposed and stated. It runs on the same runs as the other arms (both copies of private scene A at seeds 0 and 1, `kitchen` at seeds 0 to 2, `studio` at seed 0), and is measured, scored and sheeted blind the same way, against the off arm. About 3 GPU hours.
+2. **The off arm's own effect on `kitchen`** (SSIM₁ 0.0037 lower than plain over three seeds): **diagnose first,** before step 5's arms, in about 1 GPU hour, by more off-arm and plain `kitchen` seeds and/or a check of the frame cache's placement, to tell a low draw from a real effect. The rule it is read by is stated before the runs are looked at.
+3. **Step 5: go.** Its first step runs meanwhile; its arms wait for the result here.
+
+The diagnosis ran first, then the staged arm, both on 2026-11-18, with this branch's code at a77b838 (`src/` and `scripts/` as at ticket #24's 163bd39 and the first step's ef7864b), the same versions and hardware as above, under the shared GPU lock with 12 CPU threads, one training at a time. Another ticket's work held the lock between commands for seconds. `$T` is now `<scratch>/ticket-26b`, holding copies of `$T`'s scripts above, and `$O` is `<surface-runs>/ticket-26b`. Every new run wrote only there.
+
+**The diagnosis of the off arm's effect on `kitchen`: the design, fixed before any new run had ended.**
+
+- **What it costs nothing to check.** These are records already made (row T26.5).
+  - **The frame cache.** D-51's `auto` placed it by memory-mapping in every off-arm and arm run on `kitchen`. Each record holds `auto`, then `mmap` at the automatic choice. Section 3 here found that `kitchen`'s training frames take 21.8 GiB, more than half the card, so `auto` always resolves to `mmap` there. The plain runs record no placement, but their whole-card memory peaked at 21,474 to 21,814 MiB, which leaves no room for 21.8 GiB of frames beside the model. So the plain runs and the off arm placed the cache alike, and the placement cannot be the cause. No GPU time is spent on it.
+  - **Training itself.** Over iterations 29,001 to 30,000, the logged L1 of the off arm's three runs is 0.013183 to 0.013243, against 0.013111 to 0.013241 for the three plain runs. The total is 0.056323 to 0.056662 against 0.055958 to 0.056609. The training images are fitted alike, so any difference lies in the test view.
+  - **Earlier runs of the default configuration.** Of M17's `kitchen` runs, only `default-395` (openftgs's eaeb791) has today's default configuration; the others differ in the perceptual loss. Its SSIM₁ is 0.8789. Ticket #24's wrapper v1 run at seed 0, the script with every weight at 0 in its first version, has 0.8794. Both are other code, so they are reported beside the comparison and not pooled.
+- **The new runs.** Two plain `ftgs train` runs and two off-arm runs on `kitchen`, at seeds 3 and 4, in the order plain s3, off s3, off s4, plain s4. Interleaving them means that a difference between this session and the earlier ones (another day, 16 threads, the machine otherwise idle) falls on both arms alike. That is about 68 minutes. SSIM₁ is read from each run's own `METRICS.json`, `ftgs train`'s final evaluation on the test view, as in the tables above.
+- **The rule.** The statistic is E16's SSIM₁ on `kitchen`'s test view. The plain arm pools section 3 here's seeds 0 to 2 with the new seeds 3 and 4, five runs, and the off arm pools this section's seeds 0 to 2 with the new 3 and 4, five runs, all at the same code. `align_abs`, `align_rel`, `default-395` and wrapper v1 are reported beside the comparison, never pooled into it. Let d be the off arm's mean minus the plain arm's, and p the exact two-sided Mann–Whitney p of the five against the five (SciPy), as section 3 here tested parity.
+  - **A real effect** if d < −0.002 (beyond the guard) and p < 0.05.
+  - **A low draw** if d ≥ −0.002: over five seeds a side, the off arm's deficit lies within the guard.
+  - **Undetermined** otherwise: d < −0.002 with p ≥ 0.05.
+  - PSNR and ꟻLIP are reported beside the verdict, as are the new runs alone, two against two. They do not decide it.
+- **What each verdict means for the comparisons on `kitchen`.**
+  - **A real effect:** the script itself costs `kitchen` SSIM₁. Comparing against the off arm still cancels the effect, so the comparison stands. The cause should be found before a finalist's form goes into the package.
+  - **A low draw:** the off arm's three seeds understate it. Finalists 3 and 4 then judge `kitchen`'s guards against all five off-arm seeds, and finalist 2's arms are reread against them beside the three.
+  - **Undetermined:** the same as a low draw for the five seeds, with the effect stated as open.
+  - The staged arm is judged against the off arm's seeds 0 to 2, as the other arms were, with the five seeds beside.
 
 ## 6. Step 5: finalist 3, surface terms without a prior
 
