@@ -1937,6 +1937,7 @@ The private scene's folders, `<m15-runs>`, `<m17-runs>` and tickets #24's, #25's
 - **Memory:** the frame cache's `auto` placement, with the fallbacks cleared in advance if arm 2 does not fit: `perf.frame_cache` `"mmap"` on private scene A, `PYTORCH_CUDA_ALLOC_CONF=expandable_segments:True` on `studio` (question 5, option (a) with (b) and (c)).
 - **The comparison** stays the off arm of section 5 here. On `kitchen`, SSIM₁'s guard is also read against the five plain seeds (section 3 here's three, and `PLAIN_kitchen_s3` and `s4` under `<surface-runs>/ticket-26b/runs`), since the off arm's own effect on SSIM₁ against plain runs came out undetermined at that ticket's diagnosis (−0.0021, p = 0.056).
 - **After the calibration** the work goes on to the arms without a further stop, unless a rule fails to pick a weight.
+- **How `kitchen` is read** (2026-11-18, a later answer, for finalists 3 and 4): against the off arm's five seeds, `OFF_kitchen_s0` to `s2` under `<surface-runs>/ticket-26/runs` and `s3` and `s4` under `<surface-runs>/ticket-26b/runs`, for SSIM₁, PSNR and ꟻLIP; against its seeds 0 to 2 for the kept-pixel PSNR and the residual's shares. The plain baseline's five seeds stay beside it for SSIM₁. This replaces the three-seed off arm of the item above for `kitchen`.
 
 **What the papers give for the settings** (re-read on arXiv; rows T27.1 to T27.4, with CoMVS-GS's row 646 not reopened):
 
