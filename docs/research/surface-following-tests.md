@@ -1723,6 +1723,7 @@ The private scene's folders, `<m15-runs>`, `<m17-runs>` and tickets #24's and #2
 1. **Finalist 2: test the staged form** as one more arm, before step 5's arms. The alignment term is switched on only after a plain first stage, at the paper's relative scale, with `align_rel`'s settings otherwise. The switch-on iteration comes from AligNeRF's own staging if it gives one, or is proposed and stated. It runs on the same runs as the other arms (both copies of private scene A at seeds 0 and 1, `kitchen` at seeds 0 to 2, `studio` at seed 0), and is measured, scored and sheeted blind the same way, against the off arm. About 3 GPU hours.
 2. **The off arm's own effect on `kitchen`** (SSIM₁ 0.0037 lower than plain over three seeds): **diagnose first,** before step 5's arms, in about 1 GPU hour, by more off-arm and plain `kitchen` seeds and/or a check of the frame cache's placement, to tell a low draw from a real effect. The rule it is read by is stated before the runs are looked at.
 3. **Step 5: go.** Its first step runs meanwhile; its arms wait for the result here.
+4. **On the diagnosis's result** (2026-11-18, in session, relayed by the orchestrating session, after the verdict below, undetermined): **the off arm stays the comparison for finalists 3 and 4,** with the SSIM₁ guard on `kitchen` also read against the five plain `kitchen` seeds. **No more diagnosis runs.** The go for step 5's arms stands as given in item 3.
 
 The diagnosis ran first, then the staged arm, both on 2026-11-18, with this branch's code at a77b838 (`src/` and `scripts/` as at ticket #24's 163bd39 and the first step's ef7864b), the same versions and hardware as above, under the shared GPU lock with 12 CPU threads, one training at a time. Another ticket's work held the lock between commands for seconds. `$T` is now `<scratch>/ticket-26b`, holding copies of `$T`'s scripts above, and `$O` is `<surface-runs>/ticket-26b`. Every new run wrote only there.
 
@@ -1759,6 +1760,160 @@ The diagnosis ran first, then the staged arm, both on 2026-11-18, with this bran
 - **The runs** are the other arms' eight, in one queue after the diagnosis: `STG_A_h0_s0`, `STG_A_h0_s1`, `STG_A_h1_s0` and `STG_A_h1_s1` from the kept stride-4 files, then `STG_kitchen_s0` to `s2` and `STG_studio_s0` from M17's init files.
 - **The measures** are the same, by the same copied scripts, against the off arm (section 4.4's rule) with the plain baseline and `align_rel` beside. The blind sheets pair the off arm and the staged arm for each copy and seed, in an order from `random.Random(2602)`, with the key apart.
 - **Estimate.** At the off arm's speed for 60 % of each run and `align_rel`'s for 40 %, the runs take about 15, 19 and 28 minutes each on private scene A, `kitchen` and `studio`, so about 2.4 GPU hours. Post-processing adds about 0.3. With the diagnosis that is about 3.9 of the 4 hours cleared.
+
+**What ran.** The diagnosis's four runs took 16 min 33 s to 16 min 36 s each, 68 minutes in all from the first start to the last end. The staged arm's queue, its smoke run, eight runs and their post-processing, took 2 hours 36 minutes. That is about 3.7 GPU hours of the 4 cleared. The blind sheets were made afterwards on the CPU from renders already made, so they took no GPU time.
+
+- **Every staged run's wrappers** ran 30,000 times each, and each record holds window 8 px, patch 32 px, penalty 0.01 / 3,072 and start 18,000.
+- **The term was off to iteration 18,000.** The logs carry no alignment keys at iterations 17,900 and 18,000, and carry them from 18,100 on.
+- **D-51's `auto`** put the frame cache on the GPU on private scene A and memory-mapped it on `kitchen` and `studio`, as in the other arms.
+- **Times.** The staged runs took 14 min 50 s to 14 min 55 s on private scene A, 19 min 12 s to 19 min 17 s on `kitchen` and 27 min 54 s on `studio`, the estimate's 15, 19 and 28 minutes.
+- **GPU memory** peaked at 23,446 to 23,948 MiB on private scene A.
+
+**The diagnosis's result, by its rule.** Each value is E16's SSIM₁ on `kitchen`'s test view, from each run's `METRICS.json`:
+
+| Arm | Seeds 0 to 2 | Seeds 3 and 4 (new) | Mean of five (sample s.d.) |
+| --- | --- | --- | --- |
+| Plain `ftgs train` | 0.8787, 0.8803, 0.8800 | 0.8787, 0.8767 | 0.8789 (0.0014) |
+| The off arm | 0.8753, 0.8753, 0.8772 | 0.8779, 0.8781 | 0.8768 (0.0014) |
+
+- **d = −0.00208** (the off arm's mean minus plain's), and the exact two-sided Mann–Whitney p of five against five is **0.056**.
+- **Verdict: undetermined.** d lies below −0.002, by 0.00008, and p ≥ 0.05. By the rule's meaning above, that is treated like a low draw for the five seeds, with the effect stated as open.
+- **Beside it, deciding nothing:**
+  - PSNR: d = −1.57 dB, p = 0.15. The plain seeds run from 26.48 to 30.11 dB and the off arm's from 24.88 to 28.33 dB.
+  - ꟻLIP: d = +0.0036, p = 0.056.
+  - **The new runs alone** go the other way. Off 0.8779 and 0.8781 against plain 0.8787 and 0.8767, d = +0.0003. Off-arm seeds 3 and 4 lie above the three earlier ones, and plain seed 4 lies below every earlier plain seed.
+  - `default-395`'s 0.8789 and wrapper v1's 0.8794 lie at the plain mean.
+- **What it leaves.** Two of the off arm's first three seeds are the lowest of the ten runs, and its seeds 3 and 4 do not repeat the gap. Five seeds a side cannot tell a cost of about 0.002 from a low draw. The owner's answer (item 4 above) settles what follows: the off arm stays the comparison, the guard is read against the five plain seeds as well, and nothing more is run.
+
+**Finalist 2's arms reread against five seeds.** Each figure is the arm's three-seed SSIM₁ mean minus the reference's:
+
+| Arm | Against the off arm's seeds 0 to 2 | Against the off arm's five seeds | Against plain seeds 0 to 2 | Against plain's five seeds |
+| --- | --- | --- | --- | --- |
+| `align_rel` | +0.0027 | +0.0019 | −0.0010 | −0.0002 |
+| `align_abs` | +0.0020 | +0.0012 | −0.0017 | −0.0009 |
+| `align_stg` | +0.0028 | +0.0020 | −0.0009 | −0.0001 |
+
+- **No arm breaks the guard** against any of the four references.
+- **No arm's PSNR or ꟻLIP is flagged against the five seeds,** off or plain. `align_abs`'s PSNR and ꟻLIP flags and the staged arm's PSNR flag against plain seeds 0 to 2 (below) do not survive: plain seed 4's 26.48 dB lies below every arm's seeds.
+
+**The staged arm, as it acted.** The log's alignment figures from the switch on, with `align_rel`'s at the same iterations (pixels moved / mean shift / aligned L1 lower than the plain L1 by):
+
+| Iteration | Private scene A, staged | Private scene A, `align_rel` | `kitchen`, staged | `kitchen`, `align_rel` | `studio`, staged | `studio`, `align_rel` |
+| --- | --- | --- | --- | --- | --- | --- |
+| 18,100 | 0.60 to 0.61 / 2.2 to 2.4 px / 10 % | 0.62 to 0.63 / 2.4 to 2.6 px / 13 % to 14 % | 0.32 to 0.33 / 0.8 to 0.9 px / 2 % | 0.33 to 0.34 / 0.9 to 1.0 px / 2 % | 0.45 / 1.2 px / 4 % | 0.47 / 1.3 px / 4 % |
+| 20,000 | 0.57 to 0.59 / 2.2 px / 10 % to 11 % | 0.59 to 0.61 / 2.4 px / 13 % to 14 % | 0.27 / 0.7 px / 2 % | 0.27 / 0.7 px / 2 % | 0.34 / 0.9 px / 3 % | 0.35 / 1.0 px / 3 % |
+| 25,000 | 0.54 to 0.56 / 1.9 to 2.0 px / 9 % to 11 % | 0.55 to 0.57 / 2.0 to 2.1 px / 11 % to 13 % | 0.15 to 0.17 / 0.4 px / 1 % | 0.15 to 0.17 / 0.4 px / 1 % | 0.16 / 0.4 px / 2 % | 0.16 / 0.4 px / 2 % |
+| 30,000 | 0.50 to 0.51 / 1.7 to 1.8 px / 8 % to 10 % | 0.52 / 1.8 to 1.9 px / 10 % to 12 % | 0.10 / 0.2 px / 0.6 % to 0.7 % | 0.10 / 0.2 px / 0.6 % to 0.7 % | 0.12 / 0.4 px / 1.3 % | 0.12 / 0.4 px / 1.5 % |
+
+- **The staged start is not arbitrary.** At the switch the renders are sharp, and the first logged window moves 60 % of private scene A's pixels by 2.2 to 2.4 px, not 99.7 % by 9.9 px as `align_rel` did at its start.
+- **From the switch on, the staged arm moves what `align_rel` moves,** within a few hundredths, and ends where it ends: half of private scene A's pixels by under 2 px, a tenth of `kitchen`'s and `studio`'s by a quarter to half a pixel.
+- **Growth's cap** is reached at the off arm's iterations: 10,700 and 10,900 on the centre copy, 9,900 and 10,000 on the left one, 2,100 on `kitchen` and 6,800 on `studio`. `align_rel` delayed it.
+
+**The named measure, the near-side far-5 cm share,** with the tail and the other shell measures, as in the table above. The off arm's and the plain baseline's rows are repeated from it:
+
+| Run | Near side: far-5 cm / beyond 25 cm | Near side: far-10 cm | Under two frames: near / whole | Whole model: far-5 cm | Far side: far-5 cm | Cap reached at |
+| --- | --- | --- | --- | --- | --- | --- |
+| `A_h0_s0`, plain | 0.1401 / 0.0349 | 0.0634 | 0.5856 / 0.452 | 0.224 | 0.535 | 10,800 |
+| `A_h0_s1`, plain | 0.1409 / 0.0267 | 0.0583 | 0.5945 / 0.459 | 0.229 | 0.541 | 11,100 |
+| `OFF_A_h0_s0` | 0.1308 / 0.0461 | 0.0754 | 0.5857 / 0.454 | 0.218 | 0.537 | 10,900 |
+| `OFF_A_h0_s1` | 0.1380 / 0.0333 | 0.0644 | 0.5836 / 0.451 | 0.225 | 0.536 | 10,800 |
+| `STG_A_h0_s0` | 0.1290 / 0.0398 | 0.0744 | 0.5718 / 0.442 | 0.219 | 0.544 | 10,700 |
+| `STG_A_h0_s1` | 0.1404 / 0.0387 | 0.0712 | 0.5795 / 0.447 | 0.226 | 0.533 | 10,900 |
+| `A_h1_s0`, plain | 0.1632 / 0.0438 | 0.0746 | 0.5854 / 0.449 | 0.246 | 0.541 | 9,700 |
+| `A_h1_s1`, plain | 0.1526 / 0.0366 | 0.0658 | 0.5882 / 0.448 | 0.239 | 0.540 | 9,900 |
+| `OFF_A_h1_s0` | 0.1411 / 0.0379 | 0.0662 | 0.5808 / 0.445 | 0.227 | 0.536 | 10,000 |
+| `OFF_A_h1_s1` | 0.1337 / 0.0264 | 0.0561 | 0.5893 / 0.449 | 0.225 | 0.540 | 10,000 |
+| `STG_A_h1_s0` | 0.1355 / 0.0336 | 0.0641 | 0.5798 / 0.442 | 0.227 | 0.541 | 9,900 |
+| `STG_A_h1_s1` | 0.1369 / 0.0320 | 0.0595 | 0.5862 / 0.448 | 0.227 | 0.539 | 10,000 |
+
+**Judged by section 4.4's rule** against the off arm, with the plain baseline beside:
+
+| Copy | `align_stg` against the off arm | `align_stg` against the plain baseline |
+| --- | --- | --- |
+| Centre, named measure | not moved (seeds 0.129, 0.140 against 0.131, 0.138; mean 0.000 higher) | not moved (mean 0.006 lower) |
+| Centre, tail | not moved (mean 0.000) | not moved (mean 0.008 higher) |
+| Left, named measure | not moved (0.136, 0.137 against 0.141, 0.134; mean 0.001 lower) | **lower** by 0.022 (against 0.163, 0.153), the off arm's own 0.021 again |
+| Left, tail | not moved (mean 0.001 higher) | not moved |
+| Under two frames, near side (reported, not the criterion) | centre: both seeds (0.572, 0.580) below both of the off arm's (0.586, 0.584), but the mean only 0.0089 lower, inside the 0.01 margin, so not moved; left not moved (mean 0.002 lower) | centre **lower** by 0.014; left not moved |
+
+- **The staged arm does not move the named measure** on either copy, nor the tail.
+- **The under-two-frames share on the centre copy** leans the way H2 predicts, the reverse of `align_rel`'s rise, but stays inside the margin against the off arm. Against the plain baseline it counts as lower, and the off arm alone does not (0.586, 0.584 against 0.586, 0.595). With two seeds a side that is reported, not read as a result.
+
+**The test-view scores, the sharpness ratio and the tiles' coverage,** as in the table above. The off arm's rows are repeated from it:
+
+| Run | Crop PSNR | Crop SSIM₁ | Sharpness ratio | Late | Training cameras: PSNR / ratio | E16 PSNR / SSIM₁ / ꟻLIP | Kept-pixel PSNR | Coverage: between cameras to ±45°; ±60°, ±90° |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| `OFF_A_h0_s0` | 24.35 | 0.8148 | 0.7313 | 0.7536 | 32.99 / 0.7733 | 24.80 / 0.8180 / 0.1531 | 25.54 | 0.86 to 1.00; 0.53 to 1.00 |
+| `OFF_A_h0_s1` | 24.36 | 0.8153 | 0.7258 | 0.7497 | 32.84 / 0.7740 | 24.66 / 0.8176 / 0.1538 | 25.37 | 0.82 to 1.00; 0.47 to 0.87 |
+| `STG_A_h0_s0` | 24.30 | 0.8151 | 0.7285 | 0.7438 | 32.59 / 0.7674 | 24.75 / 0.8190 / 0.1527 | 25.48 | 0.84 to 1.00; 0.56 to 0.90 |
+| `STG_A_h0_s1` | 24.30 | 0.8161 | 0.7240 | 0.7443 | 32.69 / 0.7674 | 24.75 / 0.8194 / 0.1543 | 25.48 | 0.82 to 1.00; 0.49 to 0.88 |
+| `OFF_A_h1_s0` | 23.92 | 0.7487 | 0.7323 | 0.7804 | 31.57 / 0.7727 | 21.77 / 0.7403 / 0.1952 | – | 0.81 to 1.00; 0.53 to 0.89 |
+| `OFF_A_h1_s1` | 23.98 | 0.7489 | 0.7353 | 0.7874 | 31.36 / 0.7706 | 21.89 / 0.7387 / 0.1947 | – | 0.80 to 1.00; 0.51 to 0.87 |
+| `STG_A_h1_s0` | 23.90 | 0.7490 | 0.7346 | 0.7904 | 31.49 / 0.7729 | 21.80 / 0.7400 / 0.1953 | – | 0.82 to 1.00; 0.55 to 0.98 |
+| `STG_A_h1_s1` | 23.94 | 0.7494 | 0.7339 | 0.7861 | 31.24 / 0.7677 | 21.86 / 0.7404 / 0.1949 | – | 0.81 to 1.00; 0.49 to 0.92 |
+
+- **No test-view score falls by more than 0.3 dB** against the off arm. E16 PSNR's mean is 0.02 dB higher on the centre copy and 0.005 dB higher on the left. Kept-pixel PSNR is 0.03 dB higher. Crop PSNR is 0.06 dB lower on the centre copy, both seeds below both of the off arm's, and 0.03 dB lower on the left.
+- **The sharpness ratio does not fall beyond two seeds.** On the centre copy it is 0.7285 and 0.7240 against 0.7313 and 0.7258, a mean 0.002 lower, inside the off arm's spread of 0.0055. On the left copy it is 0.0005 higher.
+- **The late ratio falls on the centre copy,** as it did for `align_rel`. Both seeds, 0.744 and 0.744, lie below both of the off arm's, 0.754 and 0.750. The mean is 0.008 lower, against the off arm's spread of 0.004. On the left copy it does not separate. The late ratio is reported beside the criterion and is not the criterion.
+- **The training cameras' PSNR falls,** by 0.28 dB on the centre copy and 0.10 dB on the left, less than `align_rel`'s 0.40 and 0.31. Their ratio is lower on the centre copy too (0.767 against 0.773 and 0.774). That is what the term asks, as for `align_rel`, and the guard does not apply.
+- **The coverage** stays within the off arm's and the baseline's ranges. Every rendered value is finite.
+
+**The sheets, for judging with their labels hidden.** Four sets: the centre copy at seeds 0 and 1, then the left copy at seeds 0 and 1. Each holds the off arm and the staged arm in an order from Python's `random.Random(2602)`, labelled `set<n>-A` and `-B` only. They are `<surface-runs>/ticket-26b/sheets/blind/set<n>-<letter>.jpg`, from section 2.6's fixed request, with the key apart in `KEY.json` beside them. Nobody here has looked at them, and the owner's judgement of them is open (question 2 below).
+
+**openftgs-synth.** The columns are as in the table above. The off arm's and plain baseline's rows are repeated from it:
+
+| Run | E16 PSNR / SSIM₁ / ꟻLIP | Kept-pixel PSNR | Residual, all pixels: in front / behind | Dynamic pixels: in front / behind | Expected depth, median error, all / dynamic | Far share at 0.12·S | Beyond 25 cm | Under two frames | Cap reached at |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| `kitchen_s0`, plain | 29.25 / 0.8787 / 0.0881 | 30.42 | 0.041 / 0.291 | 0.015 / 0.613 | 251 / 56 mm | 0.036 / 0.002 | 0.023 / 0.001 | 0.381 / 0.660 | 2,100 |
+| `kitchen_s1`, plain | 30.11 / 0.8803 / 0.0856 | 31.34 | 0.039 / 0.297 | 0.015 / 0.612 | 448 / 304 mm | 0.035 / 0.003 | 0.022 / 0.001 | 0.377 / 0.662 | 2,100 |
+| `kitchen_s2`, plain | 29.25 / 0.8800 / 0.0885 | 31.15 | 0.040 / 0.295 | 0.015 / 0.618 | 277 / 102 mm | 0.036 / 0.002 | 0.023 / 0.001 | 0.385 / 0.661 | 2,100 |
+| `OFF_kitchen_s0` | 24.88 / 0.8753 / 0.0949 | 29.16 | 0.042 / 0.294 | 0.015 / 0.616 | 247 / 73 mm | 0.035 / 0.002 | 0.023 / 0.001 | 0.382 / 0.662 | 2,100 |
+| `OFF_kitchen_s1` | 26.97 / 0.8753 / 0.0934 | 29.73 | 0.041 / 0.295 | 0.016 / 0.616 | 206 / 58 mm | 0.036 / 0.002 | 0.024 / 0.001 | 0.381 / 0.659 | 2,100 |
+| `OFF_kitchen_s2` | 27.58 / 0.8772 / 0.0910 | 30.08 | 0.041 / 0.294 | 0.016 / 0.615 | 217 / 44 mm | 0.035 / 0.003 | 0.023 / 0.001 | 0.383 / 0.655 | 2,100 |
+| `STG_kitchen_s0` | 28.26 / 0.8798 / 0.0878 | 30.58 | 0.041 / 0.295 | 0.016 / 0.611 | 218 / 56 mm | 0.036 / 0.002 | 0.024 / 0.001 | 0.381 / 0.662 | 2,100 |
+| `STG_kitchen_s1` | 28.49 / 0.8786 / 0.0896 | 29.69 | 0.040 / 0.297 | 0.016 / 0.613 | 298 / 152 mm | 0.036 / 0.003 | 0.023 / 0.001 | 0.380 / 0.663 | 2,100 |
+| `STG_kitchen_s2` | 27.69 / 0.8780 / 0.0916 | 31.21 | 0.041 / 0.294 | 0.016 / 0.618 | 195 / 36 mm | 0.035 / 0.003 | 0.023 / 0.001 | 0.381 / 0.657 | 2,100 |
+| `studio_s0`, plain | 22.24 / 0.7991 / 0.1928; dynamic 24.85 | 22.30 | 0.014 / 0.412 | 0.007 / 0.647 | 144 / 87 mm | 0.041 / 0.001 | 0.068 / 0.001 | 0.387 / 0.710 | 6,800 |
+| `OFF_studio_s0` | 22.83 / 0.7986 / 0.1899; dynamic 25.02 | 23.02 | 0.014 / 0.414 | 0.009 / 0.649 | 172 / 102 mm | 0.044 / 0.001 | 0.071 / 0.001 | 0.384 / 0.707 | 6,900 |
+| `STG_studio_s0` | 21.59 / 0.7948 / 0.1971; dynamic 24.88 | 21.65 | 0.015 / 0.416 | 0.009 / 0.654 | 151 / 96 mm | 0.042 / 0.001 | 0.069 / 0.001 | 0.384 / 0.708 | 6,800 |
+
+- **On `kitchen`, no harm by the guards.**
+  - **SSIM₁:** the mean is 0.0028 above the off arm's seeds 0 to 2 and 0.0020 above its five. It is 0.0009 below plain seeds 0 to 2 and 0.0001 below plain's five, the reading the owner's answer adds (item 4 above).
+  - **The residual's shares:** every mean lies within 0.0014 of the off arm's.
+  - **PSNR, kept-pixel PSNR and ꟻLIP:** none is flagged against the off arm. Against plain seeds 0 to 2 the PSNR is flagged, all three seeds below all three plain ones and the mean 1.39 dB lower. Against plain's five it is not.
+- **On `studio`, one seed, the dynamic-region PSNR is flagged.** It is 24.88 dB against the off arm's 25.02 dB, 0.14 dB lower, beyond the 0.1 dB flag. It is 0.03 dB above the plain run's 24.85 dB. As for `align_abs`, one seed cannot tell the flag from the spread between trainings: two plain trainings of `studio` lie 0.34 dB apart (section 3 here). The whole view's PSNR is 1.24 dB below the off arm's and 0.65 dB below plain. On `kitchen` the same column spreads over 3.4 dB between the off arm's five seeds.
+- **On `studio`, the residual's shares** lie within 0.005 of the off arm's. The largest gap is on dynamic pixels behind the surface: 0.6539 against 0.6490, 0.0049, on the line but not over it, so it is not worse by the criterion.
+- **The far shares and the under-two-frames share** are the off arm's on both scenes, within 0.003.
+
+**The reading by section 7.2's row for finalist 2,** for the staged form, with its measure as the owner renamed it (section 2.6 here).
+
+- **Adopt when** the named measure moves with no harm by the other criteria. **Not met:** the staged arm does not move it on either copy.
+- **Drop when** "the share does not move: the shell is not a reconciliation, or the disagreement is not a shift of a few pixels rigid over a patch". **Met.** The staged form removes one of the two reasons `align_rel`'s drop was weak evidence:
+  - **The start is no longer arbitrary.** The term met sharp renders, chose shifts of about 2 px on private scene A and about 1 px or less on openftgs-synth, and held them in the same order between the scenes as `align_rel` did. The 12,000 aligned iterations did not move the named measure.
+  - **Only L1 tolerated the shift, still.** SSIM and ꟻLIP read the unshifted image throughout, as in `align_rel`.
+  - **A limit of its own.** Growth stops at 15,000, before the switch. Only relocation, to 25,000, and the decayed learning rate of the means could respond to the aligned loss. So the staged arm tests whether alignment reshapes a model already grown, not whether it changes where primitives are added.
+- **Other criteria.** The sharpness ratio holds. No test-view score falls by more than 0.3 dB. On `kitchen` nothing is harmed. On `studio` the one seed's dynamic-region PSNR is flagged, as `align_abs`'s was. The late ratio on the centre copy falls as it did for `align_rel`. The sheets are open.
+- **Recommended: drop finalist 2,** both forms, by the row. Neither L1 aligned from the first iteration nor L1 aligned after AligNeRF's plain first stage moves the named measure. What stays untested is the list above, apart from the staged form: a shift held for several iterations, SSIM and ꟻLIP on the shifted target, and a window wider than 8 px. Rows E11, E22 and E27 keep their own evidence, as above.
+
+**The phase's commands** (the same conventions as above; `$T` is `<scratch>/ticket-26b`, `$O` is `<surface-runs>/ticket-26b`):
+
+| Command | Device | Time | Note |
+| --- | --- | --- | --- |
+| `ftgs train $K/scene.json --init $M/kitchen/init.safetensors --out $O/runs/PLAIN_kitchen_s<3 or 4> --seed <3 or 4>` and `python $T/wrap_train.py --term align=0 --stats … -- $K/scene.json --init $M/kitchen/init.safetensors --out $O/runs/OFF_kitchen_s<3 or 4> --seed <3 or 4>`, each by `$T/run_train.sh` in the order plain s3, off s3, off s4, plain s4 | GPU | 16 min 33 s to 16 min 36 s | The diagnosis's four runs |
+| `python $T/diag.py` | CPU | seconds | The verdict by the rule, PSNR and ꟻLIP beside, and the new runs alone |
+| `bash $T/run_train.sh smoke_kitchen_stg stg $K/scene.json $M/kitchen/init.safetensors 0 --config $O/smoke/cfg300.json`, with the switch at 200 | GPU | 33 s | The staged arm's smoke run |
+| `bash $T/run_train.sh <run> stg <scene> <init> <seed>`, i.e. `python $T/wrap_train.py --term align=1 --align-window 8 --align-patch 32 --align-penalty 3.2552083333333335e-06 --align-start 18000 --stats … -- <scene> --init <init> --out $O/runs/<run> --seed <seed>`, on the same scenes and init files as the other arms | GPU | 14 min 50 s to 27 min 54 s | The staged arm, 8 runs |
+| `bash $T/post_a.sh <run> h<c>` and `bash $T/post_synth.sh <run> <scene name> <scene.json> <init>`, as above | GPU, then CPU | 1.5 to 3 min | The same post-processing |
+| `bash $T/blind.sh` | CPU | seconds | The eight sheets with their labels hidden, and their key |
+| `python $T/tables.py` | CPU | seconds | The tables here, and the five-seed rereads with a short inline script reading the same `METRICS.json` files |
+
+The private scene's folders, `<m15-runs>`, `<m17-runs>` and tickets #24's, #25's and #26's first folders were read and never written (row T26.6).
+
+**The questions for the owner after the staged arm.**
+
+1. **Finalist 2: dropped, as recommended,** now that both forms have run, or kept for one of the untested variants above?
+2. **The sheets** (`<surface-runs>/ticket-26b/sheets/blind`, key apart), beside the first set (`<surface-runs>/ticket-26/sheets/blind`): the owner's judgement with the labels hidden, which this ticket cannot give.
+3. **The off arm's seeds for finalists 3 and 4.** The owner's answer keeps the off arm as the comparison. The diagnosis's rule, fixed beforehand, said that an undetermined verdict means judging `kitchen`'s guards against all five off-arm seeds. The answer does not say whether finalists 3 and 4 read the off arm's three seeds, as the arms here were, or its five. Reading the five is the rule's consequence, and it costs nothing, since the runs exist. Either way, the guard is also read against the five plain seeds.
 
 ## 6. Step 5: finalist 3, surface terms without a prior
 
