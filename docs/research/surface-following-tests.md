@@ -1891,6 +1891,25 @@ The largest figure, `log_durations`' 2.9·10⁻⁵, is on a gradient five orders
   | Ratios (CPU), the 142 renders and scores of 10 to 11 checkpoints | about 10 min |
   | In all | about 1.6 GPU hours (about 2.0 if the start is 15,000) |
 
+**The calibration, run** on 2026-11-18, at the owner's answers above, after the other ticket's queue had ended, with this branch's code, the same versions and the RTX 4090 alone under the lock, with 14 CPU threads. Every run is the centre copy at seed 0 from `ref_h0_s4`, through the wrapper copy, stopped at exactly its iteration by the wrapper's `--stop-at`, which sends the process SIGTERM after that iteration's loss (`ftgs train` then saves its checkpoint and exits 143); `--checkpoint-every 7000 --keep-checkpoints 3` kept the checkpoints at 7,000 and 14,000. Each wrapper ran once per iteration in every run. D-51's `auto` put the frame cache on the GPU in all of them.
+
+**Stage 1, L_flat, at iteration 15,000.** The ratios are medians of the smallest scale over the middle one (min/mid) or over the largest (min/max); the near side's far-5 cm part is the shell. L1 is the mean over iterations 14,001 to 15,000; the scores are the test view's crop at 15,000. The named measure and the tail are reported and were not used.
+
+| Run | Near side min/mid at 7,000 / 15,000 | Near side min/max at 15,000 | Whole model / shell min/mid at 15,000 | L1, against the weight-0 run | Crop PSNR | Sharpness ratio (late) | Named measure / tail at 15,000 | Under two frames, near side |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| `C1_off`, every weight 0 | 0.457 / 0.323 | 0.156 | 0.338 / 0.225 | 0.014533 | 24.23 | 0.656 (0.669) | 0.159 / 0.068 | 0.577 |
+| `C1_s0.1`, λ_flat = 0.1 | 0.326 / 0.196 | 0.098 | 0.139 / 0.000 | +0.11 % | 24.29 | 0.652 (0.670) | 0.237 / 0.103 | 0.562 |
+| `C1_s1`, λ_flat = 1 | 0.188 / 0.061 | 0.032 | 0.018 / 0.000 | +1.35 % | 24.25 | 0.655 (0.669) | 0.229 / 0.077 | 0.564 |
+| `C1_s10`, λ_flat = 10 | 0.002 / 0.000 | 0.000 | 0.000 / 0.000 | +0.13 % | 24.24 | 0.660 (0.677) | 0.215 / 0.086 | 0.552 |
+| `C1_s100`, λ_flat = 100 | 0.000 / 0.000 | 0.000 | 0.000 / 0.000 | +0.48 % | 24.26 | 0.666 (0.686) | 0.207 / 0.087 | 0.564 |
+| `C1_all100`, λ_flat = 100 over all N | 0.000 / 0.000 | 0.000 | 0.000 / 0.000 | −0.49 % | 24.32 | 0.665 (0.683) | 0.230 / 0.104 | 0.565 |
+
+- **The rule picks λ_flat = 1.** λ_flat = 0.1 lowers the near side's min/mid ratio to 0.196, short of half the weight-0 run's 0.323 (0.161); λ_flat = 1 lowers it to 0.061, with L1 1.35 % high, inside the 1.5 % guard, and the crop PSNR 0.02 dB higher. It is the smallest weight that passes.
+- **The rule puts the start at 15,000.** At iteration 7,000 the chosen run's near-side min/mid ratio is 0.188, above the 0.1 that defines a settled smallest axis; it would have been met from λ_flat = 10 on.
+- **From λ_flat = 10 the flattening is total.** The median smallest scale is below 10⁻³ of the middle one everywhere, at 7,000 already; no guard is crossed by it. The shell's primitives are flattened to the same degree at every weight from 0.1 on. These are the rows with little rendering gradient, as the Adam check predicted.
+- **All N against σt-weighted at 100:** the same flattening; L1 0.49 % lower and the crop PSNR 0.09 dB higher than the weight-0 run, against +0.48 % and 0.03 dB σt-weighted; the named measure and the tail at 15,000 higher (0.230, 0.104 against 0.207, 0.087). Neither form is harmed by the guards. The arms run σt-weighted, as the owner answered.
+- **At 15,000 every flattening run has a higher named measure than the weight-0 run,** 0.207 to 0.237 against 0.159, one seed each. It was not used to choose, and the arms will read it at 30,000 against the off arm's two seeds.
+
 **The arms, as planned for the owner's go.**
 
 - **Arm 1, `flat`:** the default training configuration, 30,000 iterations, through the wrapper copy with `--term flat=<λ_flat>` and the calibration's form.
