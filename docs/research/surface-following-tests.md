@@ -2453,6 +2453,39 @@ The angle between cameras grows with their separation, and it is about half the 
 - **Against finite differences,** the wrapper's form of the gradient, λ₇·L₇ + λ₈·L₈ with the confidence weight held at its value: plane and expected depth, γ = 0.005 and 0.5. Every tensor the device reaches passes: the worst relative error is 1·10⁻⁹ to 1·10⁻⁷ on `means`, `quats`, `log_scales`, `velocities`, `times` and `opacity_logits`. On `log_durations`, whose gradient is about 10⁻⁷ here, it is up to 9·10⁻⁴.
 - **The confidence weight:** with the model's own composited normal as the prior, w = 1 at every pixel of the cut; with that prior turned by 90°, w ≈ 10⁻¹⁵ and L₈ ≈ 0. At γ = 0.005 the term thus acts only where the rendered normal already lies within a few degrees of the prior, which makes its start a setting in its own right (below).
 
+**The terms on trained models** (`<scratch>/ticket-28/prior_on_model.py`, under the lock, at one training image each: finalist 3's `FLAT_kitchen_s0` and the off arm's `OFF_kitchen_s0` at `cam05`, frame 100; `FLAT_A_h0_s0` at `cam1`, frame 60; each 3,000,000 primitives). The priors: the image's own MoGe-2 map; on `kitchen`, the ground truth's normals; on private scene A, DAViD's map over the whole image; a wrong prior, the same frame's map of another camera (`cam12`, `cam7`); and the model's own composited normal. The angle is between the model's normalized composited normal and the prior, at the pixels with alpha above 0.5.
+
+| Model, prior | Model against prior: median / 90th percentile | L₇ | L₈ | Pixels C8's weight passes (w > e⁻¹) |
+| --- | --- | --- | --- | --- |
+| `FLAT_kitchen_s0`, MoGe-2 | 17.8° / 46.7° | 0.641 | 0.173 | 11.3 % |
+| `FLAT_kitchen_s0`, the ground truth | 18.6° / 49.1° | 0.661 | 0.167 | 11.1 % |
+| `FLAT_kitchen_s0`, another camera's map | 32.2° / 70.3° | 0.935 | 0.071 | 4.2 % |
+| `FLAT_kitchen_s0`, its own normal | 0° | 0.352 | 1.850 | 100 % |
+| `OFF_kitchen_s0`, MoGe-2 / the ground truth / another camera | 17.9° / 18.6° / 32.5° (medians) | 0.670 / 0.681 / 0.954 | 0.156 / 0.166 / 0.080 | 10.0 % / 11.3 % / 5.1 % |
+| `FLAT_A_h0_s0`, MoGe-2 | 42.8° / 67.0° | 1.045 | 0.035 | 1.8 % |
+| `FLAT_A_h0_s0`, DAViD, whole image | 37.8° / 69.2° | 1.012 | 0.032 | 1.3 % |
+| `FLAT_A_h0_s0`, another camera's map | 44.0° / 70.8° | 1.080 | 0.016 | 0.7 % |
+
+- **The terms read the right prior as right.** On `kitchen`, L₇ is lower with the image's own map than with another camera's, and MoGe-2's map reads as the ground truth does (17.8° against 18.6°): on a trained model the estimator's 3° of error is small beside the model's own departure.
+- **On private scene A, today's model is not oriented by its surface.** Its primitives' normals lie 43° from the image's prior at the median, barely nearer than another camera's map (44°): there is a great deal for row C7 to turn. On `kitchen` it is 18°. Flattening does not change this (`FLAT_` against `OFF_`, 17.8° against 17.9°).
+- **C8's weight passes few pixels on a trained model:** 10 % to 11 % on `kitchen`, under 2 % on private scene A, at γ = 0.005. Unless C7 first brings the rendered normals within a few degrees of the prior, the regularizer acts on a small share of the image. That is VCR-GauS's design, where its own rendered-normal loss runs beside it.
+- **The model's own normal against its depth map's normal** (the `own` rows' L₈, 1.85 to 2.50) is far from consistent, as finalist 3's L_nc of about 0.7 found.
+- **Cost:** the two device passes with both terms and their whole gradient took 40 ms per call on these models (the first call 0.21 s), at a peak of 2.4 GiB beside the model, the device's cost of section 6 here.
+
+**The smoke runs** (300 iterations on `kitchen` at seed 0, `--config` holding `{"optim": {"iterations": 300}}`, as sections 5 and 6 here ran theirs). Each wrapper ran 300 times in every run.
+
+- **At every weight 0** (`--term flat=0 --term prior=0`), the logged losses equal ticket #27's weight-0 smoke run's at iterations 100, 200 and 300 to every digit logged (total 0.445250, 0.390724, 0.345167). The copy changes nothing at weight 0. The run also recorded its 300 draws: 300 distinct images.
+- **The maps for exactly those images:** MoGe-2 on the 300 drawn images, 32 s under the lock, into `<surface-runs>/ticket-28/kitchen/moge2_smoke`.
+- **`flat` at 1, σt-weighted, with `prior` from iteration 1** (moved early so that the terms run in a smoke run). The run ended normally in 35 s, against 32 s at weight 0, at a peak of 3,450 MiB in `nvidia-smi` against 3,226. It drew the same 300 images as the run at weight 0, so the draws do not depend on the loss.
+
+  | Iteration | L₇ | L₈ | Pixels with a prior / in C8's cut | C8's weight: mean / share above e⁻¹ | λ₇L₇ + λ₈L₈ | L1 (weight 0: 0.1724, 0.1397, 0.1132) |
+  | --- | --- | --- | --- | --- | --- | --- |
+  | 100 | 1.566 | 0.0458 | 100 % / 94.0 % | 0.040 / 5.2 % | 0.157 | 0.1740 |
+  | 200 | 1.358 | 0.0345 | 100 % / 96.3 % | 0.036 / 4.5 % | 0.136 | 0.1419 |
+  | 300 | 1.206 | 0.0331 | 100 % / 98.2 % | 0.039 / 4.6 % | 0.121 | 0.1147 |
+
+  L₇ falls as the term turns the primitives, while at 300 iterations they are still near D-25's spheres. C8's weight passes about 5 % of the cut's pixels, as on the trained models. The prior adds 0.12 to 0.16 to a total of 0.47 to 0.61.
+
 **The arms, as planned for the owner's go.**
 
 - **The main arm, `PRIOR`:** the default training configuration, 30,000 iterations, through the wrapper copy with `--term flat=1 --flat-weighting sigma_t --term prior=1 --prior-maps <MoGe-2's maps> --prior-axes x,y,z --prior-c7 0.1 --prior-c8 0.015 --prior-gamma 0.005 --prior-depth plane --prior-from <start>` (question 1). Eight runs, mirrored on finalist 3's: the centre and left copies at seeds 0 and 1 from `ref_h0_s4` and `ref_h1_s4`; `kitchen` at seeds 0 to 2 and `studio` at seed 0 from M17's init files.
@@ -2504,6 +2537,20 @@ The angle between cameras grows with their separation, and it is about half the 
 | `python $T/normals_agree.py $A $O/results/A_moge2.json --maps $O/private-scene-A/moge2 --crops $R4/crops.json --placeholder $R4/placeholder_masks.npz --grids $R4/d22 --frames 0,20,40,60,80,100,119` | CPU | about 1 min | Private scene A with MoGe-2 |
 | The same with `--maps $O/private-scene-A/david --compare-maps $O/private-scene-A/moge2 --axes-search`, then with `--axes x,-y,-z` | CPU | about 1 min each | DAViD's axes and its agreement |
 | `python $T/prior_check.py values $O/checks/prior_values.json`; `python $T/prior_check.py fd $O/checks/prior_fd.json` | CPU | seconds | The terms' checks |
+| `bash $T/prior_on_model.sh`: `python $T/prior_on_model.py $O/checks/prior_on_model.json FLAT_kitchen_s0=<surface-runs>/ticket-27/runs/FLAT_kitchen_s0/checkpoint=$K=cam05=100=<priors> OFF_kitchen_s0=<surface-runs>/ticket-26/runs/OFF_kitchen_s0/checkpoint=… FLAT_A_h0_s0=<surface-runs>/ticket-27/runs/FLAT_A_h0_s0/checkpoint=$X/scene_h0/scene.json=cam1=60=<priors>` | GPU | about 1 min, after the lock | The terms on trained models; run twice, the first stopping on the script's own parsing of the priors' list |
+| `bash $T/smoke.sh`: `bash $T/run_train.sh smoke_kitchen_off $K $M/kitchen/init.safetensors 0 --term flat=0 --term prior=0 --record-draws $O/smoke/draws_s0.json -- --config <surface-runs>/ticket-27/smoke/cfg300.json`; `python -I $T/normal_maps.py $K $O/kitchen/moge2_smoke --estimator moge2 … --draws $O/smoke/draws_s0.json`; `bash $T/run_train.sh smoke_kitchen_prior … --term flat=1 --flat-weighting sigma_t --term prior=1 --prior-maps $O/kitchen/moge2_smoke --prior-axes x,y,z --prior-c7 0.1 --prior-c8 0.015 --prior-gamma 0.005 --prior-depth plane --prior-from 1 -- --config …` | GPU | 32 s, 32 s, 35 s | The smoke runs |
+
+The private scene's folders, `<m15-runs>`, `<m17-runs>` and tickets #4's, #12's, #26's and #27's folders were read and never written.
+
+**In short, for the owner, before the arms.**
+
+- **The weights and code are as row 830 found them.** MoGe-2's `model.pt` (MIT, commit unchanged) and DAViD's normal model (MIT) still pass. MoGe's code is MIT with its DINOv2 part Apache-2.0, and the ONNX runtime is MIT, in a scratch environment only.
+- **MoGe-2's normals are in §1.4's axes as given,** 3.0° from `kitchen`'s ground truth on static surfaces. DAViD's need (x, −y, −z).
+- **On private scene A's person the two estimators' normals disagree between cameras 15° apart by 6.7° and 7.1° at the median.** That is what MoGe-2 gives on `kitchen`'s dynamic objects through exact cameras (6.9°). The pairs read alike, the two pairs one above the other included, which section 2.7's depth found worst. At the matched points, the normal prior shows no sign of the cameras' versions of the person that the depth priors inherited.
+- **The terms are in the wrapper copy and checked:** finite differences, the weight-0 parity, and a 300-iteration smoke run with flattening and both terms.
+- **On trained models today's primitives' normals lie 18° (`kitchen`) and 43° (private scene A) from the image's prior,** and C8's confidence weight at γ = 0.005 passes 2 % to 11 % of the pixels: row C7 has much to turn, and row C8 acts mostly after it has.
+- **The plan:** one arm on both sets (8 runs) and DAViD's arm on private scene A (4 runs), about 5.7 GPU hours with the terms from iteration 15,000, the full maps and the `kitchen` sheets included. Four questions above; none trains anything until answered.
+- **This step's GPU time** was about 6 minutes in all: the maps, the two passes of the checks on trained models and the three smoke commands. Everything else ran on 4 CPU threads.
 
 **The owner's answer on step 6** (whether the work goes on to the recommendation, or stops): *not yet given.* **Date:** *not yet given.*
 
