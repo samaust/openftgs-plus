@@ -2157,7 +2157,7 @@ The private scene's folders and the folders of tickets #24, #25, #26 and #26's f
 | 1 − SSIM at 30,000: unshifted; shifted | 0.100 to 0.102 | 0.111 to 0.112; 0.102 to 0.103 | 0.099 | 0.124; 0.104 |
 | ꟻLIP at 30,000: unshifted; shifted | 0.060 to 0.061 | 0.066; 0.061 | 0.069 | 0.079; 0.069 |
 
-- **The drift of private scene A comes back, smaller.** The staged arm's shifts shrink to a quarter of their start on `kitchen` and a third on `studio`, and its aligned L1 ends 0.6 % to 1.3 % below the plain L1. V2's shifts stay near 1 px. The share of pixels it moves falls by 35 % to 38 %, against the staged arm's 69 % to 74 %, and the gap between its aligned and plain L1 grows threefold on `kitchen` and fourfold on `studio`.
+- **The drift of private scene A comes back, smaller.** The staged arm's shifts shrink to a quarter of their start on `kitchen` and a third on `studio`, and its aligned L1 ends 0.6 % to 1.3 % below the plain L1. V2's shifts stay near 1 px. The share of pixels it moves falls by 35 % to 38 %, against the staged arm's 69 % to 75 %, and the gap between its aligned and plain L1 grows threefold on `kitchen` and fourfold on `studio`.
 - **V2 fits the shifted target, not the image.** At 30,000 its 1 − SSIM and ꟻLIP against the shifted target are the staged arm's against the image. Its values against the image are 0.010 and 0.006 higher on `kitchen`, and 0.025 and 0.010 higher on `studio`.
 - **The shifts do not grow in pixels** as on private scene A (2.4 to 3.2 px there). openftgs-synth's cameras are exact, and the staged arm's shifts there were about 1 px or less (above).
 
