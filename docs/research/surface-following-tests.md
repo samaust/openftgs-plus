@@ -2353,6 +2353,158 @@ The private scene's folders, `<m15-runs>`, `<m17-runs>` and tickets #24's, #26's
 
 *Ticket #28's section.* Section 2.7's measurement repeated for normals, with `kitchen` for the floor, then finalist 4's arm, run as the research document's section 5.6 says and judged by section 4.4's criteria.
 
+**The first step** was run on 2026-11-18, at the owner's go of that day (section 6 here, "The owner's answer on step 5"), while finalist 2's variant queue held the GPU, with this branch's code at 96659a0 (`src/`, `scripts/` and `tests/` as `main`'s at 02e3686), Python 3.14.10, torch 2.15.0+cu132, gsplat 1.5.3, NumPy 2.5.4 and Pillow 13.0.0 from the shared `.venv`, MoGe's code at 74fbce0 and the ONNX runtime 1.32.0 from `<scratch>/ticket-28` (below). The hardware was one RTX 4090 (driver 595.99.02), shared under the GPU lock, so every GPU command here waited its turn between the queue's trainings; the CPU work ran on 4 threads. Scripts read the scene manifests, the images, the match grids, the ground truth and checkpoints, and wrote numbers and map files (row T28.7). Private scene A's images went only to the two estimators, running offline on this machine; no image, map or render was looked at. No arm was trained.
+
+**The owner's answers at step 6's go** (2026-11-18, in session, relayed by the orchestrating session):
+
+- **Finalists 1 to 3 are dropped,** so the arms train on the manifest's cameras, and the prior is added on top of finalist 3's flattening alone, without its consistency term.
+- **The flattening weight** is finalist 3's calibrated one, λ_flat = 1, σt-weighted, in world units, from iteration 1 (section 6 here, "The arms' settings").
+- **The off arm** is section 5 here's, wrapper v2 at every added weight 0, with the plain baseline beside it. On `kitchen` it is read against the off arm's five seeds for SSIM₁, PSNR and ꟻLIP, and its seeds 0 to 2 for the rest, as section 6 here read it.
+- **The named measure** is the near-side far-5 cm share, with the tail beyond 25 cm beside it, read by section 4.4's rule, the tail with the margin 0.021.
+- **Two seeds per arm** on each copy of private scene A.
+- **DAViD's optional arm is cleared** (2026-11-18): one arm on private scene A with the maps of `normal-model-vitl16_384.onnx`.
+- **Labelled `kitchen` sheets** (the owner's request of 2026-11-18): every `kitchen` model gets a labelled sheet from a fixed `kitchen` request, by `<scratch>/kitchen-sheets/kitchen_sheets.sh <run-dir> <label>`, run after each `kitchen` run's post-processing.
+
+**The weights and the code, checked again at their publishers** (rows 569, 582, 583 and 830 hold for their dates; all fetched without credentials):
+
+| What | Checked | Terms | The file used |
+| --- | --- | --- | --- |
+| MoGe-2's weights, `Ruicheng/moge-2-vitl-normal` (row T28.1) | The card's front matter and the Hub's public record | `license: mit`; base model `facebook/dinov2-large`; not gated; commit cb0e8bb, unchanged since rows 583 and 830 | `model.pt` at cb0e8bb: 1,323,815,904 bytes, SHA-256 `280741fd…cc1a01`, equal to the publisher's linked ETag |
+| MoGe's code, `microsoft/MoGe` (row T28.2) | `LICENSE` first, then the README's "License" | MIT, copyright Microsoft Corporation; the bundled DINOv2 code under `moge/model/modules/dinov2` is Apache-2.0 (Meta AI) | The source archive at 74fbce0, used unchanged from the scratch directory |
+| DAViD's normal model and runtime, `microsoft/DAViD` (row T28.3) | The README's "Model License", `LICENSE-MIT.txt`, the normal model's card | Models and runtime code under MIT, copyright Microsoft Corporation; human subjects only | `normal-model-vitl16_384.onnx`: 1,377,959,705 bytes, SHA-256 `759cdfe0…e461d3`, its MD5 the host's Content-MD5 |
+| The ONNX runtime and its dependencies (row T28.4) | The licenses inside the wheels, read before installing | onnxruntime 1.32.0 MIT; protobuf 7.36.2 BSD-3-Clause; flatbuffers 25.12.19 Apache-2.0; no copyleft or non-commercial term in the runtime's notices | Installed with `pip install --no-deps --target <scratch>/ticket-28/env-ort`; numpy and packaging from the shared `.venv`, which was not written |
+
+All four pass the bar as section 4.9 found them. The weights live under `<scratch>/ticket-28/weights`, downloaded outside the test suite (Q-7), and each loads without a network call: MoGe's with `torch.load(..., weights_only=True)`, its two imports of `utils3d` and `huggingface_hub` given empty stand-ins, since only the point map's post-processing and downloads use them.
+
+**The estimators as run** (`<scratch>/ticket-28/normal_maps.py`, not committed):
+
+- **MoGe-2:** the model's `forward` at `infer`'s defaults, 3,600 tokens (level 9), under float16 autocast, on RGB in [0, 1]; the normal head's output, which `forward` resizes to the image bilinearly and normalizes; the mask head's sigmoid above 0.5 marks the pixels with a prior. 56 ms per `kitchen` image and 54 ms per image of private scene A, at a peak of 2.3 GiB. Its mask kept every pixel of all 201 images.
+- **DAViD:** the runtime's `estimate_normal`, its OpenCV steps done in NumPy and PyTorch: BGR in [0, 1], padded to a square by replicating the border, resized bilinearly to 512, the model, the output resized back bicubically, cropped and normalized. On the CPU, 4 threads: 1.36 s per image. Its maps mean something on the person only, so a training map would mark every other pixel as carrying no prior (below, question 3).
+- **The maps' format:** one file per image, `<surface-runs>/ticket-28/<scene>/<estimator>/maps/<camera>/<frame>.npz`, the normal as int8 (127·n) in the estimator's own axes with a packed validity mask. The code costs 0.14° at the median (0.23° at the 90th percentile; measured on `kitchen`'s ground-truth normals). A file is 4.1 MB for `kitchen` and 2.9 MB for private scene A.
+- **The images:** on `kitchen`, frames 0, 1, 100, 101, 200 and 201 of all 20 cameras (120 images); on private scene A, frames 0, 1, 20, 40, 60, 80, 81, 100 and 119 of the nine cameras (81 images), by both estimators.
+
+**The measure** (`<scratch>/ticket-28/normals_agree.py`). It is section 2.7's, with what a normal does not need taken out.
+
+- **Pairs and matches:** section 2.7's. On private scene A, D-22's 7 pairs, 14.5° or 15.0° apart. On `kitchen`, the six wide pairs, about 15° apart; D-22's 13 pairs with `cam00`–`cam01`, 2.8° to 6.6° apart; at frames 0, 100 and 200. The matches are the dense matcher's admitted matches from tickets #4's and #12's grid files: both ends inside their images, certainty at least 0.5.
+- **The comparison:** at each match, each camera's map is read at its end of the match (bilinear, renormalized), turned into the world by the manifest's rotation (n_w = Rᵀn_c, §1.4's world-to-camera R), and the two are compared by their angle. A normal has no scale, shift or anchor, so nothing is aligned and no depth enters it. The cost is that only matched points are compared: section 2.7's unmatched pixels, where its tail lay, are not reached.
+- **Regions:**
+  - On `kitchen`, static and dynamic, by the ground truth's masks at the first end. Figures there are on matches whose two ends are away from depth edges by Q-228's rule and that the ground truth calls seen: the first end, lifted by its ground-truth depth, lands within 2 px of the second, with the depth agreeing within 1 %.
+  - On private scene A, section 2.5's split by the match's triangulated depth in the first camera: the **person** is rule a's crop at 0.5 to 1.8 units, the **background** 2.2 units or more. The loose rule's placeholder pixels are left out, and person figures are on matches whose second end also lies in the other camera's crop ("both").
+- **Against the ground truth,** on `kitchen`: the estimator's camera-space normal against the normal of the ground truth's depth (planar z; the wrapper's `depth_normals`, (P_down − P_up) × (P_right − P_left), facing the camera), at pixels away from depth edges, all 120 images.
+- **One camera, two frames:** each camera's normals at frames k and k + 1 at the same pixels, the first frame's match ends (frames 0 and 1, 100 and 101, 200 and 201 on `kitchen`; 0 and 1, 80 and 81 on private scene A). A moving surface moves under a fixed pixel, so on the person and on `kitchen`'s dynamic objects this counts motion as well as the estimator's jitter.
+
+**Checks of the measure,** with the ground truth's own normals as the maps, on `kitchen`'s wide pairs:
+
+- **The conventions hold.** Between cameras 15° apart the static surfaces read 0.002° at the median and 0.007° at the 90th percentile; the dynamic objects 0.12° and 5.0°, the matches' placement on small curved objects.
+- **A camera that is slightly off.** Camera B turned about its own centre by 2° about its y axis reads 1.93° at the median (1.97° at the 90th percentile), and by 0.3° about its x axis 0.299°, as a rotation of that size should: a normal turns by less than the rotation as far as it lies along the rotation's axis. The rotations' errors of tenths of a degree that section 2.5 measured on private scene A therefore reach this measure as tenths of a degree.
+
+**On `kitchen`: the axes, and the estimator against the ground truth.**
+
+| | MoGe-2's normals against the ground truth's, static pixels |
+| --- | --- |
+| As given, §1.4's axes (x right, y down, z forward), facing the camera | **3.00°** at the median, 7.07° at the 90th percentile; 82 % under 5° |
+| The next-best of the 48 signed permutations, (−x, y, z) | 14.27° at the median |
+| (x, −y, z) | 31.1° |
+
+So MoGe-2's normals are in §1.4's axes as the README says (row T28.2), and face the camera as the device's do: the maps go to the terms unchanged. On the dynamic objects the estimator is 13.7° from the ground truth at the median (32.3° at the 90th percentile; 12 % under 5°).
+
+**On `kitchen`: between cameras, the floor.** One rendered scene through exact, synchronized cameras, so any angle between two cameras' normals is the estimator's own view-dependence.
+
+| Pairs | Static: median / 90th percentile | Dynamic: median / 90th percentile | Ground truth's normals, static / dynamic, medians |
+| --- | --- | --- | --- |
+| Six wide pairs, about 15° | **1.81° / 4.35°** (pairs 1.64° to 1.94°) | **6.93° / 16.1°** (pairs 6.08° to 7.84°) | 0.003° / 0.11° |
+| D-22's pairs and `cam00`–`cam01`, 2.8° to 6.6° | 1.01° / 3.18° | 4.86° / 12.1° | |
+| One camera, two frames | 0.07° / 0.44° | 8.2° / 34.6°, motion included | |
+
+The angle between cameras grows with their separation, and it is about half the estimator's error against the ground truth (1.81° against 3.00° static, 6.93° against 13.7° dynamic): most of each camera's error is common to two cameras 15° apart, as section 2.7 found for depth.
+
+**Private scene A: between cameras.** All seven pairs at frames 0, 20, 40, 60, 80, 100 and 119 (49 pair-frames).
+
+| | MoGe-2: median / 90th percentile | Under 5° / 10° | DAViD, in (x, −y, −z): median / 90th percentile | Under 5° / 10° |
+| --- | --- | --- | --- | --- |
+| The person, both ends | **6.71° / 14.7°** | 34 % / 74 % | **7.12° / 16.6°** | 31 % / 70 % |
+| Frames 0 to 60 / 80 to 119 | 6.46° / 6.94° | | 7.53° / 6.72° | |
+| By pair, medians | 6.02° (`cam1`–`cam4`) to 7.87° (`cam6`–`cam8`) | | 6.07° (`cam1`–`cam4`) to 8.30° (`cam6`–`cam8`) | |
+| The two pairs one above the other, `cam1`–`cam4` and `cam2`–`cam5` | 6.02°, 6.15° | | 6.07°, 6.53° | |
+| The background | 1.79° / 8.19° | 82 % / 93 % | – | |
+| One camera, two frames: person / background | 2.65° / 0.39° (medians) | | 2.53° / – | |
+
+- **DAViD's axes.** DAViD has no ground truth here, so its axes were searched against MoGe-2's, whose axes `kitchen` fixed, on the person's matched pixels. (x, −y, −z) is best at 11.9° at the median, against 28.4° for the next candidate and 135° as given. Its output is in the y-up, z-towards-the-viewer convention, and a map would be turned by (x, −y, −z) before use. The 11.9° between the two estimators at the same pixel is larger than either's angle between cameras.
+- **What it shows.** On the person, two cameras 15° apart see normals 6.7° (MoGe-2) and 7.1° (DAViD) apart at the median. That is `kitchen`'s floor for its dynamic objects at the same separation, 6.9°, with exact cameras. The pairs read alike, and the two pairs one above the other are not worse. Section 2.7's depth found those two pairs worst (4.6 % and 4.8 % against 0.9 % to 2.1 %), from the cameras' disagreement. A normal carries none of what made them so: no scale, no shift, no anchor, and a rotation error of tenths of a degree. At the matched points this measure reaches, the estimators' normals of the person disagree between cameras about as much as an estimator's do on exact, synchronized cameras, and no excess shows that would come from each camera seeing its own version of the person.
+- **What it cannot show.**
+  - The person's comparison is on matched points only, where the two images agree enough to be matched. Section 2.7 found the larger gaps among unmatched pixels, and a pose difference between cameras that the matcher refuses is not seen here.
+  - `kitchen`'s dynamic objects are small rendered objects, not a person, so the floor is the nearest one available, not a like-for-like one.
+  - The prior's own error is about twice its disagreement between cameras on `kitchen` (13.7° on the dynamic objects). An error the cameras share does not cancel in the loss, and section 3.4's within-one-image reading holds: the prior can shape a surface and cannot place it.
+- **For H2's prediction** that the loss settles between the cameras' versions and smooths: the measure finds no versions to settle between beyond the estimator's own spread, which an L1 on 6° to 7° of disagreement would still average over. Whether that smooths the renders is for the arm to show.
+
+**The terms in the wrapper** (`<scratch>/ticket-28/wrap_train.py` and `surface_device.py`, ticket #27's copies with one term registered; their weight-0 path unchanged). The term **`prior`** is registered at weight 1 and carries its own weights: λ₇·L₇ + λ₈·L₈ through the device's two passes, computed with its whole gradient before the colour pass, as `nc` is, from iteration `--prior-from` on. Before that iteration it reports 0 and computes nothing.
+
+- **L₇, row C7** (DN-Splatter's Eq. 10, row T28.5): the mean over the pixels with a prior of ‖N(p) − P(p)‖₁, with N(p) = Σwn the composited smallest-scale normal, unnormalized as its Eq. 9 composites it, and P the prior; λ₇ = 0.1. No alpha cut, since the paper's mean is over the image. The total-variation term is left out (the owner's answer at review 2).
+- **L₈, row C8** (VCR-GauS's Eq. 14, row T28.6): the mean over the consistency term's pixels of w·(‖N_d − P‖₁ + (1 − N_d·P)); λ₈ = 0.015 and γ = 0.005.
+  - N_d is the normal of the plane-distance depth map (row A5, the depth finalist 3's arm 2 read, which is PGSR's intersection depth).
+  - The confidence weight is w = exp((N̂·P − 1)/γ), with N̂ the composited normal normalized (VCR-GauS's Eq. 9). It is taken without a gradient: the paper does not say, and a gradient through it would pull the rendered normal towards the prior a third time.
+  - The pixels are finalist 3's: alpha ≥ 0.5 on the pixel and its four neighbours, among the pixels with a prior.
+- **The maps** are read per iteration from the files, one image at a time, so nothing of them is held on the GPU. An image is found by the render's camera name and the record whose timestamp equals the model's `time.to_tau(t)`, within 10⁻⁶. A missing map, a time that matches no record or a size that differs from the camera's stops the run. `--prior-axes` turns a map into §1.4's axes: (x, y, z) for MoGe-2, (x, −y, −z) for DAViD.
+- **Logged:** L₇, L₈, their pixel shares, the mean of w and the share of pixels with w above e⁻¹: at γ = 0.005, w falls to e⁻¹ at 5.7° between N̂ and P.
+- **E10's g.** The term does not enter it (section 5.2): its gradient reaches the device's copies, not the colour pass's 2D means.
+
+**Checks of the terms** (`<scratch>/ticket-28/prior_check.py`, float64 on the CPU, the reference backend; ticket #27's seven flat primitives in front of a 48 × 36 camera, a smooth synthetic prior on 80 % of the pixels):
+
+- **Against finite differences,** the wrapper's form of the gradient, λ₇·L₇ + λ₈·L₈ with the confidence weight held at its value: plane and expected depth, γ = 0.005 and 0.5. Every tensor the device reaches passes: the worst relative error is 1·10⁻⁹ to 1·10⁻⁷ on `means`, `quats`, `log_scales`, `velocities`, `times` and `opacity_logits`. On `log_durations`, whose gradient is about 10⁻⁷ here, it is up to 9·10⁻⁴.
+- **The confidence weight:** with the model's own composited normal as the prior, w = 1 at every pixel of the cut; with that prior turned by 90°, w ≈ 10⁻¹⁵ and L₈ ≈ 0. At γ = 0.005 the term thus acts only where the rendered normal already lies within a few degrees of the prior, which makes its start a setting in its own right (below).
+
+**The arms, as planned for the owner's go.**
+
+- **The main arm, `PRIOR`:** the default training configuration, 30,000 iterations, through the wrapper copy with `--term flat=1 --flat-weighting sigma_t --term prior=1 --prior-maps <MoGe-2's maps> --prior-axes x,y,z --prior-c7 0.1 --prior-c8 0.015 --prior-gamma 0.005 --prior-depth plane --prior-from <start>` (question 1). Eight runs, mirrored on finalist 3's: the centre and left copies at seeds 0 and 1 from `ref_h0_s4` and `ref_h1_s4`; `kitchen` at seeds 0 to 2 and `studio` at seed 0 from M17's init files.
+- **DAViD's arm, `DAVID`** (cleared): the same on private scene A's two copies at seeds 0 and 1, with DAViD's maps, `--prior-axes x,-y,-z`, and every pixel off the person marked as carrying no prior (question 3).
+- **Read against** the off arm (section 5 here; on `kitchen` as the owner answered), with finalist 3's `FLAT_…` (what the prior adds to flattening) and `FLATNC_…` (the prior against consistency without one) beside it, by section 6 here's copied scripts: the named measure by the rule, with the tail by its margin; the under-two-frames share; the sharpness ratio, the tiles' coverage and the sheets, relabelled blind; the test-view scores and Q-233's kept-pixel PSNR on the centre copy; on openftgs-synth `scripts/gt_depth.py`'s shares behind and in front of the surface (a surface term is expected to lower the share behind by more than 0.005), SSIM₁ against the 0.002 guard and `scripts/reference_flaws.py`'s kept-pixel PSNR; row A1's scale ratios by `ratio_stats.py`; and the logged L₇, L₈ and the share of pixels the confidence weight passes. Each `kitchen` run then gets the owner's labelled sheet (`kitchen_sheets.sh`).
+- **The full maps,** before the arms: MoGe-2 on every image of private scene A (1,080), `kitchen` (6,000) and `studio` (1,440), and DAViD on private scene A's 1,080, by `normal_maps.py` without `--frames`. About 3.2 GB, 25.7 GB and 9.3 GB for MoGe-2 and 3.2 GB for DAViD, in `<surface-runs>/ticket-28`.
+- **GPU hours, estimated** from finalist 3's measured times (section 6 here, "Times"): the device's two passes cost what they cost for `nc`, and the map read and the two terms are per-pixel work beside them.
+
+  | Part | From iteration 15,000 | From iteration 1 |
+  | --- | --- | --- |
+  | MoGe-2's full maps (about 0.06 s an image in the network, decoding beside it) | 0.25 h | 0.25 h |
+  | The main arm: 4 runs on private scene A, 3 on `kitchen`, 1 on `studio` | 4 × 23 + 3 × 26.3 + 35.2 min, about 3.4 h (`FLATNC_…`'s times) | at most 4 × 32.5 + 3 × 35.6 + 46.9 min, about 4.7 h (the device at every iteration, at its cost at the end of the run) |
+  | Its post-processing, 8 runs, and 3 labelled `kitchen` sheets | about 0.35 h | about 0.35 h |
+  | The main arm in all | **about 4.0 h** | about 5.3 h |
+  | DAViD's arm: 4 runs on private scene A, with post-processing (its maps on the CPU, about 25 min, no GPU) | about 1.7 h | about 2.3 h |
+  | Both arms | **about 5.7 h** | about 7.6 h |
+
+  Section 5.6's 4.5 hours and 2 more for DAViD's arm. Memory: finalist 3's arm 2 peaked at 23,575 to 23,924 MiB on private scene A with the same two device passes, and the prior adds one image's map (11 to 25 MB) and per-pixel tensors of L_nc's size, so the arm would run with the fallbacks the owner cleared at step 5 (`perf.frame_cache` `"mmap"` on private scene A, `PYTORCH_CUDA_ALLOC_CONF=expandable_segments:True` on `studio`) ready in advance (question 4).
+
+
+**The open choices, with this step's recommendations.**
+
+1. **The terms' start.** Neither paper states one (rows T28.5, T28.6), and DN-Splatter starts from oriented primitives, which this arm does not have. At λ_flat = 1 the smallest axis is distinct by iteration 15,000 and not yet at 7,000 (section 6 here, stage 1), and before that the normal of a primitive is a tie between near-equal scales. C8's confidence weight passes only pixels whose rendered normal lies within about 6° of the prior, so it does little until C7 has turned the primitives. Recommended: **iteration 15,000**, the start finalist 3's arm 2 had, so that the arm reads against `FLATNC_…` like for like; from iteration 1 costs about 1.3 hours more, and puts the prior on near-spheres.
+2. **The settings fixed above:** C7 on the unnormalized Σwn (DN-Splatter's form; it also pulls the alpha towards 1 where a prior is given), mean over the pixels with a prior, no alpha cut; C8 on the plane-distance depth (the owner's answer for finalist 3), with the confidence weight taken without a gradient, on finalist 3's pixels. Recommended as fixed; the alternatives are C7 on the normalized N̂ (VCR-GauS's L_n form) and C8 on expected depth (the screening row's 0.35 against 0.40, row 726).
+3. **DAViD's person.** DAViD's maps mean something on the person only (section 5.6), and the one model cleared is the normal model, so its mask cannot come from DAViD's segmentation model without a further check and clearance. Options: (a) the person as section 2.7 defines it, the pixels of rule a's crop that ticket #12's Depth Anything V2 depth, aligned on the pair's matches, lifts to 0.5 to 1.8 units, placeholder pixels left out: the rule this PRD's measures already use, from maps already made for all 1,080 images, a CPU job of minutes; (b) DAViD's `foreground-segmentation-model-vitl16_384.onnx` (MIT, row 569), its terms checked again and cleared by the owner; (c) rule a's crop alone, which leaves background inside the box with a meaningless prior. Recommended: (a).
+
+**The questions for the owner at the first step.**
+
+1. **The start** of the two prior terms: iteration 15,000 (recommended) or 1 (open choice 1).
+2. **The settings** of open choice 2: as fixed (recommended) or another.
+3. **DAViD's person mask:** (a) section 2.7's depth rule (recommended), (b) DAViD's segmentation model, or (c) rule a's crop.
+4. **The hours:** about 5.7 GPU hours for both arms with the start at 15,000, the maps and the sheets included (about 7.6 from iteration 1), against section 5.6's 6.5; and the memory fallbacks of step 5 cleared again for these arms.
+
+
+**The first step's commands.** Each ran with `OMP_NUM_THREADS=4 MKL_NUM_THREADS=4 OPENBLAS_NUM_THREADS=4` and the shared `.venv`'s Python, the CPU ones with `CUDA_VISIBLE_DEVICES=` empty and the GPU ones under the shared lock. Scripts that read downloaded code or weights ran with `python -I` and put their paths in themselves. Others ran with `PYTHONPATH=<worktree>/src:<worktree>/harness/src:<worktree>/tests:<scratch>/ticket-28`. `$T` is `<scratch>/ticket-28`, `$O` is `<surface-runs>/ticket-28`, `$K` is `<m15-runs>/kitchen/scene.json`, `$M` is `<m17-runs>`, `$G` is `$OPENFTGS_DATASETS/synth/ground_truth/kitchen`, `$R12` is `<surface-runs>/ticket-12/kitchen`, `$R4` is `<surface-runs>/ticket-4/private-scene-A`, `$X` is `<private-scene-A-exp>`, and `$A` is `<private-scene-A>/scene.json`. The scripts are not committed.
+
+| Command | Device | Time | Note |
+| --- | --- | --- | --- |
+| `curl -sSL` of `https://huggingface.co/Ruicheng/moge-2-vitl-normal/raw/main/README.md`, `https://huggingface.co/api/models/Ruicheng/moge-2-vitl-normal` and `…/resolve/cb0e8bb…/model.pt` | CPU | about 1 min | Row T28.1; the hash against the linked ETag |
+| `curl -sSL` of `https://api.github.com/repos/microsoft/MoGe/commits/main`, `https://raw.githubusercontent.com/microsoft/MoGe/74fbce0…/LICENSE`, then `https://codeload.github.com/microsoft/MoGe/tar.gz/74fbce0…` | CPU | seconds | Row T28.2; the license read before the archive was opened |
+| `curl -sSL` of DAViD's `README.md`, `LICENSE-MIT.txt`, `model_cards/surface_normal_model.md`, file list and `runtime/` at 20a3eb6, then the README's link to `normal-model-vitl16_384.onnx` | CPU | about 2 min | Row T28.3; the MD5 against the host's header |
+| `pip download --no-deps -d $T/dl/wheels onnxruntime==1.32.0 flatbuffers protobuf`; the wheels' license files read; `pip install --no-deps --no-index --target $T/env-ort $T/dl/wheels/*.whl` | CPU | seconds | Row T28.4; `pip freeze` of the shared `.venv` against the baseline: unchanged |
+| `curl -sSL -o $T/dl/<paper>/page.html https://arxiv.org/html/<id>`, for 2403.17822 and 2406.05774, then a text extraction | CPU | seconds | Rows T28.5, T28.6 |
+| `bash $T/maps_first.sh`: `python -I $T/normal_maps.py $K $O/kitchen/moge2 --estimator moge2 --weights $T/weights/moge2/model.pt --code <MoGe's archive> --frames 0,1,100,101,200,201`; the same on `$A` into `$O/private-scene-A/moge2` with `--frames 0,1,20,40,60,80,81,100,119` | GPU | 13 s and 7 s after loading | MoGe-2's maps, 120 and 81 images |
+| `python -I $T/normal_maps.py $A $O/private-scene-A/david --estimator david --weights $T/weights/david/normal-model-vitl16_384.onnx --frames <the same> --device cpu --threads 4` | CPU | 1 min 53 s | DAViD's maps, 81 images; a one-image timing run before it |
+| `python $T/normals_agree.py $K $O/checks/fake_wide.json --fake-gt --gt $G --grids $R12/wide --frames 0,100,200 --max-matches 200000`; again with `--turn-b 0,2,0` and `--turn-b 0.3,0,0` | CPU | 10 s each | The checks of the measure |
+| `python $T/normals_agree.py $K $O/results/kitchen_wide_identity.json --maps $O/kitchen/moge2 --gt $G --grids $R12/wide --frames 0,100,200 --axes-search --quant-check --max-matches 200000` | CPU | 52 s | The axes, the estimator against the ground truth, the wide pairs, the code's cost |
+| `python $T/normals_agree.py $K $O/results/kitchen_d22.json --maps $O/kitchen/moge2 --gt $G --grids $R12/d22 $R12/cam00 --frames 0,100,200 --max-matches 200000` | CPU | about 1 min | D-22's pairs |
+| `python $T/normals_agree.py $A $O/results/A_moge2.json --maps $O/private-scene-A/moge2 --crops $R4/crops.json --placeholder $R4/placeholder_masks.npz --grids $R4/d22 --frames 0,20,40,60,80,100,119` | CPU | about 1 min | Private scene A with MoGe-2 |
+| The same with `--maps $O/private-scene-A/david --compare-maps $O/private-scene-A/moge2 --axes-search`, then with `--axes x,-y,-z` | CPU | about 1 min each | DAViD's axes and its agreement |
+| `python $T/prior_check.py values $O/checks/prior_values.json`; `python $T/prior_check.py fd $O/checks/prior_fd.json` | CPU | seconds | The terms' checks |
+
 **The owner's answer on step 6** (whether the work goes on to the recommendation, or stops): *not yet given.* **Date:** *not yet given.*
 
 ## 8. The recommendation
