@@ -1414,10 +1414,10 @@ The private scene's folders, `<m15-runs>` and `<m17-runs>` were read and never w
 | --- | --- | --- | --- |
 | `python $T/make_side_request.py $K/scene.json $O/requests/kitchen_side_request.json --centre cam00 --frames 33,114,262`, and the same on ticket #25's `turned` and `corrected` manifests | CPU | under 1 s | The fixed request and finalist 1's own-pose requests; ticket #5's script, copied, with yaw 0 exact |
 | `python $T/sweep_frames.py $K/scene.json $G/kitchen scripts/gt_depth.py …`; `python $T/framing_kitchen.py $K/scene.json $G/kitchen $O/requests/kitchen_side_request.json --gt-depth-script scripts/gt_depth.py --out …_framing.json` | CPU | about 1 min | The frame rule's figures over the 300 frames, and the chosen request's framing |
-| `bash $T/kitchen_sheets.sh <run-dir> <run> [turned or corrected]`: `ftgs render <run-dir>/checkpoint --request <request> --out $O/renders/<run>.safetensors` under the shared GPU lock, then `python $T/sheet_gt.py <renders> <request> $O/sheets/<run>.jpg --label <run> --stats $O/sheets/<run>.coverage.json --gt $G/kitchen` | GPU, then CPU | 6.7 to 8.8 s per render, apart from the wait for the lock | One render per lock; ticket #5's `side_sheet.py`, copied, with the `gt` column added; the renders file is deleted once its sheet is made |
+| `bash $T/kitchen_sheets.sh <run-dir> <run> [turned or corrected]`: `ftgs render <run-dir>/checkpoint --request <request> --out $O/renders/<run>.safetensors` under the shared GPU lock, then `python $T/sheet_gt.py <renders> <request> $O/sheets/<run>.jpg --label <run> --stats $O/sheets/<run>.coverage.json --gt $G/kitchen` | GPU, then CPU | 6.4 to 8.9 s per render, apart from the wait for the lock | One render per lock; ticket #5's `side_sheet.py`, copied, with the `gt` column added; the renders file is deleted once its sheet is made |
 | `python $T/compare_sheets.py $O/compare/finalist<1, 2 or 3>_kitchen_s<n>.jpg --title … <sheets>` | CPU | seconds | The side-by-side sheets, from the per-run sheets at 0.6 scale |
 
-`$T` is `<scratch>/kitchen-sheets`, `$O` is `<surface-runs>/kitchen-sheets`, `$K` is `<m15-runs>/kitchen` and `$G` is `$OPENFTGS_DATASETS/synth/ground_truth`. Each command ran with three CPU threads, with this branch's code at 96659a0 and the shared `.venv`. The plan for the models not trained yet (finalist 4's, and any `kitchen` runs of finalist 2's variants) is `$T/PLAN.md`, applying `$T/kitchen_sheets.sh` to each. Section 7 here records those sheets.
+`$T` is `<scratch>/kitchen-sheets`, `$O` is `<surface-runs>/kitchen-sheets`, `$K` is `<m15-runs>/kitchen` and `$G` is `$OPENFTGS_DATASETS/synth/ground_truth`. Each command ran with three CPU threads, with this branch's code at 96659a0 and the shared `.venv`. The 33 renders ran from 21:39 on 2026-11-18 to 01:07 on 2026-11-19, between other runs. Every rendered value is finite, and each sheet's lowest share of pixels with alpha ≥ 0.5 is 0.75 to 0.96. The plan for the models not trained yet (finalist 4's, and any `kitchen` runs of finalist 2's variants) is `$T/PLAN.md`, applying `$T/kitchen_sheets.sh` to each. Section 7 here records those sheets.
 
 **The owner's answer on step 3** (the go for step 4 or a stop), given in session:
 - **Finalist 1** (question 2): option (a). Finalist 1 is dropped. The corrected manifests stay on file, and finalists 2 to 4 train on the manifest's cameras.
@@ -1740,7 +1740,7 @@ The private scene's folders, `<m15-runs>`, `<m17-runs>` and tickets #24's and #2
 
 | Command | Device | Time | Note |
 | --- | --- | --- | --- |
-| `bash $T/kitchen_sheets.sh <run-dir> <run>`, per run; then `python $T/compare_sheets.py $O/compare/finalist2_kitchen_s<n>.jpg --title … <sheets>` | GPU (one render under the lock), then CPU | 6.7 to 8.8 s per render, apart from the wait for the lock | As in section 4 here's table, with the same `$T` and `$O` |
+| `bash $T/kitchen_sheets.sh <run-dir> <run>`, per run; then `python $T/compare_sheets.py $O/compare/finalist2_kitchen_s<n>.jpg --title … <sheets>` | GPU (one render under the lock), then CPU | 6.4 to 8.9 s per render, apart from the wait for the lock | As in section 4 here's table, with the same `$T` and `$O` |
 
 **The owner's answer on step 4** (2026-11-18, in session, relayed by the orchestrating session):
 
@@ -2370,7 +2370,7 @@ The private scene's folders, `<m15-runs>`, `<m17-runs>` and tickets #24's, #26's
 
 | Command | Device | Time | Note |
 | --- | --- | --- | --- |
-| `bash $T/kitchen_sheets.sh <run-dir> <run>`, per run; then `python $T/compare_sheets.py $O/compare/finalist3_kitchen_s<n>.jpg --title … <sheets>` | GPU (one render under the lock), then CPU | 6.7 to 8.8 s per render, apart from the wait for the lock | As in section 4 here's table, with the same `$T` and `$O` |
+| `bash $T/kitchen_sheets.sh <run-dir> <run>`, per run; then `python $T/compare_sheets.py $O/compare/finalist3_kitchen_s<n>.jpg --title … <sheets>` | GPU (one render under the lock), then CPU | 6.4 to 8.9 s per render, apart from the wait for the lock | As in section 4 here's table, with the same `$T` and `$O` |
 
 **The owner's answer on step 5** (the go for step 6 or a stop), given in session:
 - **Finalist 3: dropped as tested** (question 1). The options left untested stay recorded: λ_nc between 0.005 and 0.05, the term from iteration 7,000 at λ_flat = 10, and an oriented start.
