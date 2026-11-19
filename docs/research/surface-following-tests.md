@@ -2486,7 +2486,8 @@ The angle between cameras grows with their separation, and it is about half the 
   | 200 | 1.358 | 0.0345 | 100 % / 96.3 % | 0.036 / 4.5 % | 0.136 | 0.1419 |
   | 300 | 1.206 | 0.0331 | 100 % / 98.2 % | 0.039 / 4.6 % | 0.121 | 0.1147 |
 
-  L₇ falls as the term turns the primitives, while at 300 iterations they are still near D-25's spheres. C8's weight passes about 5 % of the cut's pixels, as on the trained models. The prior adds 0.12 to 0.16 to a total of 0.47 to 0.61.
+  The figures are the logged rows, each the mean over the 100 iterations before it. L₇ falls as the term turns the primitives, while at 300 iterations they are still near D-25's spheres. C8's weight passes about 5 % of the cut's pixels, as on the trained models. The prior adds 0.12 to 0.16 to a total of 0.47 to 0.61.
+- **The same with `--prior-from 100`,** the path a late start takes. It ended normally in 35 s, both wrappers 300 times, with the same logged keys in every row. The row at iteration 100, the mean over iterations 1 to 100, carries the term for its one active iteration: pixel share 0.01, L₇ 0.014, a hundredth of a full iteration's. The rows at 200 and 300 equal the first run's to three figures (L₇ 1.372 and 1.215).
 
 **The arms, as planned for the owner's go.**
 
@@ -2549,6 +2550,7 @@ Questions 1, 2 and 4 block the main arm; question 3 blocks DAViD's arm only. Not
 | `python $T/prior_check.py values $O/checks/prior_values.json`; `python $T/prior_check.py fd $O/checks/prior_fd.json` | CPU | seconds | The terms' checks |
 | `bash $T/prior_on_model.sh`: `python $T/prior_on_model.py $O/checks/prior_on_model.json FLAT_kitchen_s0=<surface-runs>/ticket-27/runs/FLAT_kitchen_s0/checkpoint=$K=cam05=100=<priors> OFF_kitchen_s0=<surface-runs>/ticket-26/runs/OFF_kitchen_s0/checkpoint=… FLAT_A_h0_s0=<surface-runs>/ticket-27/runs/FLAT_A_h0_s0/checkpoint=$X/scene_h0/scene.json=cam1=60=<priors>` | GPU | about 1 min, after the lock | The terms on trained models; run twice, the first stopping on the script's own parsing of the priors' list |
 | `bash $T/smoke.sh`: `bash $T/run_train.sh smoke_kitchen_off $K $M/kitchen/init.safetensors 0 --term flat=0 --term prior=0 --record-draws $O/smoke/draws_s0.json -- --config <surface-runs>/ticket-27/smoke/cfg300.json`; `python -I $T/normal_maps.py $K $O/kitchen/moge2_smoke --estimator moge2 … --draws $O/smoke/draws_s0.json`; `bash $T/run_train.sh smoke_kitchen_prior … --term flat=1 --flat-weighting sigma_t --term prior=1 --prior-maps $O/kitchen/moge2_smoke --prior-axes x,y,z --prior-c7 0.1 --prior-c8 0.015 --prior-gamma 0.005 --prior-depth plane --prior-from 1 -- --config …` | GPU | 32 s, 32 s, 35 s | The smoke runs |
+| `bash $T/run_train.sh smoke_kitchen_prior_from100 …` with the third run's terms and `--prior-from 100` | GPU | 35 s | The late start's path |
 
 The private scene's folders, `<m15-runs>`, `<m17-runs>` and tickets #4's, #12's, #26's and #27's folders were read and never written.
 
@@ -2560,7 +2562,7 @@ The private scene's folders, `<m15-runs>`, `<m17-runs>` and tickets #4's, #12's,
 - **The terms are in the wrapper copy and checked:** finite differences, the weight-0 parity, and a 300-iteration smoke run with flattening and both terms.
 - **On trained models today's primitives' normals lie 18° (`kitchen`) and 43° (private scene A) from the image's prior,** and C8's confidence weight at γ = 0.005 passes 2 % to 11 % of the pixels: row C7 has much to turn, and row C8 acts mostly after it has.
 - **The plan:** one arm on both sets (8 runs) and DAViD's arm on private scene A (4 runs), about 5.7 GPU hours with the terms from iteration 15,000, the full maps and the `kitchen` sheets included. Four questions above; none trains anything until answered.
-- **This step's GPU time** was about 6 minutes in all: the maps, the two passes of the checks on trained models and the three smoke commands. Everything else ran on 4 CPU threads.
+- **This step's GPU time** was about 6 minutes in all: the maps, the two passes of the checks on trained models and the four smoke commands. Everything else ran on 4 CPU threads.
 
 **The owner's answer on step 6** (whether the work goes on to the recommendation, or stops): *not yet given.* **Date:** *not yet given.*
 
