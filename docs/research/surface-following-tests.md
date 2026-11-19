@@ -2178,6 +2178,170 @@ The largest figure, `log_durations`' 2.9·10⁻⁵, is on a gradient five orders
 | `bash $T/run_train.sh smoke_kitchen_nc2 … <the third smoke run's terms> -- --config $O/smoke/cfg300.json` | GPU | 34 s | The smoke run in the wrapper's final form |
 | A short inline read of `train_log.jsonl` of `$B/A_h0_s0`, `A_h0_s1`, `A_h0_s0_rep`, `A_h0_s0_v2`, `A_h0_s0_wrap` and `<surface-runs>/ticket-26/runs/` `OFF_A_h0_s1`, `ABS_A_h0_s0`, `ABS_A_h0_s1` | CPU | seconds | The L1 guard's noise |
 
+**In short, for the owner.** Neither arm lowers the shell. With λ_flat = 1 from the calibration, flattening alone makes almost every primitive flat, the shell's included (the median smallest scale goes from a fifth of the middle one to a thousandth on the near side, and to 0 within the shell), and leaves the near-side far-5 cm share where the off arm has it on both copies. The renders keep their sharpness and no guard is crossed on openftgs-synth, but the share behind the surface does not fall. Adding the consistency term, at the only weight the calibration's L1 guard allowed (λ_nc = 0.005 from iteration 15,000), raises the named measure on the centre copy by 0.011, by the rule. On `kitchen` it moves the residual from in front of the surface to behind it by 0.006, beyond the 0.005 guard, while the error of expected depth falls. By section 7.2's row this is the drop clause, the shell staying and turning flat: H2's second outcome. At 2DGS's weight of 0.05, where the term reshapes the model, the calibration's renders turned softer instead: H2's first outcome, on one seed. Recommended: drop finalist 3 as tested. Finalist 4's flattening weight, should it run: λ_flat = 1.
+
+**The arms, run** on 2026-11-18, at the owner's answers above, after the calibration, with the same code, versions and hardware: the RTX 4090 alone under the lock, 14 CPU threads, one training at a time. Every run wrote only under `<surface-runs>/ticket-27`. Scripts read tensors, JSON, images and mask files, wrote numbers and files, and no image, render or sheet of private scene A was looked at (row T27.6).
+
+- **The runs:** 16, eight per arm, all 30,000 iterations of the default training configuration through the wrapper copy: `FLAT_…` with `--term flat=1 --flat-weighting sigma_t`, and `FLATNC_…` with that and `--term nc=0.005 --nc-depth plane --nc-from 15000`. Private scene A's two copies at seeds 0 and 1 from the kept stride-4 files; `kitchen` at seeds 0 to 2 and `studio` at seed 0 from M17's init files. Every wrapper ran 30,000 times in every run.
+- **Memory.** No run needed a fallback: arm 2 fit beside the frame cache on the GPU on private scene A (peaks of 23,575 to 23,924 MiB in `nvidia-smi`) and with the cache memory-mapped on `studio` (23,775 MiB). D-51's `auto` placed the cache as in the off arm: on the GPU on private scene A, memory-mapped on openftgs-synth.
+- **Times.** Arm 1: 13 min 14 s to 13 min 18 s on private scene A, 16 min 51 s to 17 min 14 s on `kitchen`, 23 min 29 s on `studio`, the off arm's. Arm 2: 22 min 33 s to 23 min 7 s, 26 min 16 s to 26 min 17 s and 35 min 11 s, the device from 15,000 as estimated.
+- **GPU hours.** The arms with their post-processing took about 5.9 hours, the calibration about 1.9 and the first step about 0.3: about 8.1 hours in all, inside the 8.5 cleared.
+
+**The named measure,** the near-side far-5 cm share against the kept files, with the tail beyond 25 cm (each cell 5 cm / tail), and the other shell measures. The off arm and plain baseline are section 5 here's.
+
+| Run | Near side: far-5 cm / beyond 25 cm | Near side: far-10 cm | Under two frames: near / whole | Whole model: far-5 cm | Far side: far-5 cm | Cap reached at |
+| --- | --- | --- | --- | --- | --- | --- |
+| `OFF_A_h0_s0` / `s1` | 0.1308 / 0.0461; 0.1380 / 0.0333 | 0.0754; 0.0644 | 0.5857 / 0.454; 0.5836 / 0.451 | 0.218; 0.225 | 0.537; 0.536 | 10,900; 10,800 |
+| `FLAT_A_h0_s0` | 0.1243 / 0.0411 | 0.0706 | 0.5827 / 0.450 | 0.210 | 0.511 | 10,900 |
+| `FLAT_A_h0_s1` | 0.1463 / 0.0477 | 0.0837 | 0.5815 / 0.448 | 0.226 | 0.516 | 10,600 |
+| `FLATNC_A_h0_s0` | 0.1465 / 0.0574 | 0.0831 | 0.5823 / 0.448 | 0.225 | 0.514 | 10,500 |
+| `FLATNC_A_h0_s1` | 0.1448 / 0.0328 | 0.0721 | 0.5907 / 0.455 | 0.231 | 0.531 | 10,800 |
+| `OFF_A_h1_s0` / `s1` | 0.1411 / 0.0379; 0.1337 / 0.0264 | 0.0662; 0.0561 | 0.5808 / 0.445; 0.5893 / 0.449 | 0.227; 0.225 | 0.536; 0.540 | 10,000; 10,000 |
+| `FLAT_A_h1_s0` | 0.1372 / 0.0338 | 0.0650 | 0.5792 / 0.437 | 0.225 | 0.517 | 9,800 |
+| `FLAT_A_h1_s1` | 0.1467 / 0.0388 | 0.0670 | 0.5838 / 0.442 | 0.231 | 0.519 | 9,900 |
+| `FLATNC_A_h1_s0` | 0.1350 / 0.0326 | 0.0683 | 0.5927 / 0.451 | 0.221 | 0.529 | 9,700 |
+| `FLATNC_A_h1_s1` | 0.1338 / 0.0313 | 0.0589 | 0.5847 / 0.444 | 0.223 | 0.526 | 9,800 |
+
+**Judged by section 4.4's rule against the off arm** (both of the arm's seeds beyond both of the off arm's, the means more than 0.01 apart; 0.021 for the tail):
+
+| Copy | Arm 1, `flat` | Arm 2, `flat` with `nc` | Against the plain baseline, for reference |
+| --- | --- | --- | --- |
+| Centre, named measure | not moved (0.124, 0.146 against 0.131, 0.138; mean 0.001 higher) | **higher by 0.011** (0.147, 0.145 against 0.131, 0.138) | arm 1 not moved; arm 2 not moved (mean 0.005 higher) |
+| Centre, tail | not moved | not moved (mean 0.005 higher) | not moved |
+| Left, named measure | not moved (0.137, 0.147 against 0.141, 0.134; mean 0.005 higher) | not moved (0.135, 0.134; mean 0.003 lower) | arm 1 lower by 0.016, arm 2 by 0.024: the script's own effect, which the off arm takes out (section 5 here) |
+| Left, tail | not moved | not moved | not moved |
+| Under two frames, near side (reported) | not moved on either copy | not moved on either copy | not moved |
+
+- **Neither arm lowers the named measure** on either copy. Arm 2 raises it on the centre copy by the rule, the wrong way for H1.
+- **The tail does not move** in either arm on either copy.
+- **The far side's far-5 cm share** is lower in every arm run, 0.511 to 0.531 against the off arm's 0.536 to 0.540; the rule is not applied to it.
+
+**Row A1: does flattening survive growth and relocation?** The medians of the ratio of the smallest scale to the middle one (min/mid) and to the largest (min/max) at iteration 30,000, by `ratio_stats.py`, with the share of primitives whose min/max is below 0.01:
+
+| Runs | Whole model: min/mid, min/max, share below 0.01 | Near side | Near side's far-5 cm part (the shell) |
+| --- | --- | --- | --- |
+| Off arm, centre copy, 2 seeds | 0.224, 0.061, 0.21 | 0.198 to 0.200, 0.075, 0.17 | 0.166, 0.051, 0.24 to 0.25 |
+| Off arm, left copy, 2 seeds | 0.217 to 0.221, 0.058 to 0.059, 0.21 to 0.22 | 0.188 to 0.190, 0.071, 0.18 | 0.150 to 0.172, 0.053 to 0.058, 0.22 to 0.25 |
+| Plain baseline, centre copy, 2 seeds | 0.226, 0.062, 0.21 | 0.202, 0.076, 0.17 | 0.164 to 0.166, 0.055 to 0.056, 0.24 to 0.25 |
+| Arm 1, private scene A, 4 runs | 0.0001, 2·10⁻⁵ to 5·10⁻⁵, 0.72 to 0.74 | 0.0016 to 0.0026, 0.0007 to 0.0011, 0.64 to 0.66 | 0.0000, 0.0000, 0.87 to 0.88 |
+| Arm 2, private scene A, 4 runs | 0.0001 to 0.0002, 3·10⁻⁵ to 5·10⁻⁵, 0.73 to 0.74 | 0.0018 to 0.0025, 0.0008 to 0.0011, 0.65 to 0.66 | 0.0000, 0.0000, 0.86 to 0.88 |
+| Off arm / arm 1 / arm 2, `kitchen`, 3 seeds each | 0.561, 0.168, 0.06 / 0.090, 0.022, 0.41 / 0.085 to 0.087, 0.020, 0.41 to 0.42 | – | – |
+| Off arm / arm 1 / arm 2, `studio` | 0.330, 0.082, 0.14 / 0.0000, 0.0000, 0.86 / 0.0000, 0.0000, 0.86 | – | – |
+
+- **Flattening survives growth and relocation.** At the end of every arm run the near side's median smallest scale is about 1/500 of its middle one, against a fifth in the off arm, and the shell's is 0 to the printed digit; E11's and E17's copies keep it, as row A1 read them.
+- **The shell flattens most.** Its primitives get the least rendering gradient, so under Adam L_flat drives them at the learning rate's pace (the Adam check above); the share of the shell below 0.01 is 0.86 to 0.88, against 0.64 to 0.66 on the near side.
+- **`kitchen` flattens far less** (min/mid 0.09) than private scene A and `studio` (about 0), at the same λ_flat in world units. Its rendering gradients balance the term at a larger ratio, as the trained models showed (above).
+- **The smallest-scale direction did settle without an oriented start:** in the calibration by iteration 15,000 at λ_flat = 1 and by 7,000 at 10, and in every arm run. Row A10's remedy is not needed for the term to act. It is still not shown that the settled direction is the surface's.
+- **The consistency term moved little at λ_nc = 0.005:** L_nc ended at 0.51 to 0.57 on private scene A, 0.24 to 0.25 on `kitchen` and 0.35 on `studio`, from about 0.7 at its start.
+
+**The test-view scores, the sharpness ratio and the tiles' coverage,** as section 3 here takes them. Kept-pixel PSNR is Q-233's, on the centre copy only. Every rendered value is finite.
+
+| Run | Crop PSNR | Crop SSIM₁ | Sharpness ratio | Late | Training cameras: PSNR / ratio | E16 PSNR / SSIM₁ / ꟻLIP | Kept-pixel PSNR | Coverage: between cameras to ±45°; ±60°, ±90° |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| `FLAT_A_h0_s0` | 24.37 | 0.8152 | 0.7232 | 0.7449 | 32.86 / 0.7764 | 24.83 / 0.8189 / 0.1535 | 25.57 | 0.81 to 1.00; 0.49 to 0.90 |
+| `FLAT_A_h0_s1` | 24.41 | 0.8163 | 0.7278 | 0.7519 | 32.76 / 0.7704 | 24.96 / 0.8196 / 0.1533 | 25.70 | 0.82 to 1.00; 0.50 to 0.88 |
+| `FLATNC_A_h0_s0` | 24.35 | 0.8153 | 0.7252 | 0.7419 | 32.76 / 0.7713 | 24.84 / 0.8183 / 0.1521 | 25.57 | 0.89 to 1.00; 0.45 to 0.93 |
+| `FLATNC_A_h0_s1` | 24.36 | 0.8164 | 0.7236 | 0.7445 | 32.71 / 0.7685 | 24.73 / 0.8203 / 0.1533 | 25.47 | 0.81 to 1.00; 0.44 to 0.88 |
+| `FLAT_A_h1_s0` | 23.86 | 0.7461 | 0.7463 | 0.8011 | 31.50 / 0.7745 | 21.86 / 0.7382 / 0.1957 | – | 0.81 to 1.00; 0.62 to 0.99 |
+| `FLAT_A_h1_s1` | 23.85 | 0.7464 | 0.7418 | 0.7912 | 31.49 / 0.7724 | 21.67 / 0.7381 / 0.1959 | – | 0.79 to 1.00; 0.48 to 0.87 |
+| `FLATNC_A_h1_s0` | 23.82 | 0.7485 | 0.7317 | 0.7856 | 31.46 / 0.7700 | 21.62 / 0.7395 / 0.1965 | – | 0.80 to 1.00; 0.51 to 0.87 |
+| `FLATNC_A_h1_s1` | 24.00 | 0.7494 | 0.7292 | 0.7822 | 31.40 / 0.7679 | 21.79 / 0.7402 / 0.1940 | – | 0.78 to 1.00; 0.48 to 0.89 |
+
+- **No test-view score falls by more than 0.3 dB** against the off arm in either arm on either copy. The largest falls are arm 1's crop PSNR on the left copy (−0.10 dB) and arm 2's E16 PSNR there (−0.12 dB). On the centre copy arm 1 is higher: E16 +0.16 dB and kept-pixel PSNR +0.18 dB, about the off arm's own seed spread (0.14 and 0.17).
+- **The sharpness ratio does not fall in arm 1:** −0.003 on the centre copy, within the off arm's spread of 0.0055, and +0.010 on the left copy, both seeds above both of the off arm's.
+- **In arm 2 it falls slightly on the left copy:** 0.732 and 0.729 against 0.732 and 0.735, a mean 0.003 lower, about the off arm's spread of 0.003. On the centre copy it is 0.004 lower, within the spread of 0.0055. Section 7.2's last column, a measure that falls while the renders soften, does not arise.
+- **The coverage** stays within the off arm's and the baseline's ranges; no tile collapses.
+
+**The sheets, for judging with their labels hidden.** There are four sets, the centre copy at seeds 0 and 1, then the left copy at seeds 0 and 1. Each holds the off arm and both arms in an order from Python's `random.Random(27)`, labelled `set<n>-A` to `-C` only. They are `<surface-runs>/ticket-27/sheets/blind/set<n>-<letter>.jpg`, from section 2.6's fixed request, with the key apart in `KEY.json` beside them. Nobody here has looked at them, and the owner's judgement is open.
+
+**openftgs-synth.** The columns are as in section 3 here. On `kitchen`, at the owner's answer, SSIM₁, PSNR and ꟻLIP are read against the off arm's five seeds; the kept-pixel PSNR and the residual's shares against its seeds 0 to 2; and the plain baseline's five seeds are beside them for SSIM₁.
+
+| Run | E16 PSNR / SSIM₁ / ꟻLIP | Kept-pixel PSNR | Residual, all pixels: in front / behind | Dynamic pixels: in front / behind | Expected depth, median error, all / dynamic | Far share at 0.12·S | Beyond 25 cm | Under two frames | Cap reached at |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| `OFF_kitchen_s0` to `s2` | 24.88 to 27.58 / 0.8753 to 0.8772 / 0.0910 to 0.0949 | 29.16 to 30.08 | 0.041 to 0.042 / 0.294 to 0.295 | 0.015 to 0.016 / 0.615 to 0.616 | 206 to 247 / 44 to 73 mm | 0.035 to 0.036 / 0.002 to 0.003 | 0.023 to 0.024 / 0.001 | 0.381 to 0.383 / 0.655 to 0.662 | 2,100 |
+| `OFF_kitchen_s3`, `s4` | 28.33 / 0.8779 / 0.0895; 27.69 / 0.8781 / 0.0945 | – | – | – | – | – | – | – | 2,100 |
+| `FLAT_kitchen_s0` | 29.10 / 0.8792 / 0.0887 | 31.02 | 0.041 / 0.295 | 0.016 / 0.618 | 192 / 52 mm | 0.038 / 0.003 | 0.024 / 0.001 | 0.384 / 0.659 | 2,000 |
+| `FLAT_kitchen_s1` | 27.42 / 0.8785 / 0.0916 | 30.44 | 0.041 / 0.298 | 0.016 / 0.617 | 244 / 107 mm | 0.036 / 0.003 | 0.023 / 0.001 | 0.383 / 0.662 | 2,000 |
+| `FLAT_kitchen_s2` | 29.96 / 0.8799 / 0.0861 | 31.42 | 0.041 / 0.294 | 0.016 / 0.619 | 186 / 37 mm | 0.037 / 0.003 | 0.024 / 0.001 | 0.385 / 0.658 | 2,000 |
+| `FLATNC_kitchen_s0` | 27.41 / 0.8785 / 0.0897 | 30.83 | 0.035 / 0.299 | 0.014 / 0.627 | 169 / 29 mm | 0.032 / 0.002 | 0.020 / 0.001 | 0.380 / 0.660 | 2,000 |
+| `FLATNC_kitchen_s1` | 27.41 / 0.8768 / 0.0923 | 29.81 | 0.036 / 0.299 | 0.016 / 0.622 | 182 / 39 mm | 0.032 / 0.003 | 0.020 / 0.001 | 0.381 / 0.663 | 2,000 |
+| `FLATNC_kitchen_s2` | 26.15 / 0.8776 / 0.0911 | 30.52 | 0.036 / 0.301 | 0.014 / 0.627 | 203 / 32 mm | 0.032 / 0.003 | 0.019 / 0.001 | 0.379 / 0.657 | 2,000 |
+| `OFF_studio_s0` | 22.83 / 0.7986 / 0.1899; dynamic 25.02 | 23.02 | 0.014 / 0.414 | 0.009 / 0.649 | 172 / 102 mm | 0.044 / 0.001 | 0.071 / 0.001 | 0.384 / 0.707 | 6,900 |
+| `FLAT_studio_s0` | 22.63 / 0.7942 / 0.1919; dynamic 25.29 | 22.57 | 0.013 / 0.414 | 0.007 / 0.645 | 140 / 82 mm | 0.040 / 0.001 | 0.068 / 0.001 | 0.389 / 0.716 | 6,600 |
+| `FLATNC_studio_s0` | 22.69 / 0.7963 / 0.1886; dynamic 25.36 | 22.68 | 0.011 / 0.436 | 0.007 / 0.648 | 159 / 91 mm | 0.036 / 0.001 | 0.064 / 0.001 | 0.390 / 0.712 | 6,600 |
+
+- **Arm 1 on `kitchen` does no harm by the guards.**
+  - SSIM₁ is 0.0024 above the off arm's five seeds, and 0.0003 above the plain baseline's five.
+  - The residual's shares are within 0.003 of the off arm's: behind the surface +0.0016 on all pixels and +0.0026 on dynamic pixels.
+  - PSNR, kept-pixel PSNR and ꟻLIP are not flagged.
+  - **The share behind the surface does not fall,** so the better result section 5.5 expected of a surface term on openftgs-synth does not appear.
+- **Arm 2 on `kitchen` moves the residual behind the surface.**
+  - Its share behind is 0.0057 above the off arm's on all pixels and 0.0097 on dynamic pixels, beyond the 0.005 by which section 4.4 calls a share worse. Its share in front is 0.0056 lower, beyond the same margin the other way.
+  - The median error of expected depth falls: 169 to 203 mm against 206 to 247 mm, and 29 to 39 against 44 to 73 mm on dynamic pixels, ranges that do not overlap, so the criterion applies and reads better.
+  - SSIM₁ is 0.0008 above the off arm's five seeds and 0.0012 below the plain baseline's five, within the guard. PSNR, kept-pixel PSNR and ꟻLIP are not flagged against the off arm.
+  - So the consistency term moves weight from in front of the surface to behind it and brings expected depth closer: the guard on the share behind counts it as harm, the depth error as a gain.
+- **On `studio`, one seed.** The dynamic-region PSNR is 25.29 dB in arm 1 and 25.36 dB in arm 2, against the off arm's 25.02 dB; neither is flagged. Arm 2's share behind the surface is 0.436 against 0.414, 0.022 higher, the direction `kitchen` shows; arm 1's is the off arm's.
+- **The far shares and the under-two-frames share** are within 0.004 of the off arm's on `kitchen`; on `studio`'s one seed within 0.009, arm 2's far share at 0.12·S 0.036 against 0.044.
+
+**The reading by section 7.2's row for finalist 3.**
+
+- **Adopt when** "the near-side far-5 cm share moves with the renders sharp, with no harm on openftgs-synth, where a lower share behind the surface is expected". **Not met:** neither arm lowers it, and arm 2 raises it on the centre copy.
+- **Drop when** "the shell stays and turns flat, thin and aligned with its own depth, H2's other outcome". **Met, in part for the last word.**
+  - **Arm 1** keeps the shell where the off arm has it and makes its primitives flat, thinner than any other population. The row says the first arm predicts nothing about the shell; it was run to see what flattening does to today's spheres, and it shows that L_flat alone shapes the shell and does not move it, as row A1 read.
+  - **Arm 2**, at the weight the guard allowed, aligns the primitives with their own depth only a little (L_nc from 0.7 to about 0.5 on private scene A). It keeps the shell, raises it on the centre copy by 0.011, and on `kitchen` moves the residual behind the surface.
+  - **At 2DGS's weight, 0.05,** the calibration's centre-copy run aligned them more (L_nc 0.21), raised L1 by 9.75 % and lowered the sharpness ratio from 0.705 to 0.674; at 0.5, to 0.594. That is H2's first outcome, the renders turning soft, on one seed at iteration 23,000; the arms did not run it.
+- **What this test does not cover.**
+  - λ_nc between 0.005 and 0.05, and any weight above 0.005 at 30,000 iterations on both sets.
+  - The consistency term from iteration 7,000 (the start rule moved it to 15,000 at λ_flat = 1).
+  - PGSR's image-edge weight and its multi-view terms.
+  - λ_flat expressed as s_min/S.
+- **Recommended: drop finalist 3 in the form tested,** by the row. Flattening survives growth and does no harm, but does not move the shell. The consistency term either barely acts, at the weight the guard allows, or softens the renders, at the papers' weight. For finalist 4, which the PRD runs on top of finalist 3's flattening, the calibrated λ_flat = 1 is the weight this step found.
+
+**Section 5.5's open choices, as answered** (by the owner, at this step's recommendations, and by the runs):
+
+1. **L_flat over all N or σt-weighted:** σt-weighted, at the owner's answer. The calibration's all-N run at 100 flattened alike and crossed no guard, so the choice stays open for a revision on evidence: neither form lowered the shell.
+2. **Which depth L_nc reads:** the plane distance, at the owner's answer. At 0.05 the two depths behaved alike in L1, L_nc and sharpness; the calibration's one expected-depth run had a lower named measure at 23,000 (0.128 against 0.153), one seed each. Not settled by these runs.
+3. **An oriented start:** not needed for the smallest axis to settle: today's spheres flatten by iteration 7,000 at λ_flat ≥ 10, and by 15,000 at 1. Whether an oriented start would put the flat primitives on the surface is not tested.
+
+**Against the ticket's acceptance criteria.**
+
+- **The plane-distance check, before the arms:** done (the first step, above).
+- **The calibration's proposal, the owner's answer and its result:** recorded above.
+- **The two arms on both sets:** 16 runs, against the off arm, the plain baseline beside it.
+- **The named measure by section 4.4's rule, with the sharpness ratio and the sheets, against H2's two outcomes:** above; the sheets are keyed and await the owner's judgement.
+- **On openftgs-synth, the share behind the surface and the guards:** above. Arm 1 does no harm and does not lower the share; arm 2 raises it by 0.006, beyond the guard.
+- **The ratio distribution at the end of each arm:** above, row A1's table.
+- **Section 5.5's open choices:** answered or stated as open, above.
+- **The reading by section 7.2's row, and the owner's answer:** the reading above; the owner's answer below, not yet given, with the flattening weight for finalist 4 to be recorded there.
+- **Sources, commands, files changed, privacy:**
+  - sources: rows T27.1 to T27.6;
+  - commands: below;
+  - files changed: only this document and the source log;
+  - privacy: nothing names private scene A or shows its images.
+
+**The questions for the owner at step 5.**
+
+1. **Finalist 3:** dropped, as recommended, or kept for a further arm (λ_nc between 0.005 and 0.05, or from 7,000 at λ_flat = 10, about 3.5 to 4 GPU hours each on both sets)?
+2. **Step 6, finalist 4:** go or stop. If go, its flattening weight: λ_flat = 1, σt-weighted, as calibrated here (recommended), or another.
+3. **The sheets** (`<surface-runs>/ticket-27/sheets/blind`, key apart): the owner's judgement with the labels hidden.
+
+**The calibration's and the arms' commands** (the conventions of the first step's table, with 14 threads, `$I` for `<surface-runs>/ticket-24/init`, `$G` for `$OPENFTGS_DATASETS/synth/ground_truth` and `$S` for `<surface-runs>/ticket-5/side_request.json`):
+
+| Command | Device | Time | Note |
+| --- | --- | --- | --- |
+| `bash $T/run_train.sh smoke_stop150 $K/scene.json $M/kitchen/init.safetensors 0 --stop-at 150 --term flat=0 -- --config $O/smoke/cfg300.json --checkpoint-every 100 --keep-checkpoints 3` | GPU | 30 s | The exact stop checked: exit 143 at iteration 150, its checkpoint saved; then removed |
+| `bash $T/cal_stage1.sh`: `bash $T/run_train.sh C1_<…> $X/scene_h0/scene.json $I/ref_h0_s4.safetensors 0 --stop-at 15000 <terms> -- --checkpoint-every 7000 --keep-checkpoints 3`, six runs | GPU | 6 min each | Stage 1 |
+| `bash $T/cal_post.sh <run>`: `ftgs render <checkpoint> --request $X/requests/heldout_novel.json`; `python $T/score_a.py … --heldout cam0 --crop 96,256,640,1280 --stored-masks <surface-runs>/ticket-4/private-scene-A/placeholder_masks.npz`; `python $T/ratio_stats.py` at 7,000, 14,000 and the stop; `python $T/measures_a.py` | GPU, then CPU | about 35 s | The calibration's figures |
+| `python $T/cal_decide.py stage1` | CPU | seconds | The stage-1 rule: λ_flat = 1, start 15,000 |
+| `bash $T/cal_stage2.sh 1 15000 23000`: `C2_flat_only`, then `C2_nc<0.05, 0.5, 0.005>` and `C2_exp0.05` with `--term nc=<…> --nc-depth <plane or expected> --nc-from 15000 --stop-at 23000` | GPU | 10 min, then 14.5 to 14.8 min each | Stage 2 |
+| `python $T/cal_decide.py stage2 C2_flat_only 23000` | CPU | seconds | The stage-2 rule: λ_nc = 0.005 |
+| `bash $T/arms.sh 1 0.005 15000 both`: per arm, `bash $T/run_train.sh <run> <scene.json> <init> <seed> <terms>` for the eight runs, each followed by `bash $T/post_a.sh <run> h<c>` or `bash $T/post_synth.sh <run> <scene> <scene.json> <init>` (section 5 here's, repointed, with `ratio_stats.py` added) | GPU, then CPU | 13 to 35 min a run; 1 to 2 min a post | The arms; the script's memory fallbacks were never taken |
+| `python $T/ratio_stats.py` on the off arm's and the plain baseline's checkpoints | CPU | seconds each | The off arm's ratios |
+| `bash $T/blind.sh` | CPU | seconds | The twelve sheets with their labels hidden, and their key |
+| `python $T/tables27.py` | CPU | seconds | The tables of this section, with the five-seed reads on `kitchen` |
+
+The private scene's folders, `<m15-runs>`, `<m17-runs>` and tickets #24's, #26's and #26b's folders were read and never written.
+
 **The owner's answer on step 5** (the go for step 6 or a stop): *not yet given.* **Date:** *not yet given.*
 
 ## 7. Step 6: finalist 4, a normal prior on top of finalist 3's flattening
