@@ -2571,6 +2571,169 @@ The private scene's folders, `<m15-runs>`, `<m17-runs>` and tickets #4's, #12's,
 - **The plan:** one arm on both sets (8 runs) and DAViD's arm on private scene A (4 runs), about 5.7 GPU hours with the terms from iteration 15,000, the full maps and the `kitchen` sheets included. Four questions above; none trains anything until answered.
 - **This step's GPU time** was about 6 minutes in all: the maps, the two passes of the checks on trained models and the four smoke commands. Everything else ran on 4 CPU threads.
 
+**In short, for the owner, after the arms.**
+
+- **The prior turns the primitives fast** and does not move the shell enough to adopt. With MoGe-2's maps, from iteration 15,000 at the papers' weights, the near-side far-5 cm share is lower than the off arm's and than flattening alone on the left copy only (by 0.011 and 0.016), and lower than finalist 3's consistency term's on the centre copy only.
+- **The renders turn softer:** the sharpness ratio falls by 0.035 on both copies. No test-view score falls; they rise by 0.15 to 0.19 dB.
+- **On `kitchen` it halves the expected depth's error** and removes most of what floated in front of the surface, with no harm to the image scores, but the share behind the surface does not fall; on `studio`'s one seed it rises beyond its guard.
+- **DAViD's maps on the person do less** and cost up to 0.28 dB.
+- **By section 7.2's row** this is its third column, a measure that moves in part with softer renders: keep finalist 4 for the combined arm, preferably at a lower, calibrated weight; do not adopt it alone.
+
+**The arms, run** from 2026-11-18 to 2026-11-19, at the owner's answers above, after finalist 2's variant queue had ended, with this branch's code, the same versions and hardware: the RTX 4090 alone under the lock, 14 CPU threads, one training at a time. Every run wrote only under `<surface-runs>/ticket-28`. Scripts read tensors, JSON, images, maps and mask files and wrote numbers and files; no image, render, map or sheet of private scene A was looked at (row T28.8).
+
+- **The maps first.** MoGe-2 on every image: private scene A's 1,080 in 93 s, `kitchen`'s 6,000 in 10 min 34 s, `studio`'s 1,440 in 3 min 16 s (54 to 58 ms per image in the network), 3.0, 24 and 8.7 GB. DAViD on private scene A's 1,080 on the CPU, 4 threads, in 25 min 18 s.
+- **DAViD's person**, by section 2.7's rule (`<scratch>/ticket-28/person_masks.py`, CPU, 3 min 33 s). Each camera is aligned on the first of D-22's pairs it belongs to, with 49,941 to 50,000 anchors per image. The person is 28.3 % of an image at the median (16.9 % at the least); section 2.7 found 28.8 %. Every other pixel carries no prior.
+- **The runs:** twelve, all 30,000 iterations of the default training configuration through the wrapper copy with `--term flat=1 --flat-weighting sigma_t --term prior=1 --prior-c7 0.1 --prior-c8 0.015 --prior-gamma 0.005 --prior-depth plane --prior-from 15000`.
+  - `PRIOR_…`, MoGe-2's maps with `--prior-axes x,y,z`: private scene A's two copies at seeds 0 and 1 from the kept stride-4 files; `kitchen` at seeds 0 to 2 and `studio` at seed 0 from M17's init files.
+  - `DAVID_…`, DAViD's person maps with `--prior-axes x,-y,-z`: private scene A's two copies at seeds 0 and 1.
+  - Every wrapper ran 30,000 times in every run.
+- **Memory.** No run needed a fallback. The arms fit beside the frame cache on the GPU on private scene A, at peaks of 23,416 to 24,006 MiB in `nvidia-smi`, and with the cache memory-mapped on openftgs-synth (22,446 to 23,740 MiB). D-51's `auto` placed the cache as in the off arm.
+- **Times:** 22 min 44 s to 23 min 6 s on private scene A; 27 min 7 s to 27 min 11 s on `kitchen`; 36 min 24 s on `studio`.
+- **GPU hours:** the maps, the arms and their post-processing took 5.49 hours (00:04 to 05:33 on 2026-11-19), the labelled `kitchen` sheets 20 s, and the first step 0.1 hours: about 5.6 hours in all, inside the 5.7 cleared.
+
+**The named measure,** the near-side far-5 cm share against the kept files, with the tail beyond 25 cm (each cell 5 cm / tail), and the other shell measures. The off arm's and finalist 3's runs are section 6 here's.
+
+| Run | Near side: far-5 cm / beyond 25 cm | Near side: far-10 cm | Under two frames: near / whole | Whole model: far-5 cm | Far side: far-5 cm | Cap reached at |
+| --- | --- | --- | --- | --- | --- | --- |
+| `OFF_A_h0_s0` / `s1` | 0.1308 / 0.0461; 0.1380 / 0.0333 | 0.0754; 0.0644 | 0.5857 / 0.454; 0.5836 / 0.451 | 0.218; 0.225 | 0.537; 0.536 | 10,900; 10,800 |
+| `PRIOR_A_h0_s0` | 0.1279 / 0.0301 | 0.0573 | 0.6085 / 0.476 | 0.217 | 0.541 | 11,000 |
+| `PRIOR_A_h0_s1` | 0.1360 / 0.0388 | 0.0704 | 0.6056 / 0.476 | 0.216 | 0.523 | 10,600 |
+| `DAVID_A_h0_s0` | 0.1380 / 0.0386 | 0.0688 | 0.6057 / 0.448 | 0.226 | 0.523 | 10,600 |
+| `DAVID_A_h0_s1` | 0.1300 / 0.0284 | 0.0560 | 0.6115 / 0.453 | 0.222 | 0.534 | 10,900 |
+| `OFF_A_h1_s0` / `s1` | 0.1411 / 0.0379; 0.1337 / 0.0264 | 0.0662; 0.0561 | 0.5808 / 0.445; 0.5893 / 0.449 | 0.227; 0.225 | 0.536; 0.540 | 10,000; 10,000 |
+| `PRIOR_A_h1_s0` | 0.1213 / 0.0269 | 0.0513 | 0.6127 / 0.473 | 0.213 | 0.551 | 9,800 |
+| `PRIOR_A_h1_s1` | 0.1307 / 0.0276 | 0.0557 | 0.6151 / 0.472 | 0.219 | 0.535 | 9,700 |
+| `DAVID_A_h1_s0` | 0.1287 / 0.0316 | 0.0568 | 0.6001 / 0.439 | 0.224 | 0.535 | 9,800 |
+| `DAVID_A_h1_s1` | 0.1387 / 0.0251 | 0.0582 | 0.6092 / 0.441 | 0.234 | 0.537 | 9,800 |
+
+**Judged by section 4.4's rule** (both of the arm's seeds beyond both of the reference's, the means more than 0.01 apart; 0.021 for the tail), against the off arm and against finalist 3's two arms, as section 5.6 asks:
+
+| Copy, measure | `PRIOR` against the off arm | against `FLAT` (what the prior adds to flattening) | against `FLATNC` (the prior against consistency) | `DAVID` against the off arm / `FLAT` / `FLATNC` |
+| --- | --- | --- | --- | --- |
+| Centre, named measure | not moved (0.128, 0.136 against 0.131, 0.138; mean 0.003 lower) | not moved (against 0.124, 0.146) | **lower by 0.014** (against 0.147, 0.145) | not moved / not moved / **lower by 0.012** |
+| Left, named measure | **lower by 0.011** (0.121, 0.131 against 0.141, 0.134) | **lower by 0.016** (against 0.137, 0.147) | not moved (against 0.135, 0.134; mean 0.008 lower) | not moved (mean 0.004 lower) / not moved / not moved |
+| Either copy, tail | not moved (means 0.005 lower) | not moved | not moved | not moved |
+| Under two frames, near side (reported) | **higher** by 0.022 and 0.029 | higher by 0.025, 0.032 | higher by 0.021, 0.025 | higher by 0.024, 0.020 against the off arm |
+
+- **The prior lowers the named measure in one place against each reference, never in both copies.** Against the off arm and against flattening alone, it is lower on the left copy and not on the centre copy. Against the consistency term it is the other way round, since `FLATNC` raised the centre copy (section 6 here).
+- **DAViD's maps move it against `FLATNC` alone, on the centre copy.** On the person they do less than MoGe-2's over the whole image.
+- **The near side's under-two-frames share rises** by 0.02 to 0.03 in all eight runs, beyond every reference's seeds. The prior's runs keep more short-lived primitives near the camera, which section 4.4 names as finalist 2's measure, not this one's.
+- **The tail does not move.**
+
+**Row A1: the scale ratios at iteration 30,000** (`ratio_stats.py`; medians of min/mid and min/max, and the share with min/max below 0.01):
+
+| Runs | Whole model | Near side | Near side's far-5 cm part (the shell) |
+| --- | --- | --- | --- |
+| `FLAT_…`, private scene A, 4 runs (section 6 here) | 0.0001, 2·10⁻⁵ to 5·10⁻⁵, 0.72 to 0.74 | 0.0016 to 0.0026, 0.0007 to 0.0011, 0.64 to 0.66 | 0.0000, 0.0000, 0.87 to 0.88 |
+| `PRIOR_…`, private scene A, 4 runs | 0.0001, 2·10⁻⁵ to 4·10⁻⁵, 0.73 to 0.75 | 0.0013 to 0.0017, 0.0006 to 0.0007, 0.66 to 0.67 | 0.0000, 0.0000, 0.83 to 0.89 |
+| `DAVID_…`, private scene A, 4 runs | 0.0000 to 0.0001, 7·10⁻⁶ to 2·10⁻⁵, 0.73 to 0.75 | 0.0012 to 0.0019, 0.0005 to 0.0008, 0.64 to 0.66 | 0.0000, 0.0000, 0.86 to 0.88 |
+| `FLAT_…` / `PRIOR_…`, `kitchen`, 3 seeds each | 0.090, 0.022, 0.41 / 0.041 to 0.042, 0.0096 to 0.0098, 0.50 | – | – |
+| `FLAT_…` / `PRIOR_…`, `studio` | 0.0000, 0.0000, 0.86 / 0.0000, 0.0000, 0.87 | – | – |
+
+The prior keeps the flattening and adds to it on `kitchen`, where flattening alone left most primitives thicker. E11's and E17's copies keep the parent's rotation, so the prior's turns survive growth as the flattening does.
+
+**The prior terms over the run** (the logged rows, each the mean of the 100 iterations before it):
+
+| Runs | At iteration 15,100: L₇ / L₈ / share C8's weight passes | At 30,000: L₇ / L₈ / share | λ₇L₇ + λ₈L₈ at 30,000, of the total loss | L1 at 30,000 (off arm) |
+| --- | --- | --- | --- | --- |
+| `PRIOR_…`, private scene A | 0.665 to 0.680 / 0.259 to 0.270 / 16 % to 17 % | 0.138 to 0.142 / 0.438 to 0.467 / 78 % to 79 % | 0.020 to 0.021 of 0.073 to 0.075 | 0.0118 to 0.0122 (0.0104 to 0.0107) |
+| `DAVID_…`, private scene A | 0.697 to 0.723 / 0.108 to 0.130 / 7 % to 9 % | 0.247 to 0.256 / 0.257 to 0.281 / 43 % to 46 % | 0.029 to 0.030 of 0.080 to 0.082 | 0.0117 to 0.0119 |
+| `PRIOR_…`, `kitchen` | 0.458 to 0.543 / 0.255 to 0.348 / 22 % to 32 % | 0.076 / 0.194 to 0.198 / 91 % | 0.0105 of 0.068 | 0.0133 to 0.0135 |
+| `PRIOR_…`, `studio` | 0.312 / 0.538 / 45 % | 0.089 / 0.258 / 89 % | 0.013 of 0.078 | 0.0139 |
+
+- **Row C7 turns the primitives quickly:** L₇ falls from about 0.67 to 0.14 on private scene A, and C8's weight then passes 78 % of the pixels instead of 16 %, as VCR-GauS's design has it.
+- **The prior ends at about 28 % of the total loss on private scene A** (36 % with DAViD's maps), not the 2.2 times the trained models suggested before it acted: the primitives move to meet it.
+- **L1 ends 11 % to 17 % higher than the off arm's on private scene A** (0.0117 to 0.0122 against 0.0104 to 0.0107).
+
+**The test-view scores, the sharpness ratio and the tiles' coverage,** as section 3 here takes them. Kept-pixel PSNR is Q-233's, on the centre copy.
+
+| Run | Crop PSNR / SSIM | Sharpness ratio (late frames) | Training views: PSNR / sharpness | E16 PSNR / SSIM₁ / ꟻLIP | Kept-pixel PSNR | Tiles with alpha ≥ 0.5: front; side |
+| --- | --- | --- | --- | --- | --- | --- |
+| `OFF_A_h0_s0` / `s1` | 24.35 / 0.8148; 24.36 / 0.8153 | 0.7313 (0.7536); 0.7258 (0.7497) | 32.99 / 0.7733; 32.84 / 0.7740 | 24.80 / 0.8180 / 0.1531; 24.66 / 0.8176 / 0.1538 | 25.54; 25.37 | 0.86 to 1.00; 0.53 to 1.00 / 0.82 to 1.00; 0.47 to 0.87 |
+| `PRIOR_A_h0_s0` / `s1` | 24.37 / 0.8205; 24.38 / 0.8210 | **0.6913** (0.7090); **0.6935** (0.7212) | 32.14 / 0.7483; 31.96 / 0.7418 | 24.79 / 0.8256 / 0.1492; 25.00 / 0.8255 / 0.1492 | 25.53; 25.76 | 0.89 to 1.00; 0.94 to 1.00 / 0.83 to 1.00; 0.92 to 1.00 |
+| `DAVID_A_h0_s0` / `s1` | 24.33 / 0.8185; 24.32 / 0.8191 | 0.6997 (0.7111); 0.6952 (0.7112) | 32.40 / 0.7604; 32.08 / 0.7565 | 24.81 / 0.8202 / 0.1534; 24.34 / 0.8189 / 0.1560 | 25.55; 25.02 | 0.93 to 1.00; 0.45 to 0.97 / 0.80 to 1.00; 0.46 to 0.85 |
+| `OFF_A_h1_s0` / `s1` | 23.92 / 0.7487; 23.98 / 0.7489 | 0.7323 (0.7804); 0.7353 (0.7874) | 31.57 / 0.7727; 31.36 / 0.7706 | 21.77 / 0.7403 / 0.1952; 21.89 / 0.7387 / 0.1947 | – | 0.81 to 1.00; 0.53 to 0.89 / 0.80 to 1.00; 0.51 to 0.87 |
+| `PRIOR_A_h1_s0` / `s1` | 24.04 / 0.7554; 24.08 / 0.7558 | **0.6989** (0.7477); **0.6990** (0.7486) | 30.97 / 0.7491; 30.99 / 0.7487 | 21.79 / 0.7444 / 0.1912; 22.17 / 0.7438 / 0.1890 | – | 0.86 to 1.00; 0.75 to 1.00 / 0.87 to 1.00; 0.88 to 1.00 |
+| `DAVID_A_h1_s0` / `s1` | 23.75 / 0.7490; 23.85 / 0.7512 | 0.7119 (0.7559); 0.7113 (0.7565) | 31.12 / 0.7587; 30.98 / 0.7589 | 21.41 / 0.7396 / 0.1985; 21.70 / 0.7418 / 0.1947 | – | 0.78 to 1.00; 0.47 to 0.90 / 0.78 to 1.00; 0.40 to 0.86 |
+
+- **The renders turn softer.** The sharpness ratio falls by 0.036 (centre) and 0.035 (left) with MoGe-2's maps and by 0.031 and 0.022 with DAViD's. The off arm's seeds lie 0.003 to 0.006 apart, and `FLAT`'s and `FLATNC`'s means lie 0.019 to 0.045 above the prior arms'. It is larger than the softening of finalist 3's calibration run at 2DGS's weight, 0.031 (0.705 to 0.674), on one seed. On the training views PSNR falls by 0.5 to 0.9 dB and sharpness by 0.025 to 0.03.
+- **No test-view score falls by 0.3 dB.** `PRIOR`'s crop PSNR is 0.02 and 0.11 dB above the off arm's, its E16 PSNR 0.17 and 0.15 dB above, its kept-pixel PSNR 0.19 dB above, and its SSIM₁ and ꟻLIP better on both copies. `DAVID`'s are 0.03 to 0.28 dB below, the left copy's E16 PSNR closest to the guard (−0.28).
+- **The side views fill:** with MoGe-2's maps the side tiles reach 0.75 to 1.00 of alpha ≥ 0.5, against 0.47 to 1.00 in the off arm. DAViD's, on the person alone, do not.
+
+**The sheets.** For private scene A: four sets, the centre copy at seeds 0 and 1, then the left copy at seeds 0 and 1. Each holds five sheets, the off arm, `FLAT`, `FLATNC`, `PRIOR` and `DAVID` in a seeded order, labelled only by set and letter, in `<surface-runs>/ticket-28/sheets/blind`, with `KEY.json` apart. They await the owner's judgement with their labels hidden. For `kitchen` (the owner's request): the labelled sheet of each `PRIOR_kitchen_s<n>` from the fixed request (SHA-256 `5560b8a3…6fd27c`, checked), in `<surface-runs>/kitchen-sheets/sheets`, and one side-by-side per seed, `PRIOR`, `FLAT`, `OFF` and `PLAIN`, in `<surface-runs>/kitchen-sheets/compare/finalist4_kitchen_s<n>.jpg`. The lowest tile coverage is 0.79 to 0.81 against the off arm's 0.82 to 0.85 and `FLAT`'s 0.75 to 0.86. The labelled sheets were made after the arms, since the sheet script asked for its checkout (`FTGS_WORKTREE`) after it was first called.
+
+**openftgs-synth.** The columns are as in section 6 here. On `kitchen`, at the owner's answer, SSIM₁, PSNR and ꟻLIP are read against the off arm's five seeds, and the rest against its seeds 0 to 2.
+
+| Run | PSNR / SSIM₁ / ꟻLIP | Kept-pixel PSNR | Residual: in front / behind (all) | Dynamic: in front / behind | Expected depth's error, median: all / dynamic | Far share (0.12 S): whole / dynamic | Beyond 25 cm | Under two frames |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| `OFF_kitchen_s0` to `s2` | 24.88 to 27.58 / 0.8753 to 0.8772 / 0.0910 to 0.0949 | 29.16 to 30.08 | 0.041 to 0.042 / 0.294 to 0.295 | 0.015 to 0.016 / 0.615 to 0.616 | 206 to 247 / 44 to 73 mm | 0.035 to 0.036 / 0.002 to 0.003 | 0.023 to 0.024 / 0.001 | 0.381 to 0.383 / 0.655 to 0.662 |
+| `FLATNC_kitchen_s0` to `s2` | 26.15 to 27.41 / 0.8768 to 0.8785 / 0.0897 to 0.0923 | 29.81 to 30.83 | 0.035 to 0.036 / 0.299 to 0.301 | 0.014 to 0.016 / 0.622 to 0.627 | 169 to 203 / 29 to 39 mm | 0.032 / 0.002 to 0.003 | 0.019 to 0.020 / 0.001 | 0.379 to 0.381 / 0.657 to 0.663 |
+| `PRIOR_kitchen_s0` to `s2` | 25.81 to 29.39 / 0.8761 to 0.8796 / 0.0909 to 0.0951 | 28.91 to 30.82 | **0.017 to 0.018** / 0.294 to 0.298 | 0.009 to 0.010 / 0.622 to 0.627 | **109 to 123 / 16 to 17 mm** | 0.022 / 0.002 | 0.012 to 0.013 / 0.001 | 0.358 to 0.361 / 0.659 to 0.666 |
+| `OFF_studio_s0` | 22.83 / 0.7986 / 0.1899 | 23.02 | 0.014 / 0.414 | 0.009 / 0.649 | 172 / 102 mm | 0.044 / 0.001 | 0.071 / 0.001 | 0.384 / 0.707 |
+| `PRIOR_studio_s0` | 23.17 / 0.7978 / 0.1863 | 23.13 | 0.005 / **0.423** | 0.006 / 0.650 | 189 / 91 mm | 0.026 / 0.000 | 0.043 / 0.001 | 0.377 / 0.692 |
+
+- **No guard is crossed on `kitchen`.** Against the off arm's five seeds, SSIM₁ is 0.0010 higher (the guard is 0.002 the other way), PSNR 0.28 dB higher and ꟻLIP unchanged, none flagged; kept-pixel PSNR is 0.51 dB higher against seeds 0 to 2. Against the five plain seeds, SSIM₁ is 0.0010 lower, inside the guard.
+- **The geometry moves on `kitchen`, but not as expected.** The expected depth's error halves (from 206 to 247 mm to 109 to 123 mm; on the dynamic objects from 44 to 73 mm to 16 to 17 mm), and the residual in front of the surface falls from 0.041 to 0.017. The share behind the surface, where a surface term is expected to fall by more than 0.005, does not: +0.002 overall and +0.009 on the dynamic objects. The prior draws in what floated in front of the surface, and the far shares fall by a third (0.035 to 0.022; beyond 25 cm 0.023 to 0.013).
+- **`studio`, one seed:** in front falls from 0.014 to 0.005, behind rises from 0.414 to 0.423 (beyond the 0.005 guard, the wrong way), and the expected depth's error rises from 172 to 189 mm while the far shares fall. PSNR is 0.34 dB higher.
+
+**The reading by section 7.2's row for finalist 4.**
+
+- **Adopt when** "it moves the named measure beyond finalist 3's two arms, with the renders sharp and no harm on openftgs-synth". **Not met.**
+  - The named measure is lower than `FLAT`'s on the left copy and than `FLATNC`'s on the centre copy, never beyond both on one copy.
+  - The renders turn softer by 0.035.
+  - `studio`'s share behind the surface rises beyond its guard on its one seed.
+- **Drop when** "it adds nothing to finalist 3's flattening". **Not met in full.** Against `FLAT` it lowers the left copy's named measure by 0.016 by the rule, and on `kitchen` it halves the expected depth's error and the share in front where flattening alone moved neither. It adds something, and not what the adopt clause asks.
+- **The row's third column,** "if its measure moves and the renders turn soft: H2's prediction for it, the loss settling between the cameras' versions of the person: the combined arm". **This is the outcome:** a measure that moves in part, with renders that turn soft.
+  - The first step found the cameras' normals of the person no further apart than an estimator's on exact cameras. So the softening is not shown to come from the cameras' versions; the prior's own spread and its size beside the rendering loss (28 % of the total at the end) explain it as well.
+  - On `kitchen`, with exact cameras, no image score was harmed, but the sharpness ratio is measured on private scene A only.
+- **DAViD's arm** does less on the shell (one move, against `FLATNC` on the centre copy), softens less (0.022 to 0.031), and costs 0.03 to 0.28 dB of test-view PSNR. Made for people and given the person only, it is not better here than MoGe-2 over the whole image.
+- **What this test does not cover:**
+  - weights below the papers' (λ₇ = 0.1, λ₈ = 0.015) that would keep the renders sharp;
+  - the start before iteration 15,000;
+  - C7's total-variation term;
+  - the combined arm, with finalist 2's term;
+  - more than one seed on `studio`.
+- **Recommended: do not adopt finalist 4 as tested; keep it for the combined arm**, as the row's third column says, preferably at a lower weight found first by a calibration like finalist 3's. Dropping it outright would leave out the one surface effect any finalist has shown on `kitchen`, the halved depth error.
+
+**Against the ticket's acceptance criteria.**
+
+- **The normals' agreement on the person, against `kitchen`'s floor, and the axes check, before the arm:** done (the first step, above).
+- **The weights' terms and each package's license, checked and logged before use:** rows T28.1 to T28.4.
+- **The arm on both sets without the total-variation term, read against finalist 3's two arms:** 8 runs, judged against the off arm, `FLAT` and `FLATNC` (above).
+- **Section 4.4's criteria, as for finalist 3:**
+  - the named measure by the rule, with the tail by its margin;
+  - the 0.3 dB guard, not crossed;
+  - the sharpness ratio, lower;
+  - the sheets, keyed and awaiting the owner's judgement;
+  - on openftgs-synth, the share behind and the guards (above).
+- **DAViD's arm, with the pixels without a prior left out:** 4 runs, on the person by section 2.7's rule.
+- **The reading by section 7.2's row:** above; the owner's answer below, not yet given.
+- **Sources, commands, files changed, privacy:**
+  - sources: rows T28.1 to T28.8;
+  - commands: in the tables of this section;
+  - files changed: only this document and the source log;
+  - privacy: nothing names private scene A or shows its images, and its images went only to the two estimators, offline on this machine.
+
+**The questions for the owner at step 6.**
+
+1. **Finalist 4:** kept for the combined arm (recommended), dropped, or given a further arm at a lower, calibrated weight (about 1 GPU hour for a calibration on the centre copy, then about 4 for the arm on both sets)?
+2. **Step 7, the recommendation (ticket #29):** go, or stop.
+3. **The sheets** (`<surface-runs>/ticket-28/sheets/blind`, key apart): the owner's judgement with the labels hidden; and the labelled `kitchen` side-by-sides.
+
+**The arms' commands** (the conventions of the first step's table, with 14 threads, `$I` for `<surface-runs>/ticket-24/init`, `$O12` for `<surface-runs>/ticket-12/private-scene-A`, `$KS` for `<scratch>/kitchen-sheets`):
+
+| Command | Device | Time | Note |
+| --- | --- | --- | --- |
+| `python -I $T/normal_maps.py $A $O/private-scene-A/david_full --estimator david --weights … --device cpu --threads 4` | CPU | 25 min 18 s | DAViD on every image of private scene A |
+| `python $T/person_masks.py $A $O/private-scene-A/david_full $O/private-scene-A/david_person --da2 $O12/da2s/maps --grids $R4/d22 --crops $R4/crops.json --placeholder $R4/placeholder_masks.npz` | CPU, 4 threads | 3 min 33 s | DAViD's maps restricted to the person by section 2.7's rule |
+| `bash $T/maps_full.sh`: `python -I $T/normal_maps.py <scene.json> $O/<scene>/moge2_full --estimator moge2 …` for private scene A, `kitchen` and `studio`, each under the lock | GPU | 16 min in all | MoGe-2 on every image |
+| `bash $T/arms.sh both`: per run `bash $T/run_train.sh <run> <scene.json> <init> <seed> --term flat=1 --flat-weighting sigma_t --term prior=1 --prior-c7 0.1 --prior-c8 0.015 --prior-gamma 0.005 --prior-depth plane --prior-from 15000 --prior-maps <maps> --prior-axes <axes>`, each followed by `bash $T/post_a.sh <run> h<c>` or `bash $T/post_synth.sh <run> <scene> <scene.json> <init>` (section 6 here's, repointed) | GPU, then CPU | 23 to 36 min a run; under 2 min a post | The twelve runs; the memory fallbacks were never taken |
+| `FTGS_WORKTREE=<worktree> bash $KS/kitchen_sheets.sh <surface-runs>/ticket-28/runs/PRIOR_kitchen_s<n> PRIOR_kitchen_s<n>`, then `python $KS/compare_sheets.py <surface-runs>/kitchen-sheets/compare/finalist4_kitchen_s<n>.jpg --title … PRIOR_… FLAT_… OFF_… PLAIN_…` | GPU, then CPU | about 7 s each | The labelled `kitchen` sheets and side-by-sides |
+| `bash $T/blind.sh` | CPU | seconds | The twenty sheets with their labels hidden, and their key |
+| `python $T/tables28.py` and short inline reads of `ratios.json`, `train_log.jsonl` and the sheets' coverage | CPU | seconds | The tables of this section |
+
+Tickets #4's, #12's, #24's, #26's, #26b's and #27's folders, `<m15-runs>`, `<m17-runs>` and the private scene's folders were read and never written.
+
 **The owner's answer on step 6** (whether the work goes on to the recommendation, or stops): *not yet given.* **Date:** *not yet given.*
 
 ## 8. The recommendation
