@@ -3000,7 +3000,7 @@ The prior keeps the flattening and adds to it on `kitchen`, where flattening alo
 | `OFF_studio_s0` | 22.83 / 0.7986 / 0.1899 | 23.02 | 0.014 / 0.414 | 0.009 / 0.649 | 172 / 102 mm | 0.044 / 0.001 | 0.071 / 0.001 | 0.384 / 0.707 |
 | `PRIOR_studio_s0` | 23.17 / 0.7978 / 0.1863 | 23.13 | 0.005 / **0.423** | 0.006 / 0.650 | 189 / 91 mm | 0.026 / 0.000 | 0.043 / 0.001 | 0.377 / 0.692 |
 
-- **No guard is crossed on `kitchen`.** Against the off arm's five seeds, SSIM₁ is 0.0010 higher (the guard is 0.002 the other way), PSNR 0.28 dB higher and ꟻLIP unchanged, none flagged; kept-pixel PSNR is 0.51 dB higher against seeds 0 to 2. Against the five plain seeds, SSIM₁ is 0.0010 lower, inside the guard.
+- **No image guard is crossed on `kitchen`, but one shape guard is.** Against the off arm's five seeds, SSIM₁ is 0.0010 higher (the guard is 0.002 the other way), PSNR 0.28 dB higher and ꟻLIP unchanged, none flagged; kept-pixel PSNR is 0.51 dB higher against seeds 0 to 2. Against the five plain seeds, SSIM₁ is 0.0010 lower, inside the guard. The share behind the surface on the dynamic objects is worse by section 4.4's rule (a share differing from the off arm's by more than 0.005): 0.622 to 0.627 against the off arm's 0.615 to 0.616, +0.009 at the means, every seed beyond the off arm's (read again from the runs' `gt_depth` files).
 - **The geometry moves on `kitchen`, but not as expected.** The expected depth's error halves (from 206 to 247 mm to 109 to 123 mm; on the dynamic objects from 44 to 73 mm to 16 to 17 mm), and the residual in front of the surface falls from 0.041 to 0.017. The share behind the surface, where a surface term is expected to fall by more than 0.005, does not: +0.002 overall and +0.009 on the dynamic objects. The prior draws in what floated in front of the surface, and the far shares fall by a third (0.035 to 0.022; beyond 25 cm 0.023 to 0.013).
 - **`studio`, one seed:** in front falls from 0.014 to 0.005, behind rises from 0.414 to 0.423 (beyond the 0.005 guard, the wrong way), and the expected depth's error rises from 172 to 189 mm while the far shares fall. PSNR is 0.34 dB higher.
 
@@ -3208,6 +3208,64 @@ Tickets #24's, #26's, #27's and #28's folders, `<m15-runs>`, `<m17-runs>` and th
 2. **The sheets** (`<surface-runs>/ticket-28b/sheets/blind`, key apart; the labelled `kitchen` side-by-sides `finalist4low_kitchen_s<n>.jpg`): the owner's judgement with the labels hidden.
 
 **The owner's answer on the lower-weight arm:** *not yet given.* **Date:** *not yet given.*
+
+**Two combinations, before the recommendation** (2026-11-19, at the owner's answer on step 6 above). Two arms, each fixed below before its first full run, and read both by section 4.4's criteria and under the scenario of section 1 here ("The two scenarios") that the owner gave it. Arm A, `F1F4`, is scenario 2's, on private scene A. Arm B, `F3F4p10`, is scenario 1's, on openftgs-synth. Every finalist 4 arm already carries finalist 3's flattening, so `F3F4p10` differs from `PRIOR` and `LOWP` in the prior's weight alone. Its name keeps the owner's wording: finalist 3's flattening with finalist 4 at a tenth of the papers' weights.
+
+**Arm A, `F1F4`: the design, fixed before its runs.**
+
+- **What it trains:** finalist 1's corrected cameras with finalist 4 at the papers' weights.
+  - The cameras are ticket #19's corrected manifests `P/h0` and `P/h1` and their train-only forms, copied byte for byte (`cmp`) into `<surface-runs>/combinations/manifests`. Each copy has a link to its copy's images and a copy of ticket #25's frame cache, which training keys by the manifest's SHA-256.
+  - The init is `CM_h<c>`, arm `F1m`'s from section 4 here: the corrected cameras with the manifest's D-22 pairs, read from `<surface-runs>/ticket-25/init`.
+  - The terms are `PRIOR`'s settings unchanged, through ticket #28b's wrapper copy with its paths changed: `--term flat=1 --flat-weighting sigma_t --term prior=1 --prior-c7 0.1 --prior-c8 0.015 --prior-gamma 0.005 --prior-depth plane --prior-from 15000 --prior-axes x,y,z`, with ticket #28's MoGe-2 maps.
+  - Four runs, `F1F4_A_h<c>_s<s>`: both copies at seeds 0 and 1, 30,000 iterations, 14 CPU threads, one training at a time. Step 5's memory fallback (`perf.frame_cache` `"mmap"`) is ready, as before.
+- **The maps serve the corrected cameras unchanged, and the reuse is exact.**
+  - *The images are the same.* A check of the two manifests per copy (`check_manifests.py`) finds the same 1,080 records keyed by camera and frame, timestamps equal to the bit, intrinsics and image sizes equal, and every camera turned about its own centre: 0.10° to 0.38° on the centre copy and 0.05° to 0.38° on the left copy, with the centres within 3·10⁻⁸. The wrapper finds a map by camera name and frame from the training manifest, so it finds every one through the corrected manifest.
+  - *No pose enters the comparison.* A map is the estimator's normal in its camera's own axes, computed from the image alone. The device turns each primitive's normal into the training camera's axes by that camera's `world_to_camera`, the corrected one here, and compares it with the map there. No map is ever turned by a pose. So the maps mean for the corrected cameras exactly what they meant for the manifest's, and none is remade.
+  - *Smoke run.* A 300-iteration smoke run on the corrected centre copy, with the prior from iteration 100, found every map it drew (pixel share 1.0, C8's cut 79 % at iteration 300).
+- **What it is read against:**
+  - The off arm (`OFF_A_…`, section 5 here; `OFF_A_h0_s0` is ticket #24's `A_h0_s0_v2`): the combination's whole effect.
+  - `PRIOR` (manifest cameras, kept files): what the corrected cameras add to finalist 4. This is the comparison that decides. On the left copy `PRIOR` already lies below both of `F1m`'s seeds on the kept file, so being lower than `F1m` alone would show nothing the combination adds.
+  - `F1m` (section 4 here, all four seeds): what finalist 4 adds on the corrected cameras.
+- **The named measure** is the near-side far-5 cm share, with the tail beyond 25 cm beside it, read by section 4.4's rule (both seeds beyond both, the means more than 0.01 apart; 0.021 for the tail). The near side is cut along the centre copy's manifest's `cam0`, as in sections 3 and 4 here.
+  - Every run of the four arms is measured anew by the same script against all five reference files of section 4 here: `kept`, `MM`, `CM`, `MC` and `CC`. The off arm and `PRIOR` had been measured against `kept` only.
+  - Three files decide: `kept`, against which the off arm and `PRIOR` were judged, and `MM` and `CM`, the combination's own two files from the same matches, against which `F1m` was judged.
+  - The combination counts as lower than a reference arm on a copy when it is lower by the rule against all three files. The other two files are reported.
+- **The test-view scores** are taken at both poses of the test view, as `F1m`'s were (section 4 here): the manifest's (`mpose`) and the corrected one (`cpose`), using ticket #25's two scoring requests per copy and E16 at the manifest's pose from `ftgs eval` on the copy's train-only manifest.
+  - The 0.3 dB guard is read at the corrected pose, the one the cameras trained on. `F1m` crossed it at the manifest's pose from the pose's mismatch alone.
+  - The manifest's pose is reported beside it. The off arm and `PRIOR` have that pose only.
+- **Also reported:** the sharpness ratio, the tiles' coverage, the under-two-frames share, row A1's scale ratios and the logged prior terms.
+- **The sheets** go in four blind sets, one per copy and seed, each holding the off arm, `PRIOR`, `F1m` and `F1F4` in an order from Python's `random.Random(2904)`. They are labelled by set and letter only, with `KEY.json` apart, from section 2.6's fixed request.
+- **Confounds, stated before the runs:**
+  - Against the off arm and `PRIOR`, the combination differs in its init's sample as well as its cameras (`CM` against the kept file), as `F1m` did (section 4 here).
+  - Against `F1m`, it differs in the wrapper as well as the terms. `F1m` ran plain, and the script's own effect on the left copy's named measure was about 0.02 (section 6 here, the plain baseline against the off arm).
+  - No run through the wrapper at weight 0 on the corrected cameras is made. It would take about 0.9 GPU hours, beyond this work's budget, so the closing questions below name it.
+- **Scenario 2's reading, fixed now.** A compromise is acceptable: softer renders are allowed if the shape improves.
+  - *Shape improves* when the named measure is lower by the rule above. The combination is a better trade than `PRIOR` when it is lower than `PRIOR`'s on at least one copy and not higher on the other, with no test-view score at the corrected pose more than 0.3 dB below `PRIOR`'s.
+  - The sharpness ratio is reported and is not counted against it.
+  - The same test against the off arm gives the combination's whole trade.
+  - If nothing moves, scenario 2 allows that the data are too poor for any finalist.
+
+**Arm B, `F3F4p10`: the design, fixed before its runs.**
+
+- **What it trains:** finalist 3's flattening (λ_flat = 1, σt-weighted, in world units, from iteration 1) with finalist 4 at a tenth of the papers' prior weights (`--prior-c7 0.01 --prior-c8 0.0015`). Everything else is `PRIOR`'s: γ = 0.005, the plane-distance depth, both terms from iteration 15,000, and ticket #28's MoGe-2 maps for `kitchen` and `studio`.
+  - Four runs, `F3F4p10_kitchen_s0` to `s2` and `F3F4p10_studio_s0`, from M17's init files, 30,000 iterations, through the same wrapper copy. Step 5's fallback for `studio` is ready, as before.
+  - This is the calibration's candidate f = 1/10, which the calibration turned away on private scene A at 1.69 % of L1 and 0.0128 of sharpness, both just past their guards (above). It runs here on openftgs-synth only.
+- **What it is read against:**
+  - The off arm: its five seeds for SSIM₁, PSNR and ꟻLIP, and its seeds 0 to 2 for the rest, as sections 6 and 7 here read it.
+  - The plain baseline's five seeds for SSIM₁ (section 3 here's three, and ticket #26b's `PLAIN_kitchen_s3` and `s4`).
+  - `PRIOR`, `LOWP` and `FLAT` beside them.
+  - Scenario 1's "openftgs alone" is the plain baseline. The off arm is the wrapper's own reference. Both are reported, and each reading says which it uses.
+- **The measures:**
+  - `scripts/gt_depth.py`'s shares in front of and behind the surface, on all pixels and on the dynamic objects. Section 4.4's 0.005 rule applies to both columns.
+  - The expected depth's median error, all and dynamic, counted where the three seeds' ranges part.
+  - The far shares, the image scores and `scripts/reference_flaws.py`'s kept-pixel PSNR.
+  - Row A1's scale ratios and the logged prior terms.
+  - Labelled `kitchen` sheets from the fixed request by `kitchen_sheets.sh`, and a side-by-side per seed of `F3F4p10`, `PRIOR`, `LOWP`, `FLAT`, `OFF` and `PLAIN`.
+  - The sharpness ratio is measured on private scene A only, so `kitchen` has none. Sharpness there is read from SSIM₁, the kept-pixel PSNR and the labelled sheets, which are the owner's to judge, and no claim of sharpness rests on PSNR alone.
+- **Scenario 1's reading, fixed now.** The aim is sharper shape and colour than openftgs alone.
+  - *Shape is better* when the expected depth's median error on `kitchen` has its three seeds' range below the off arm's and the plain baseline's, and neither share behind the surface (all or dynamic) is worse than the off arm's by more than 0.005.
+  - *Colour is at least as good* when no image guard is crossed against either the plain baseline's five seeds or the off arm's (SSIM₁ 0.002, a test-view score 0.3 dB) and the kept-pixel PSNR does not fall by more than 0.3 dB. It is better when a score rises beyond those margins.
+  - `studio`'s one seed is read beside `kitchen` and not counted by the rule.
 
 ## 8. The recommendation
 
