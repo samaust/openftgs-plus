@@ -3085,6 +3085,23 @@ Tickets #4's, #12's, #24's, #26's, #26b's and #27's folders, `<m15-runs>`, `<m17
 - **The arm, at the chosen f:** `LOWP_…`, the main arm's eight runs with `--prior-c7 0.1·f --prior-c8 0.015·f` and nothing else changed: the centre and left copies at seeds 0 and 1 from `ref_h0_s4` and `ref_h1_s4`, `kitchen` at seeds 0 to 2 and `studio` at seed 0 from M17's init files, 30,000 iterations, 14 CPU threads, the memory fallbacks of step 5 as the main arm had them. Read by section 4.4's criteria against the off arm, with `PRIOR` and `FLAT` beside, and by section 7.2's row, with the main arm's measures, scores, blind sheets for private scene A, and a labelled `kitchen` sheet and side-by-side per `kitchen` run.
 - **The hours, estimated** from section 6 here's stage 2 (10 min to 23,000 without the device, 14.5 to 14.8 min with it from 15,000) and the main arm's times: the calibration about 1.2 GPU hours with its scores and ratios (five runs, about 70 min); the arm about 3.9 hours with its post-processing; about 5.1 hours in all.
 
+**The calibration, run** on 2026-11-19 from 11:54 to 13:07, after the rule's commit, with this branch's code (`src/`, `scripts/` and `tests/` as `main`'s at 02e3686), the shared `.venv`'s versions as in the first step, the RTX 4090 alone under the lock and 14 CPU threads. Each run stopped at exactly 23,000 (`ftgs train` saved its checkpoint and exited 143), its wrapper ran once per iteration, and D-51's `auto` put the frame cache on the GPU in all five, at peaks of 23,720 to 23,918 MiB in `nvidia-smi`. Times: 14 min 57 s to 15 min 1 s with the prior, 9 min 42 s for `C3_off`. L1 is the mean over iterations 22,001 to 23,000; L₇, L₈ and C8's share are the logged row at 23,000 (the mean of its 100 iterations); the scores are the test view's crop at 23,000.
+
+| Run | L1, against `C2_flat_only` | Crop PSNR, against `C2_flat_only` | Sharpness ratio (late), against `C3_off` | L₇ / L₈ / share C8's weight passes, at 23,000 | Near side min/mid at 23,000 | Named measure / tail at 23,000 | Under two frames, near side |
+| --- | --- | --- | --- | --- | --- | --- | --- |
+| `C2_flat_only` (section 6 here) | 0.012007 | 24.25 | 0.7047 (0.7220); −0.0015 | – | 0.015 | 0.144 / 0.054 | 0.583 |
+| `C3_off`, every weight 0 | 0.011942 (−0.54 %) | 24.30 (+0.05) | **0.7063** (0.7209) | – | 0.238 | 0.154 / 0.060 | 0.565 |
+| `C3_f1`, the papers' weights | **+37.2 %** | 24.24 (−0.01) | 0.6660 (0.6843); **−0.0403** | 0.171 / 0.502 / 75 % | 0.015 | 0.150 / 0.045 | 0.599 |
+| `C3_f0.33` | **+5.21 %** | 24.34 (+0.09) | 0.6861 (0.7036); **−0.0202** | 0.196 / 0.757 / 72 % | 0.016 | 0.134 / 0.032 | 0.591 |
+| `C3_f0.1` | **+1.69 %** | 24.30 (+0.05) | 0.6935 (0.7101); **−0.0128** | 0.299 / 0.880 / 59 % | 0.016 | 0.161 / 0.071 | 0.582 |
+| `C3_f0.033` | +0.15 % | 24.26 (+0.01) | 0.7049 (0.7201); −0.0014 | 0.460 / 0.662 / 36 % | 0.016 | 0.156 / 0.055 | 0.579 |
+
+- **The stop sees the softening.** At the papers' weights the sharpness ratio is 0.040 below the weight-0 run's at 23,000, as the main arm's fell by 0.035 at 30,000, so the guard can tell weights apart here.
+- **The rule picks f = 1/30: λ₇ = 0.00333, λ₈ = 0.0005.** It is the only candidate that passes all three guards. At 1/10, L1 is 1.69 % above flattening alone, just past the 1.5 % guard, and the sharpness ratio 0.0128 below the weight-0 run's, past the 0.010 guard; at 1/3 both are well past (5.2 %, 0.020). No crop PSNR falls. The rule was met, so the work went on to the arm without a stop.
+- **The softening falls with the weight and the L1 cost with it:** 0.040, 0.020, 0.013 and 0.001 below the weight-0 run's sharpness, and 37 %, 5.2 %, 1.7 % and 0.15 % above flattening alone's L1. At the chosen weight both are inside the seeds' noise.
+- **At the chosen weight the prior still acts, but less.** L₇ falls from 1.05 over iterations 15,001 to 15,100 to 0.46 at 23,000, against 0.17 at the papers' weights, and C8's weight passes 36 % of the cut's pixels instead of 75 %: the primitives turn about two thirds of the way the papers' weights turn them by this stop. The prior's share of the loss at 23,000 is 0.0019 of 0.056.
+- **The named measure and the tail at 23,000** were not used to choose. One seed each, they spread 0.134 to 0.161 across the candidates with no order in the weight, against 0.144 for flattening alone and 0.154 at weight 0.
+
 ## 8. The recommendation
 
 *Ticket #29's section.* Per finalist that ran: adopt, drop, or test in combination; a finalist the owner stopped before its step says so. Where it recommends adopting, the spec change's wording proposed for the owner, on an issue of its own.
