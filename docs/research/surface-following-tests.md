@@ -1757,6 +1757,7 @@ The private scene's folders, `<m15-runs>`, `<m17-runs>` and tickets #24's and #2
    - **Each variant's term is scratch-checked** as the first step's was, and smoke-run for 300 iterations before the full runs.
    - **Each is judged** by section 4.4's criteria against the off arm, with the plain baseline beside, as the staged arm was, with blind sheets as before (key apart), and read by section 7.2's row, with a combined recommendation for finalist 2. The owner's decision on finalist 2 stays open.
    - **Step 4's first test-view table is corrected:** its coverage column held run metadata (the cap, wall time and peak memory), and now holds the coverage, from each run's records.
+6. **After the variants** (2026-11-19, in session, relayed by the orchestrating session), on question 3 below: **V2, `align_full`, is run on openftgs-synth,** `kitchen` at seeds 0 to 2 and `studio` at seed 0, about 1.2 GPU hours, to see its effect there. The decision on finalist 2 follows it. Each `kitchen` run gets its labelled sheet and a side-by-side with `align_stg`, the off arm and the plain baseline.
 
 The diagnosis ran first, then the staged arm, both on 2026-11-18, with this branch's code at a77b838 (`src/` and `scripts/` as at ticket #24's 163bd39 and the first step's ef7864b), the same versions and hardware as above, under the shared GPU lock with 12 CPU threads, one training at a time. Another ticket's work held the lock between commands for seconds. `$T` is now `<scratch>/ticket-26b`, holding copies of `$T`'s scripts above, and `$O` is `<surface-runs>/ticket-26b`. Every new run wrote only there.
 
@@ -2120,6 +2121,112 @@ The private scene's folders and the folders of tickets #24, #25, #26 and #26's f
 1. **Finalist 2: dropped, as recommended,** now that the staged arm's three variants have run, or kept for one of the narrower forms above? This decides whether section 7.2's combined arm has a disagreement side from finalist 2.
 2. **The sheets** (`<surface-runs>/ticket-26c/sheets/blind`, key apart), beside the first two sets (`<surface-runs>/ticket-26/sheets/blind` and `<surface-runs>/ticket-26b/sheets/blind`): the owner's judgement with the labels hidden, which this ticket cannot give.
 3. **V2 on `kitchen` and `studio`.** By the owner's answer they wait, since V2 moved the named measure. Recommended: not run. It moved the measure up, by 0.0002 over the margin on one copy, and harmed on private scene A, so neither outcome on openftgs-synth would make it an adoption. About 1.7 GPU hours with post-processing (three `kitchen` seeds and one `studio`, at the staged arm's times and V2's 15 ms more per aligned iteration) if the owner wants them.
+
+**V2 on openftgs-synth: the design, fixed before its runs** (2026-11-19, at the owner's answer above, item 6).
+
+- **The runs.** `FUL_kitchen_s0` to `s2` on M15's `kitchen` and `FUL_studio_s0` on M17's `studio`, with M17's init files, as the staged arm's were. Each runs V2 exactly as on private scene A: the wrapper copy and the term unchanged (`<scratch>/ticket-26d`, copied from `<scratch>/ticket-26c` with only its paths changed), `--align-mode full`, window 8 px, patch 32 px, penalty 0.01 / 3,072, the switch after 18,000. Each is post-processed as the staged arm's `kitchen` and `studio` runs were: E16's `METRICS.json`, `scripts/gt_depth.py`, `scripts/reference_flaws.py` and the same measures script.
+- **A smoke run first,** 300 iterations on `kitchen` at seed 0 with the switch at 200, because V2 had not yet met `kitchen`'s 1352 × 1014 frames, the edge patches they leave, or the memory-mapped frame cache. It ran on 2026-11-19 in 35 s, its wrappers counted 300 each, rows 100 and 200 carry no alignment key, and row 300 carries them all, finite, V2's shifted-target 1 − SSIM and ꟻLIP included.
+- **The guards, section 4.4's for openftgs-synth, against the off arm:**
+  - On `kitchen`, SSIM₁: V2's three-seed mean not below the off arm's five-seed mean by more than 0.002, with the plain baseline's five seeds beside.
+  - On `kitchen`, PSNR and ꟻLIP are flagged when all three of V2's values are worse than all five of the off arm's. Kept-pixel PSNR is flagged against the off arm's seeds 0 to 2, the only ones it was scored on.
+  - On both scenes, a residual share is worse when V2's mean differs from the off arm's (seeds 0 to 2 on `kitchen`) by more than 0.005, in front and behind, on all pixels and on dynamic pixels.
+  - On `studio`, one seed: dynamic-region PSNR is flagged when it is lower than the off arm's by more than 0.1 dB.
+- **What the runs can settle.** Section 7.2's adopt condition is read on private scene A, where V2 raised the named measure instead of lowering it. So openftgs-synth can show harm or no harm, not an adoption. The alignment log is read as well, to see whether the runaway on private scene A happens on `kitchen` and `studio`, where the staged arm's shifts were about 1 px.
+- **The estimate.** From the staged arm's times and V2's overhead on private scene A, scaled by the frames' pixels: about 21 minutes per `kitchen` run and 31 minutes for `studio`, with about 1.5 minutes of post-processing each, about 1.6 GPU hours with the smoke run. That is over the 1.2 cleared and under the 1.8 to stop at. `studio` runs last and starts only if its expected end falls before 1.8 hours.
+
+**Read this first: V2 harms on openftgs-synth by section 4.4's guards.**
+
+- **On `kitchen`, SSIM₁ fails its guard.** V2's three seeds lie below all five of the off arm's and all five of the plain baseline's, and their mean is 0.0094 below the off arm's, more than four times the 0.002 margin.
+- **On `studio`, two guards fail.** The dynamic-region PSNR is 0.17 dB below the off arm's, past the 0.1 dB flag. The residual's share behind the surface on dynamic pixels is 0.0080 worse, past the 0.005 line.
+
+**What ran** (2026-11-19). The smoke run ran at a4638fd, the branch's base, with the same wrapper copy. The four runs ran at fc1272b, the commit that holds the design above. Its commit time is the queue's start to the second. The code was the shared `.venv`'s, on one RTX 4090 under the shared lock, with 16 CPU threads for training and post-processing and 2 for the tables. Each run started within seconds of the previous one's post-processing, with no wait for the lock.
+
+- **The three `kitchen` runs and their post-processing** ran from 06:47 to 07:56. **`studio` started at 07:57,** after the GPU time used so far (about 1.18 hours) was added up and its expected end, about 1.73 hours, fell before 1.8. It ended at 08:29.
+- **In all, about 1.71 GPU hours,** the smoke run and the sheets' renders included: over the 1.2 cleared and under the 1.8 to stop at.
+- **Times:** 20 min 57 s to 21 min 0 s on `kitchen`, 30 min 38 s on `studio`, the estimate's 21 and 31 minutes. D-51's `auto` memory-mapped the frame cache in every run, as in the other arms. GPU memory peaked at 23,470 to 23,971 MiB.
+- **Every run's wrappers** ran 30,000 times each. Each record holds window 8 px, patch 32 px, penalty 0.01 / 3,072, start 18,000 and mode `full`. No row up to iteration 18,000 carries the alignment keys, every row from 18,100 on does, 120 rows each, and every logged value is finite.
+
+**V2 on openftgs-synth, as it acted.** The log's alignment figures from the switch on: pixels moved / mean shift / aligned L1 lower than the plain L1 by. Then, at 30,000, the logged 1 − SSIM and ꟻLIP against the unshifted image, and against the shifted target. The staged arm's figures are beside, from the same logs:
+
+| Iteration | `align_stg`, `kitchen` (3 seeds) | V2, `kitchen` (3 seeds) | `align_stg`, `studio` | V2, `studio` |
+| --- | --- | --- | --- | --- |
+| 18,100 | 0.32 to 0.33 / 0.8 to 0.9 px / 2 % | 0.34 to 0.36 / 0.9 to 1.0 px / 2 % | 0.45 / 1.2 px / 4 % | 0.51 / 1.4 px / 4 % |
+| 20,000 | 0.27 / 0.7 px / 2 % | 0.34 to 0.35 / 1.0 to 1.1 px / 4 % | 0.34 / 0.9 px / 3 % | 0.53 / 1.7 px / 9 % |
+| 25,000 | 0.15 to 0.17 / 0.4 px / 1 % | 0.26 to 0.27 / 0.9 px / 6 % | 0.16 / 0.4 px / 2 % | 0.37 / 1.2 px / 13 % |
+| 30,000 | 0.10 / 0.2 px / 0.6 % to 0.7 % | 0.21 to 0.22 / 0.8 px / 6 % to 7 % | 0.12 / 0.4 px / 1 % | 0.33 / 1.2 px / 15 % |
+| 1 − SSIM at 30,000: unshifted; shifted | 0.100 to 0.102 | 0.111 to 0.112; 0.102 to 0.103 | 0.099 | 0.124; 0.104 |
+| ꟻLIP at 30,000: unshifted; shifted | 0.060 to 0.061 | 0.066; 0.061 | 0.069 | 0.079; 0.069 |
+
+- **The drift of private scene A comes back, smaller.** The staged arm's shifts shrink to a quarter of their start on `kitchen` and a third on `studio`, and its aligned L1 ends 0.6 % to 1.3 % below the plain L1. V2's shifts stay near 1 px. The share of pixels it moves falls by 35 % to 38 %, against the staged arm's 69 % to 75 %, and the gap between its aligned and plain L1 grows threefold on `kitchen` and fourfold on `studio`.
+- **V2 fits the shifted target, not the image.** At 30,000 its 1 − SSIM and ꟻLIP against the shifted target are the staged arm's against the image. Its values against the image are 0.010 and 0.006 higher on `kitchen`, and 0.025 and 0.010 higher on `studio`.
+- **The shifts do not grow in pixels** as on private scene A (2.4 to 3.2 px there). openftgs-synth's cameras are exact, and the staged arm's shifts there were about 1 px or less (above).
+
+**openftgs-synth's scores and measures.** The columns are as in the staged arm's table above, where the plain baseline's and `align_stg`'s rows stand. The off arm's rows are repeated from it:
+
+| Run | E16 PSNR / SSIM₁ / ꟻLIP | Kept-pixel PSNR | Residual, all pixels: in front / behind | Dynamic pixels: in front / behind | Expected depth, median error, all / dynamic | Far share at 0.12·S | Beyond 25 cm | Under two frames | Cap reached at |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| `OFF_kitchen_s0` | 24.88 / 0.8753 / 0.0949 | 29.16 | 0.042 / 0.294 | 0.015 / 0.616 | 247 / 73 mm | 0.035 / 0.002 | 0.023 / 0.001 | 0.382 / 0.662 | 2,100 |
+| `OFF_kitchen_s1` | 26.97 / 0.8753 / 0.0934 | 29.73 | 0.041 / 0.295 | 0.016 / 0.616 | 206 / 58 mm | 0.036 / 0.002 | 0.024 / 0.001 | 0.381 / 0.659 | 2,100 |
+| `OFF_kitchen_s2` | 27.58 / 0.8772 / 0.0910 | 30.08 | 0.041 / 0.294 | 0.016 / 0.615 | 217 / 44 mm | 0.035 / 0.003 | 0.023 / 0.001 | 0.383 / 0.655 | 2,100 |
+| `FUL_kitchen_s0` | 29.33 / 0.8696 / 0.0928 | 30.62 | 0.043 / 0.291 | 0.016 / 0.612 | 417 / 279 mm | 0.035 / 0.002 | 0.023 / 0.001 | 0.380 / 0.658 | 2,100 |
+| `FUL_kitchen_s1` | 25.74 / 0.8638 / 0.1010 | 29.06 | 0.043 / 0.291 | 0.017 / 0.614 | 245 / 65 mm | 0.036 / 0.003 | 0.023 / 0.001 | 0.377 / 0.656 | 2,100 |
+| `FUL_kitchen_s2` | 29.16 / 0.8685 / 0.0936 | 30.56 | 0.042 / 0.292 | 0.016 / 0.618 | 212 / 53 mm | 0.035 / 0.003 | 0.023 / 0.002 | 0.381 / 0.657 | 2,100 |
+| `OFF_studio_s0` | 22.83 / 0.7986 / 0.1899; dynamic 25.02 | 23.02 | 0.014 / 0.414 | 0.009 / 0.649 | 172 / 102 mm | 0.044 / 0.001 | 0.071 / 0.001 | 0.384 / 0.707 | 6,900 |
+| `FUL_studio_s0` | 22.11 / 0.7822 / 0.1959; dynamic 24.85 | 22.11 | 0.015 / 0.414 | 0.007 / 0.657 | 144 / 83 mm | 0.041 / 0.001 | 0.069 / 0.001 | 0.372 / 0.695 | 6,800 |
+
+The five-seed references on `kitchen` are from the diagnosis above:
+
+- **The off arm's SSIM₁** is 0.8753, 0.8753, 0.8772, 0.8779 and 0.8781 at seeds 0 to 4. Its PSNR runs from 24.88 to 28.33 dB and its ꟻLIP from 0.0895 to 0.0949.
+- **The plain baseline's SSIM₁** is 0.8787, 0.8803, 0.8800, 0.8787 and 0.8767.
+
+**Judged by section 4.4's guards for openftgs-synth, against the off arm,** with the plain baseline beside:
+
+| Guard | V2 against the off arm | Against the plain baseline |
+| --- | --- | --- |
+| `kitchen`, SSIM₁ (five seeds; mean not lower by more than 0.002) | **Fails:** the mean is 0.0094 lower than the five seeds' (0.0086 lower than seeds 0 to 2). All three seeds, 0.8638 to 0.8696, lie below all five of the off arm's | 0.0115 lower than plain's five, all three seeds below all five |
+| `kitchen`, PSNR (flagged when all three seeds are below all five) | Not flagged: two seeds lie above the off arm's highest. The mean is 0.99 dB higher | Not flagged (mean 0.59 dB lower) |
+| `kitchen`, ꟻLIP (flagged when all three are worse than all five) | Not flagged: two seeds lie inside the off arm's range. The mean is 0.0031 worse | Not flagged against the five. All three lie worse than plain seeds 0 to 2 |
+| `kitchen`, kept-pixel PSNR (seeds 0 to 2) | Not flagged (mean 0.42 dB higher) | Not flagged (mean 0.89 dB lower) |
+| `kitchen`, residual shares (seeds 0 to 2; worse beyond 0.005) | Within the line: in front +0.0015 and behind −0.0028 on all pixels, +0.0011 and −0.0008 on dynamic pixels | Within the line |
+| `studio`, dynamic-region PSNR (one seed; flagged beyond 0.1 dB) | **Flagged:** 24.85 dB against 25.02 dB, 0.17 dB lower | Equal to plain's 24.85 dB (0.001 dB lower) |
+| `studio`, residual shares (worse beyond 0.005) | **Worse on dynamic pixels behind the surface:** 0.6570 against 0.6490, +0.0080. The others lie within the line: +0.0009 and +0.0001 on all pixels, −0.0018 on dynamic pixels in front | Dynamic pixels behind: +0.0102 against plain's 0.6468 |
+
+- **The SSIM₁ guard is the clearest result.** No other arm of finalist 2 run on `kitchen` failed it: `align_rel`'s, `align_abs`'s and `align_stg`'s means lay 0.0020 to 0.0028 above the off arm's seeds 0 to 2. V2 fails it at all three seeds, against both references. It is consistent with the softening on private scene A, where V2's sharpness ratio fell by 0.03 on both copies. No sharpness ratio was taken on `kitchen`.
+- **The PSNR columns spread too widely to read with three seeds,** as for the other arms. Over the off arm's five seeds the whole view spreads 3.4 dB, and V2's own seeds spread 3.6 dB.
+- **On `studio`, one seed, the two failures point the same way.** The dynamic-region PSNR falls, and more of the dynamic pixels' weight lies behind the surface. The staged arm's one seed sat on the same residual line, at +0.0049, and its PSNR flag, 0.14 dB, was near V2's. As there, one seed cannot tell the flag from the spread between trainings: two plain trainings of `studio` lie 0.34 dB apart (section 3 here). The whole view's SSIM₁ is 0.016 lower than the off arm's and its PSNR 0.72 dB lower.
+- **Reported, not criteria.** The far shares are the off arm's within 0.003 on both scenes. The under-two-frames share is 0.012 lower on `studio` (0.372 against 0.384) and the off arm's on `kitchen`. The expected depth's median error is the off arm's at seeds 1 and 2. At seed 0 it is 417 mm against 247 mm, and the plain baseline's seed 1 spreads as far (448 mm).
+
+**Sheets on `kitchen`.** `FUL_kitchen_s0` to `s2` have labelled sheets in `<surface-runs>/kitchen-sheets/sheets/`. They come from the same fixed request as the other arms' (SHA-256 `5560b8a317157d825b53561a519f755498f286feb78bd82298f88e0e856fd27c`, checked before use), with the ground truth's `cam00` column. Every rendered value is finite in all 27 items of each coverage record. The side-by-side sheets are `<surface-runs>/kitchen-sheets/compare/finalist2v2_kitchen_s<0, 1 or 2>.jpg`. Each stacks, top to bottom, `align_full`, `align_stg`, the off arm and the plain baseline. They are new files: step 4's `finalist2_kitchen_s<n>.jpg` stay as they were. They are labelled, so they are not a blind judgement, and the owner's look at them is open.
+
+**The reading by section 7.2's row, with V2's openftgs-synth runs added.** On private scene A, V2 met neither the adopt condition nor the drop condition as written, and harmed by the scene's criteria. openftgs-synth adds harm by its own guards:
+
+- SSIM₁ on `kitchen` at all three seeds.
+- On `studio`, at its one seed: the dynamic-region PSNR and the dynamic pixels' share behind the surface.
+
+The mechanism is the one private scene A showed. With L1, SSIM and ꟻLIP all reading the shifted target, nothing in the loss pins the render to the image. The model ends fitting targets displaced by about 1 px on a scene whose cameras are exact. On private scene A the shifts grew to about 3 px.
+
+**The combined recommendation for finalist 2, with V2's openftgs-synth runs: drop it, all six arms.** The recommendation above stands and is firmer for V2.
+
+- **V2 was the only form that moved the named measure.** It moved it up, the wrong way. It now harms on all three scenes where it was measured:
+  - private scene A: the sharpness ratio on both copies, and the test-view PSNR on the centre copy;
+  - `kitchen`: SSIM₁ at every seed;
+  - `studio`: two guards at its one seed.
+- **No form of finalist 2 has met section 7.2's adopt condition.** `align_rel`, `align_abs`, `align_stg`, V1 and V3 leave the named measure where the off arm has it. The first three do no harm on openftgs-synth beyond `align_abs`'s and `align_stg`'s one-seed dynamic-region PSNR flags on `studio`. V1 and V3 were not run there.
+- **What stays untested is the list above.** That list includes V2 with an anchor that keeps the render on the unshifted image, which is what these runs show V2 lacks. Each item is a smaller step from an arm that did not move the measure the hoped way.
+- **The decision is the owner's.** The questions after the variants still stand, apart from question 3, which these runs answer.
+
+**V2 on openftgs-synth's commands** (the same conventions as above; `$T` is `<scratch>/ticket-26d`, `$O` is `<surface-runs>/ticket-26d`, `$K` is the kitchen sheets' `<scratch>/kitchen-sheets`):
+
+| Command | Device | Time | Note |
+| --- | --- | --- | --- |
+| `bash $T/queue.sh smoke`, i.e. `ALIGN_START=200 bash $T/run_train.sh smoke_kitchen_v2 v2 <m15-runs>/kitchen/scene.json <m17-runs>/kitchen/init.safetensors 0 --config $O/smoke/cfg300.json` | GPU | 35 s | The smoke run |
+| `bash $T/queue.sh kitchen`, then `bash $T/queue.sh studio`, i.e. for each run `bash $T/run_train.sh <run> v2 <scene> <init> <seed>`, then `bash $T/post_synth.sh <run> <kitchen or studio> <scene> <init>`. The run is `python $T/wrap_train.py --term align=1 --align-window 8 --align-patch 32 --align-penalty 3.2552083333333335e-06 --align-start 18000 --align-mode full --stats … -- <scene> --init <init> --out $O/runs/<run> --seed <seed>`. Post-processing is `scripts/gt_depth.py` and `scripts/reference_flaws.py run` under the lock, then `synth_measures.py` and `scripts/run_summary.py` on the CPU | GPU, then CPU | 21 min (`kitchen`) and 31 min (`studio`) per run; about 2 min post-processing | The four runs, `kitchen` seeds 0 to 2 first, then `studio` |
+| `FTGS_WORKTREE=<this worktree> bash $K/kitchen_sheets.sh $O/runs/FUL_kitchen_s<n> FUL_kitchen_s<n>`; then `python $K/compare_sheets.py <surface-runs>/kitchen-sheets/compare/finalist2v2_kitchen_s<n>.jpg --title … FUL_ STG_ OFF_ PLAIN_kitchen_s<n>.jpg` | GPU (one render under the lock), then CPU | 6.4 s per render | The labelled sheets and the side-by-sides |
+| `python $T/tables.py` | CPU, 2 threads | seconds | The tables and guards here, against the off arm with the plain baseline and `align_stg` beside, the five-seed reads included |
+
+The folders of tickets #24, #26 and #26's first follow-up were read and never written (rows 890 and 891). Private scene A's folders were not opened.
+
+**The question for the owner after V2 on openftgs-synth.** Finalist 2: dropped, as recommended, or kept for a narrower form, such as V2 with an anchor to the unshifted image? This is question 1 after the variants, now with V2's openftgs-synth runs. Question 2 there, on the blind sheets, stays open, and the labelled `kitchen` side-by-sides above are added to it.
 
 ## 6. Step 5: finalist 3, surface terms without a prior
 
