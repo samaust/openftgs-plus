@@ -1757,6 +1757,7 @@ The private scene's folders, `<m15-runs>`, `<m17-runs>` and tickets #24's and #2
    - **Each variant's term is scratch-checked** as the first step's was, and smoke-run for 300 iterations before the full runs.
    - **Each is judged** by section 4.4's criteria against the off arm, with the plain baseline beside, as the staged arm was, with blind sheets as before (key apart), and read by section 7.2's row, with a combined recommendation for finalist 2. The owner's decision on finalist 2 stays open.
    - **Step 4's first test-view table is corrected:** its coverage column held run metadata (the cap, wall time and peak memory), and now holds the coverage, from each run's records.
+6. **After the variants** (2026-11-19, in session, relayed by the orchestrating session), on question 3 below: **V2, `align_full`, is run on openftgs-synth,** `kitchen` at seeds 0 to 2 and `studio` at seed 0, about 1.2 GPU hours, to see its effect there. The decision on finalist 2 follows it. Each `kitchen` run gets its labelled sheet and a side-by-side with `align_stg`, the off arm and the plain baseline.
 
 The diagnosis ran first, then the staged arm, both on 2026-11-18, with this branch's code at a77b838 (`src/` and `scripts/` as at ticket #24's 163bd39 and the first step's ef7864b), the same versions and hardware as above, under the shared GPU lock with 12 CPU threads, one training at a time. Another ticket's work held the lock between commands for seconds. `$T` is now `<scratch>/ticket-26b`, holding copies of `$T`'s scripts above, and `$O` is `<surface-runs>/ticket-26b`. Every new run wrote only there.
 
@@ -2120,6 +2121,18 @@ The private scene's folders and the folders of tickets #24, #25, #26 and #26's f
 1. **Finalist 2: dropped, as recommended,** now that the staged arm's three variants have run, or kept for one of the narrower forms above? This decides whether section 7.2's combined arm has a disagreement side from finalist 2.
 2. **The sheets** (`<surface-runs>/ticket-26c/sheets/blind`, key apart), beside the first two sets (`<surface-runs>/ticket-26/sheets/blind` and `<surface-runs>/ticket-26b/sheets/blind`): the owner's judgement with the labels hidden, which this ticket cannot give.
 3. **V2 on `kitchen` and `studio`.** By the owner's answer they wait, since V2 moved the named measure. Recommended: not run. It moved the measure up, by 0.0002 over the margin on one copy, and harmed on private scene A, so neither outcome on openftgs-synth would make it an adoption. About 1.7 GPU hours with post-processing (three `kitchen` seeds and one `studio`, at the staged arm's times and V2's 15 ms more per aligned iteration) if the owner wants them.
+
+**V2 on openftgs-synth: the design, fixed before its runs** (2026-11-19, at the owner's answer above, item 6).
+
+- **The runs.** `FUL_kitchen_s0` to `s2` on M15's `kitchen` and `FUL_studio_s0` on M17's `studio`, with M17's init files, as the staged arm's were. Each runs V2 exactly as on private scene A: the wrapper copy and the term unchanged (`<scratch>/ticket-26d`, copied from `<scratch>/ticket-26c` with only its paths changed), `--align-mode full`, window 8 px, patch 32 px, penalty 0.01 / 3,072, the switch after 18,000. Each is post-processed as the staged arm's `kitchen` and `studio` runs were: E16's `METRICS.json`, `scripts/gt_depth.py`, `scripts/reference_flaws.py` and the same measures script.
+- **A smoke run first,** 300 iterations on `kitchen` at seed 0 with the switch at 200, because V2 had not yet met `kitchen`'s 1352 × 1014 frames, the edge patches they leave, or the memory-mapped frame cache. It ran on 2026-11-19 in 35 s, its wrappers counted 300 each, rows 100 and 200 carry no alignment key, and row 300 carries them all, finite, V2's shifted-target 1 − SSIM and ꟻLIP included.
+- **The guards, section 4.4's for openftgs-synth, against the off arm:**
+  - On `kitchen`, SSIM₁: V2's three-seed mean not below the off arm's five-seed mean by more than 0.002, with the plain baseline's five seeds beside.
+  - On `kitchen`, PSNR and ꟻLIP are flagged when all three of V2's values are worse than all five of the off arm's. Kept-pixel PSNR is flagged against the off arm's seeds 0 to 2, the only ones it was scored on.
+  - On both scenes, a residual share is worse when V2's mean differs from the off arm's (seeds 0 to 2 on `kitchen`) by more than 0.005, in front and behind, on all pixels and on dynamic pixels.
+  - On `studio`, one seed: dynamic-region PSNR is flagged when it is lower than the off arm's by more than 0.1 dB.
+- **What the runs can settle.** Section 7.2's adopt condition is read on private scene A, where V2 raised the named measure instead of lowering it. So openftgs-synth can show harm or no harm, not an adoption. The alignment log is read as well, to see whether the runaway on private scene A happens on `kitchen` and `studio`, where the staged arm's shifts were about 1 px.
+- **The estimate.** From the staged arm's times and V2's overhead on private scene A, scaled by the frames' pixels: about 21 minutes per `kitchen` run and 31 minutes for `studio`, with about 1.5 minutes of post-processing each, about 1.6 GPU hours with the smoke run. That is over the 1.2 cleared and under the 1.8 to stop at. `studio` runs last and starts only if its expected end falls before 1.8 hours.
 
 ## 6. Step 5: finalist 3, surface terms without a prior
 
