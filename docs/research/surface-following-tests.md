@@ -2896,7 +2896,7 @@ The private scene's folders, `<m15-runs>`, `<m17-runs>` and tickets #4's, #12's,
 - **The renders turn softer:** the sharpness ratio falls by 0.035 on both copies. No test-view score falls: crop PSNR rises by 0.02 and 0.11 dB, E16's PSNR by 0.17 and 0.15 dB, and the kept-pixel PSNR by 0.19 dB.
 - **On `kitchen` it halves the expected depth's error** and removes most of what floated in front of the surface, with no harm to the image scores, but the share behind the surface does not fall; on `studio`'s one seed it rises beyond its guard.
 - **DAViD's maps on the person do less** and cost up to 0.28 dB.
-- **By section 7.2's row** this is its third column, a measure that moves in part with softer renders: not adopted alone and not dropped, waiting for a disagreement-side term or a lower, calibrated weight.
+- **By section 7.2's row** this is its third column, a measure that moves in part with softer renders: not adopted alone and not dropped, waiting for a disagreement-side term or a lower, calibrated weight. The lower-weight arm, below, changes the recommendation to a drop in the form tested.
 
 **The arms, run** from 2026-11-18 to 2026-11-19, at the owner's answers above, after finalist 2's variant queue had ended, with this branch's code, the same versions and hardware: the RTX 4090 alone under the lock, 14 CPU threads, one training at a time. Every run wrote only under `<surface-runs>/ticket-28`. Scripts read tensors, JSON, images, maps and mask files and wrote numbers and files; no image, render, map or sheet of private scene A was looked at (row 889).
 
@@ -3014,9 +3014,9 @@ The prior keeps the flattening and adds to it on `kitchen`, where flattening alo
   - weights below the papers' (λ₇ = 0.1, λ₈ = 0.015) that would keep the renders sharp;
   - the start before iteration 15,000;
   - C7's total-variation term;
-  - the combined arm, with finalist 2's term;
+  - the combined arm, with finalist 2's term (finalist 2 since dropped, below);
   - more than one seed on `studio`.
-- **Recommended: not adopted alone, and not dropped.** The row's third column sends it to the combined arm, but that arm has a partner only if a term on the disagreement side exists. Finalist 2 was dropped as tested, and its variants are ticket #26c's to report. So finalist 4 waits:
+- **Recommended: not adopted alone, and not dropped** (updated after the lower-weight arm below: drop in the form tested). The row's third column sends it to the combined arm, but that arm has a partner only if a term on the disagreement side exists. Finalist 2 was dropped as tested, and is now dropped with its variants (the owner, 2026-11-19; section 5 here, the owner's answers, item 7). So finalist 4 waits:
   - for such a term, should one come out of ticket #26c or a later step;
   - or for a further arm of its own at a lower, calibrated weight.
   Dropping it outright would leave out the one surface effect any finalist has shown on `kitchen`, the halved depth error.
@@ -3061,7 +3061,146 @@ The prior keeps the flattening and adds to it on `kitchen`, where flattening alo
 
 Tickets #4's, #12's, #24's, #26's, #26b's and #27's folders, `<m15-runs>`, `<m17-runs>` and the private scene's folders were read and never written.
 
-**The owner's answer on step 6** (whether the work goes on to the recommendation, or stops): *not yet given.* **Date:** *not yet given.*
+**The owner's answer on step 6:**
+
+- **Finalist 4 gets a further arm at a calibrated lower weight** (question 1; 2026-11-19, in session, relayed by the orchestrating session): a calibration on the centre copy (about 1 GPU hour), then the arm on both sets (about 4 GPU hours), with MoGe-2's maps, both prior terms from iteration 15,000, λ_flat = 1 σt-weighted, and everything else as the main arm. Its form, rule and results are below.
+- **Whether the work goes on to the recommendation, or stops** (question 2): *not yet given.* **Date:** *not yet given.*
+
+**The further arm at a lower weight: the calibration, fixed before its runs** (2026-11-19, at the owner's answer above). The rule and the runs below were committed before any calibration run.
+
+- **What is scaled.** Both prior weights together by one factor f, λ₇ = 0.1·f and λ₈ = 0.015·f, with γ = 0.005, the plane-distance depth, C7 and C8 as the main arm has them. Flattening stays at λ_flat = 1, σt-weighted, from iteration 1; the prior starts at iteration 15,000. The candidates are **f = 1/3, 1/10 and 1/30** (λ₇ = 0.0333, 0.01, 0.00333; λ₈ = 0.005, 0.0015, 0.0005), fixed here; none is added after the results.
+- **The runs,** as section 6 here's stage 2: the centre copy of private scene A, seed 0, from `ref_h0_s4`, through this follow-up's wrapper copy (`<scratch>/ticket-28b`, ticket #28's with its paths changed), MoGe-2's full maps with `--prior-axes x,y,z`, stopped at iteration 23,000 by `--stop-at`, so that the prior acts for 8,000 iterations, with `--checkpoint-every 7000 --keep-checkpoints 3`.
+  - `C3_f0.33`, `C3_f0.1` and `C3_f0.033`, the three candidates.
+  - `C3_f1`, the papers' weights to the same stop: not a candidate, but the check that this stop sees the main arm's softening at all.
+  - `C3_off`, every weight 0 to the same stop, the sharpness guard's reference. No weight-0 run to 23,000 exists: section 6 here's `C1_off` stopped at 15,000.
+  - The flattening-only run to 23,000 is section 6 here's `C2_flat_only`, reused (λ_flat = 1 alone, the same copy, seed, init and stop). The wrapper copy's weight-0 path was checked first: its 300-iteration smoke run on `kitchen` at every weight 0 logged totals of 0.445250, 0.390724 and 0.345167 at iterations 100, 200 and 300, ticket #27's to every digit logged.
+- **What is read,** at 23,000: the last-1,000 L1 mean (iterations 22,001 to 23,000, from `train_log.jsonl`); the test view's crop PSNR and sharpness ratio (`score_a.py`, all 120 frames, the late frames beside); and, reported but not used to choose, L₇, L₈ and the share of pixels C8's weight passes at the end, the scale ratios (`ratio_stats.py`, at 7,000, 14,000 and the stop), the named measure and its tail, and the near side's under-two-frames share. As in section 6 here, the named measure is not used to choose: choosing a weight by the measure the arm is then judged on would decide the test in its calibration.
+- **The guards, one-sided, against harm:**
+  - **L1** no more than 1.5 % above `C2_flat_only`'s (0.012007), section 6 here's guard, against the flattening the arm keeps.
+  - **Crop PSNR** no more than 0.3 dB below `C2_flat_only`'s (24.25), section 4.4's harm guard.
+  - **Sharpness ratio** no more than **0.010** below `C3_off`'s at the same stop. The owner's aim is a ratio within the off arm's two-seed spread; with one seed a side, the spread itself (0.0055 on the centre copy at 30,000) would turn away a harmless weight often. Over the 15 kept seed pairs of one configuration at 30,000 (both copies; the plain baseline, the off arm, `align_abs`, `align_rel`, `FLAT`, `FLATNC`, `PRIOR` and `DAVID`), two seeds' sharpness ratios differ by 0.0048 in root mean square (0.0001 to 0.0124). The guard is two such differences, which a harmless run passes about 95 times in 100; the main arm's fall of 0.035 is seven.
+- **The rule:** f is the **largest of the three candidates that passes all three guards,** the strongest prior that does no harm by them, as section 6 here chose λ_nc.
+  - If `C3_f1` passes the sharpness guard as well, this stop does not see the softening the arm is calibrated against, and the calibration stops and reports before the arm.
+  - If no candidate passes, the calibration stops and reports before the arm.
+- **The arm, at the chosen f:** `LOWP_…`, the main arm's eight runs with `--prior-c7 0.1·f --prior-c8 0.015·f` and nothing else changed: the centre and left copies at seeds 0 and 1 from `ref_h0_s4` and `ref_h1_s4`, `kitchen` at seeds 0 to 2 and `studio` at seed 0 from M17's init files, 30,000 iterations, 14 CPU threads, the memory fallbacks of step 5 as the main arm had them. Read by section 4.4's criteria against the off arm, with `PRIOR` and `FLAT` beside, and by section 7.2's row, with the main arm's measures, scores, blind sheets for private scene A, and a labelled `kitchen` sheet and side-by-side per `kitchen` run.
+- **The hours, estimated** from section 6 here's stage 2 (10 min to 23,000 without the device, 14.5 to 14.8 min with it from 15,000) and the main arm's times: the calibration about 1.2 GPU hours with its scores and ratios (five runs, about 70 min); the arm about 3.9 hours with its post-processing; about 5.1 hours in all.
+
+**The calibration, run** on 2026-11-19 from 11:54 to 13:07, after the rule's commit, with this branch's code (`src/`, `scripts/` and `tests/` as `main`'s at 02e3686), the shared `.venv`'s versions as in the first step, the RTX 4090 alone under the lock and 14 CPU threads. Each run stopped at exactly 23,000 (`ftgs train` saved its checkpoint and exited 143), its wrapper ran 23,000 times (the wrapper's records), and D-51's `auto` put the frame cache on the GPU in all five, at peaks of 23,720 to 23,918 MiB in `nvidia-smi`. Times: 14 min 57 s to 15 min 1 s with the prior, 9 min 42 s for `C3_off`. L1 is the mean over iterations 22,001 to 23,000; L₇, L₈ and C8's share are the logged row at 23,000 (the mean of its 100 iterations); the scores are the test view's crop at 23,000. The scale ratios were read at 14,000 and at the stop, not at 7,000 as the form said: with a stop at 23,000, `--keep-checkpoints 3` keeps only the checkpoints at 14,000 and 21,000 beside the final one.
+
+| Run | L1, against `C2_flat_only` | Crop PSNR, against `C2_flat_only` | Sharpness ratio (late), against `C3_off` | L₇ / L₈ / share C8's weight passes, at 23,000 | Near side min/mid at 23,000 | Named measure / tail at 23,000 | Under two frames, near side |
+| --- | --- | --- | --- | --- | --- | --- | --- |
+| `C2_flat_only` (section 6 here) | 0.012007 | 24.25 | 0.7047 (0.7220); −0.0015 | – | 0.015 | 0.144 / 0.054 | 0.583 |
+| `C3_off`, every weight 0 | 0.011942 (−0.54 %) | 24.30 (+0.05) | **0.7063** (0.7209) | – | 0.238 | 0.154 / 0.060 | 0.565 |
+| `C3_f1`, the papers' weights | **+37.2 %** | 24.24 (−0.01) | 0.6660 (0.6843); **−0.0403** | 0.171 / 0.502 / 75 % | 0.015 | 0.150 / 0.045 | 0.599 |
+| `C3_f0.33` | **+5.21 %** | 24.34 (+0.09) | 0.6861 (0.7036); **−0.0202** | 0.196 / 0.757 / 72 % | 0.016 | 0.134 / 0.032 | 0.591 |
+| `C3_f0.1` | **+1.69 %** | 24.30 (+0.05) | 0.6935 (0.7101); **−0.0128** | 0.299 / 0.880 / 59 % | 0.016 | 0.161 / 0.071 | 0.582 |
+| `C3_f0.033` | +0.15 % | 24.26 (+0.01) | 0.7049 (0.7201); −0.0014 | 0.460 / 0.662 / 36 % | 0.016 | 0.156 / 0.055 | 0.579 |
+
+- **The stop sees the softening.** At the papers' weights the sharpness ratio is 0.040 below the weight-0 run's at 23,000, as the main arm's fell by 0.035 at 30,000, so the guard can tell weights apart here.
+- **The rule picks f = 1/30: λ₇ = 0.00333, λ₈ = 0.0005.** It is the only candidate that passes all three guards. At 1/10, L1 is 1.69 % above flattening alone, just past the 1.5 % guard, and the sharpness ratio 0.0128 below the weight-0 run's, past the 0.010 guard; at 1/3 both are well past (5.2 %, 0.020). No crop PSNR falls. The rule was met, so the work went on to the arm without a stop.
+- **The softening falls with the weight and the L1 cost with it:** 0.040, 0.020, 0.013 and 0.001 below the weight-0 run's sharpness, and 37 %, 5.2 %, 1.7 % and 0.15 % above flattening alone's L1. At the chosen weight both are inside the seeds' noise.
+- **At the chosen weight the prior still acts, but less.** L₇ falls from 1.05 over iterations 15,001 to 15,100 to 0.46 at 23,000, against 0.17 at the papers' weights, and C8's weight passes 36 % of the cut's pixels instead of 75 %: the primitives turn about two thirds of the way the papers' weights turn them by this stop. The prior's share of the loss at 23,000 is 0.0019 of 0.056.
+- **The named measure and the tail at 23,000** were not used to choose. One seed each, they spread 0.134 to 0.161 across the candidates with no order in the weight, against 0.144 for flattening alone and 0.154 at weight 0.
+
+**The arm at f = 1/30, run** on 2026-11-19 from 13:07 to 16:47, straight after the calibration, with the same code, versions and hardware, 14 CPU threads, one training at a time: `LOWP_…`, the main arm's eight runs with `--prior-c7 0.0033333 --prior-c8 0.0005`. Every run wrote only under `<surface-runs>/ticket-28b`, read ticket #28's MoGe-2 maps, and ran its wrappers 30,000 times. No run needed a fallback: peaks of 23,620 to 23,984 MiB on private scene A with the cache on the GPU, 22,400 to 23,873 MiB on openftgs-synth with it memory-mapped, as D-51's `auto` placed it in the off arm. Times: 22 min 57 s to 23 min 6 s on private scene A, 26 min 58 s to 27 min 10 s on `kitchen`, 36 min 20 s on `studio`. Scripts read tensors, JSON, images, maps and masks and wrote numbers and files; no image, render, map or sheet of private scene A was looked at (row 892).
+
+**The named measure** (each cell 5 cm / tail; the off arm's, `FLAT`'s and `PRIOR`'s rows are in the tables above):
+
+| Run | Near side: far-5 cm / beyond 25 cm | Near side: far-10 cm | Under two frames: near / whole | Whole model: far-5 cm | Far side: far-5 cm | Cap reached at |
+| --- | --- | --- | --- | --- | --- | --- |
+| `LOWP_A_h0_s0` | 0.1257 / 0.0419 | 0.0753 | 0.5605 / 0.433 | 0.209 | 0.516 | 10,600 |
+| `LOWP_A_h0_s1` | 0.1287 / 0.0338 | 0.0645 | 0.5852 / 0.447 | 0.220 | 0.534 | 10,900 |
+| `LOWP_A_h1_s0` | 0.1401 / 0.0374 | 0.0690 | 0.5812 / 0.439 | 0.228 | 0.526 | 9,600 |
+| `LOWP_A_h1_s1` | 0.1473 / 0.0375 | 0.0660 | 0.5878 / 0.448 | 0.231 | 0.520 | 10,000 |
+
+**Judged by section 4.4's rule** (both seeds beyond both, means more than 0.01 apart; 0.021 for the tail):
+
+| Copy, measure | `LOWP` against the off arm | against `FLAT` | against `PRIOR` |
+| --- | --- | --- | --- |
+| Centre, named measure | not moved (0.126, 0.129 against 0.131, 0.138; mean 0.007 lower) | not moved (against 0.124, 0.146) | not moved (against 0.128, 0.136) |
+| Left, named measure | not moved (0.140, 0.147 against 0.141, 0.134; mean 0.006 higher) | not moved (against 0.137, 0.147) | **higher by 0.018** (against 0.121, 0.131) |
+| Either copy, tail | not moved | not moved | not moved |
+| Under two frames, near side | not moved (centre mean 0.012 lower, left the same) | not moved | lower by 0.034 and 0.029 |
+
+Against `FLATNC` it is lower on the centre copy by 0.018, as `PRIOR` was, since `FLATNC` raised that copy (section 6 here); not moved on the left.
+
+- **At the calibrated weight the prior does not move the shell.** Neither copy's named measure moves against the off arm or against flattening alone, and on the left copy it ends higher than the main arm's, which was the one copy where the papers' weights lowered it.
+- **The rise in short-lived primitives near the camera goes with the weight:** `PRIOR`'s 0.02 to 0.03 is gone.
+
+**Row A1 and the prior terms over the run.**
+
+- **The scale ratios** at 30,000 (`ratio_stats.py`): on private scene A, whole model 0.0001, 3·10⁻⁵ to 4·10⁻⁵, 0.74 to 0.75; near side 0.0015 to 0.0020, 0.0006 to 0.0008, 0.66 to 0.67; the shell 0.0000, 0.0000, 0.87 to 0.91, as `FLAT`'s and `PRIOR`'s. On `kitchen`, 0.082 to 0.084 and 0.019 to 0.020, between `FLAT`'s 0.090 and `PRIOR`'s 0.041; on `studio`, 0.0000. Every run reached the cap by iteration 10,900, before the prior's start.
+- **The terms** (logged rows, means of 100 iterations): on private scene A, L₇ falls from 1.02 to 1.04 at iteration 15,100 to 0.40 to 0.42 at 30,000 (`PRIOR`: 0.14), and C8's weight passes 43 % to 45 % of the cut's pixels at the end (`PRIOR`: 78 % to 79 %). On `kitchen` L₇ ends at 0.25 to 0.27 (`PRIOR`: 0.076) and C8 passes 64 % to 67 %; on `studio`, 0.24 and 60 %. The prior's share of the loss at the end is 0.0017 of 0.048 to 0.050 on private scene A.
+- **L1 at 30,000** is 0.0104 to 0.0109 on private scene A, the off arm's 0.0104 to 0.0107; `PRIOR`'s was 0.0118 to 0.0122.
+
+**The test-view scores, the sharpness ratio and the tiles' coverage:**
+
+| Run | Crop PSNR / SSIM | Sharpness ratio (late frames) | Training views: PSNR / sharpness | E16 PSNR / SSIM₁ / ꟻLIP | Kept-pixel PSNR | Tiles with alpha ≥ 0.5: front; side |
+| --- | --- | --- | --- | --- | --- | --- |
+| `LOWP_A_h0_s0` / `s1` | 24.39 / 0.8154; 24.37 / 0.8155 | 0.7302 (0.7558); 0.7192 (0.7422) | 32.61 / 0.7701; 32.70 / 0.7677 | 24.93 / 0.8191 / 0.1522; 24.77 / 0.8183 / 0.1535 | 25.69; 25.51 | 0.77 to 1.00; 0.45 to 0.86 / 0.82 to 1.00; 0.50 to 0.86 |
+| `LOWP_A_h1_s0` / `s1` | 23.96 / 0.7501; 23.90 / 0.7484 | 0.7335 (0.7905); 0.7335 (0.7819) | 31.54 / 0.7733; 31.44 / 0.7737 | 21.93 / 0.7421 / 0.1932; 21.66 / 0.7394 / 0.1961 | – | 0.80 to 1.00; 0.48 to 0.89 / 0.79 to 1.00; 0.47 to 0.87 |
+
+- **The renders stay about as sharp as the off arm's.** On the left copy the sharpness ratio is 0.7335 at both seeds, inside the off arm's 0.7323 to 0.7353. On the centre copy the mean is 0.004 below the off arm's: seed 0 is inside its pair (0.7258 to 0.7313), and seed 1 is 0.0066 below it, within the calibration's 0.010. Against `FLAT` the means differ by 0.001 (centre) and 0.011 lower (left, where `FLAT` was the sharpest arm); against `PRIOR` they are 0.032 and 0.035 higher. The training views lose 0.26 dB of PSNR on the centre copy and none on the left, against 0.5 to 0.9 dB for `PRIOR`.
+- **No test-view score falls by 0.3 dB.** Against the off arm: crop PSNR +0.02 and −0.02 dB, E16 PSNR +0.13 and −0.03 dB, kept-pixel PSNR +0.14 dB.
+- **The side views do not fill:** 0.45 to 0.89 of alpha ≥ 0.5, the off arm's 0.47 to 1.00, against `PRIOR`'s 0.75 to 1.00.
+
+**The sheets.** For private scene A: four sets, the centre copy at seeds 0 and 1, then the left copy at seeds 0 and 1, each of four sheets, the off arm, `FLAT`, `PRIOR` and `LOWP`, in a seeded order (seed 2819), labelled only by set and letter, in `<surface-runs>/ticket-28b/sheets/blind`, with `KEY.json` apart. They await the owner's judgement with their labels hidden. For `kitchen`: the labelled sheet of each `LOWP_kitchen_s<n>` from the fixed request (SHA-256 `5560b8a3…6fd27c`, checked before use), in `<surface-runs>/kitchen-sheets/sheets`, made after each run's post-processing with `FTGS_WORKTREE` set to this worktree; and one side-by-side per seed, `LOWP`, `PRIOR`, `FLAT`, `OFF` and `PLAIN`, in `<surface-runs>/kitchen-sheets/compare/finalist4low_kitchen_s<n>.jpg`. The lowest tile coverage is 0.74 to 0.80, against the off arm's 0.82 to 0.85, `FLAT`'s 0.75 to 0.86 and `PRIOR`'s 0.79 to 0.81.
+
+**openftgs-synth** (columns as in the main arm's table; `kitchen`'s SSIM₁, PSNR and ꟻLIP against the off arm's five seeds, the rest against its seeds 0 to 2):
+
+| Run | PSNR / SSIM₁ / ꟻLIP | Kept-pixel PSNR | Residual: in front / behind (all) | Dynamic: in front / behind | Expected depth's error, median: all / dynamic | Far share (0.12 S): whole / dynamic | Beyond 25 cm | Under two frames |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| `LOWP_kitchen_s0` to `s2` | 26.58 to 27.49 / 0.8768 to 0.8778 / 0.0900 to 0.0916 | 29.69 to 30.39 | 0.037 to 0.038 / 0.301 to 0.303 | 0.016 to 0.017 / 0.612 to 0.619 | 181 to 197 / 31 to 47 mm | 0.036 to 0.037 / 0.002 to 0.003 | 0.023 to 0.024 / 0.001 | 0.380 to 0.384 / 0.656 to 0.661 |
+| `LOWP_studio_s0` | 23.00 / 0.8005 / 0.1851 | 23.03 | 0.012 / 0.419 | 0.007 / 0.650 | 151 / 88 mm | 0.039 / 0.001 | 0.068 / 0.001 | 0.386 / 0.714 |
+
+- **No image guard is crossed on `kitchen`.** Against the off arm's five seeds SSIM₁ is 0.0006 higher, PSNR 0.01 dB higher and ꟻLIP 0.002 lower, none flagged; kept-pixel PSNR is 0.45 dB higher against seeds 0 to 2. Against the five plain seeds SSIM₁ is 0.0015 lower, inside the 0.002 guard.
+- **`kitchen`'s geometry is close to flattening's, not the prior's.** The expected depth's error, 181 to 197 mm (dynamic 31 to 47 mm), is below the off arm's 206 to 247 mm on every seed and overlaps `FLAT`'s 186 to 244 mm (dynamic 37 to 107), its lowest seed below `FLAT`'s; `PRIOR` reached 109 to 123 mm. The share in front is 0.037 to 0.038, below every seed of the off arm and of `FLAT` (0.041 to 0.042), a fall of 0.004 against `PRIOR`'s 0.024. The far shares do not move.
+- **The share behind the surface is worse on `kitchen`** by section 4.4's rule (a share differing from the off arm's by more than 0.005): 0.301 to 0.303 against the off arm's 0.294 to 0.295 and `FLAT`'s 0.294 to 0.298, +0.008 and +0.007, every seed beyond both references' seeds. A surface term was expected to lower it.
+- **Against `FLAT`,** kept-pixel PSNR is lower on every seed (29.69 to 30.39 against 30.44 to 31.42 dB; mean −0.86 dB), flagged by the rule the guards use; SSIM₁ is 0.0018 lower.
+- **`studio`, one seed:** behind 0.4189 against the off arm's 0.4138, +0.0051, just past section 4.4's 0.005, the wrong way, as `PRIOR` was by more (+0.009); in front 0.012 against 0.014; the expected depth's error 151 mm against 172; PSNR 0.17 dB higher.
+
+**The reading by section 7.2's row, at the calibrated weight.**
+
+- **Adopt when** "it moves the named measure beyond finalist 3's two arms, with the renders sharp and no harm on openftgs-synth". **Not met:** the renders stay sharp, but the named measure does not move against `FLAT` on either copy, and the share behind the surface is worse on `kitchen` and, by a hair, on `studio`.
+- **Drop when** "it adds nothing to finalist 3's flattening". **Met for this arm:** against `FLAT` nothing moves on the named measure, the tail or the under-two-frames share; on `kitchen` the expected depth error overlaps `FLAT`'s seeds and the share in front is a little lower, while the share behind is a little higher and the kept-pixel PSNR lower.
+- **The two arms together.** At the papers' weights the prior turns the primitives, halves `kitchen`'s expected depth error and lowers the left copy's named measure, and the renders soften by 0.035. At a thirtieth of them, the strongest of the three candidates the guards let through, the renders keep their sharpness, the shell does not move, and on `kitchen` what remains of the depth effect is within flattening's seeds. The candidate between, 1/10, was turned away by the calibration at 1.69 % of L1 and 0.013 of sharpness, both just past their guards; no arm was run at it. In the range tested, what the prior adds and what it costs in sharpness come and go together.
+- **What this does not cover:** an arm at 1/10 or between; the start before 15,000; C7's total-variation term; a combined arm, which has no partner since finalist 2 is dropped; more than one seed on `studio`.
+- **Recommended: drop finalist 4 in the form tested.** At the weight the guards allow it adds nothing to flattening on the shell, and `kitchen`'s share behind the surface is worse by section 4.4's rule. At the papers' weights it does more, but only with the softening that section 4.4's sharpness reading weighs against it, and with `studio`'s share behind the surface beyond its guard. The halved depth error at the papers' weights stays recorded as the one surface effect a finalist has shown on `kitchen`, for the recommendation to weigh. The decision is the owner's.
+
+**Against the follow-up's scope:**
+
+- **The calibration first, its form and rule committed before any run:** d83d3cf at 11:54:31, the first run at 11:54:44. The rule picked f = 1/30, so there was no stop.
+- **The arm at the chosen weight:** 8 runs, measured, scored and sheeted, read against the off arm with `PRIOR` and `FLAT` beside, by section 4.4's criteria and section 7.2's row (above).
+- **GPU hours:** the calibration 1.21 hours (11:54 to 13:07), the arm with its post-processing 3.66 hours (13:07 to 16:47), the smoke run and the sheets under a minute: about 4.9 hours, inside the 5 cleared.
+- **Files changed:** this document and the source log only. Sources: row 892.
+- **Privacy:** nothing names private scene A or shows its images; no image, map, render or sheet of it was looked at.
+
+**The follow-up's commands** (the conventions of the first step's table, with 14 threads; `$T` here is `<scratch>/ticket-28b`, `$O` is `<surface-runs>/ticket-28b`, `$M28` is `<surface-runs>/ticket-28`, `$KS` is `<scratch>/kitchen-sheets`; the scripts are not committed):
+
+| Command | Device | Time | Note |
+| --- | --- | --- | --- |
+| `bash $T/run_train.sh smoke_kitchen_off $K $M/kitchen/init.safetensors 0 --term flat=0 --term prior=0 -- --config <surface-runs>/ticket-27/smoke/cfg300.json` | GPU | 32 s | The copy's weight-0 parity: totals as ticket #27's |
+| `bash $T/cal.sh`: per run `bash $T/run_train.sh <run> $X/scene_h0/scene.json <surface-runs>/ticket-24/init/ref_h0_s4.safetensors 0 --stop-at 23000 --term flat=1 --flat-weighting sigma_t [--term prior=1 --prior-c7 <0.1·f> --prior-c8 <0.015·f> --prior-gamma 0.005 --prior-depth plane --prior-from 15000 --prior-maps $M28/private-scene-A/moge2_full --prior-axes x,y,z] -- --checkpoint-every 7000 --keep-checkpoints 3` (`C3_off` with every weight 0), each followed by `bash $T/cal_post.sh <run>` (section 6 here's, repointed) | GPU, then CPU | 15 min a run, 9 min 42 s for `C3_off`; 33 s a post | The calibration's five runs |
+| `python $T/cal_decide.py` | CPU | seconds | The calibration's table and its rule |
+| `bash $T/arms.sh 0.0033333 0.0005`: per run `bash $T/run_train.sh <run> <scene.json> <init> <seed> --term flat=1 --flat-weighting sigma_t --term prior=1 --prior-c7 0.0033333 --prior-c8 0.0005 --prior-gamma 0.005 --prior-depth plane --prior-from 15000 --prior-maps $M28/<scene>/moge2_full --prior-axes x,y,z`, then `post_a.sh` or `post_synth.sh` (ticket #28's, repointed), then for `kitchen` `FTGS_WORKTREE=<worktree> bash $KS/kitchen_sheets.sh $O/runs/<run> <run>` | GPU, then CPU | 23 to 36 min a run; under 3 min a post; 6.4 s a sheet | The arm's eight runs |
+| `python $KS/compare_sheets.py <surface-runs>/kitchen-sheets/compare/finalist4low_kitchen_s<n>.jpg --title … LOWP_… PRIOR_… FLAT_… OFF_… PLAIN_…`; `bash $T/blind.sh` | CPU | seconds | The side-by-sides and the sixteen blind sheets with their key |
+| `python $T/tables28.py` and short inline reads of the logs, ratios and coverage files | CPU | seconds | The tables of this follow-up |
+
+Tickets #24's, #26's, #27's and #28's folders, `<m15-runs>`, `<m17-runs>` and the private scene's folders were read and never written.
+
+**In short, for the owner, after the lower-weight arm.**
+
+- **The calibration picked a thirtieth of the papers' weights** (λ₇ = 0.00333, λ₈ = 0.0005), the only one of 1/3, 1/10 and 1/30 that kept L1, crop PSNR and sharpness inside their guards; 1/10 missed two guards narrowly.
+- **At that weight the renders stay sharp** (inside the off arm's seeds on the left copy, 0.004 below on the centre copy), and no score falls.
+- **But the shell does not move:** not the named measure on either copy. `kitchen`'s depth error, which the papers' weights had halved, stays within flattening's seeds, and its share behind the surface is slightly worse. The prior adds nothing to flattening at this weight.
+- **Recommended: drop finalist 4 in the form tested.** Its effects and its softening come and go together across the weights tried.
+
+**The questions for the owner on the lower-weight arm.**
+
+1. **Finalist 4:** dropped in the form tested (recommended); or kept waiting for a partner term; or one more arm at 1/10, which the calibration narrowly turned away (about 4 GPU hours).
+2. **The sheets** (`<surface-runs>/ticket-28b/sheets/blind`, key apart; the labelled `kitchen` side-by-sides `finalist4low_kitchen_s<n>.jpg`): the owner's judgement with the labels hidden.
+
+**The owner's answer on the lower-weight arm:** *not yet given.* **Date:** *not yet given.*
 
 ## 8. The recommendation
 
