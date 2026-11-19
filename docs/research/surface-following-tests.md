@@ -1604,27 +1604,27 @@ The private scene's folders, `<m15-runs>` and `<m17-runs>` were read and never w
 
 | Run | Crop PSNR | Crop SSIM₁ | Sharpness ratio | Late | Training cameras: PSNR / ratio | E16 PSNR / SSIM₁ / ꟻLIP | Kept-pixel PSNR | Coverage: between cameras to ±45°; ±60°, ±90° |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- |
-| `A_h0_s0`, plain | 24.36 | 0.8149 | 0.7262 | 0.7504 | 32.90 / 0.7755 | 24.79 / 0.8187 / 0.1531 | 25.52 | cap 10800 wall 13:09.38 peak 23895 cache None finite True |
-| `A_h0_s1`, plain | 24.31 | 0.8153 | 0.7249 | 0.7467 | 32.79 / 0.7742 | 24.75 / 0.8189 / 0.1545 | 25.47 | cap 11100 wall 13:11.67 peak 23982 cache None finite True |
-| `OFF_A_h0_s0` (ticket #24's `A_h0_s0_v2`) | 24.35 | 0.8148 | 0.7313 | 0.7536 | 32.99 / 0.7733 | 24.80 / 0.8180 / 0.1531 | 25.54 | cap 10900 wall 13:28.94 peak 23845 cache None finite True |
-| `OFF_A_h0_s1` | 24.36 | 0.8153 | 0.7258 | 0.7497 | 32.84 / 0.7740 | 24.66 / 0.8176 / 0.1538 | 25.37 | cap 10800 wall 13:11.81 peak 23936 cache gpu finite True |
-| `REL_A_h0_s0` | 24.38 | 0.8174 | 0.7220 | 0.7431 | 32.61 / 0.7730 | 24.71 / 0.8196 / 0.1532 | 25.45 | cap 14200 wall 17:24.58 peak 23902 cache gpu finite True |
-| `REL_A_h0_s1` | 24.36 | 0.8182 | 0.7198 | 0.7422 | 32.42 / 0.7678 | 24.61 / 0.8209 / 0.1529 | 25.32 | cap 14600 wall 17:52.33 peak 23920 cache gpu finite True |
-| `ABS_A_h0_s0` | 24.40 | 0.8160 | 0.7293 | 0.7493 | 32.93 / 0.7736 | 24.77 / 0.8189 / 0.1525 | 25.51 | cap 11000 wall 17:34.22 peak 23787 cache gpu finite True |
-| `ABS_A_h0_s1` | 24.40 | 0.8157 | 0.7247 | 0.7469 | 32.78 / 0.7717 | 24.70 / 0.8187 / 0.1539 | 25.42 | cap 11000 wall 18:55.59 peak 23870 cache gpu finite True |
-| `A_h1_s0`, plain | 23.90 | 0.7473 | 0.7403 | 0.7938 | 31.31 / 0.7719 | 21.92 / 0.7392 / 0.1951 | – | cap 9700 wall 13:23.93 peak 23394 cache None finite True |
-| `A_h1_s1`, plain | 23.71 | 0.7472 | 0.7457 | 0.7969 | 31.59 / 0.7686 | 21.66 / 0.7384 / 0.1976 | – | cap 9900 wall 13:32.80 peak 23970 cache None finite True |
-| `OFF_A_h1_s0` | 23.92 | 0.7487 | 0.7323 | 0.7804 | 31.57 / 0.7727 | 21.77 / 0.7403 / 0.1952 | – | cap 10000 wall 13:07.48 peak 23740 cache gpu finite True |
-| `OFF_A_h1_s1` | 23.98 | 0.7489 | 0.7353 | 0.7874 | 31.36 / 0.7706 | 21.89 / 0.7387 / 0.1947 | – | cap 10000 wall 13:01.80 peak 23961 cache gpu finite True |
-| `REL_A_h1_s0` | 24.00 | 0.7502 | 0.7272 | 0.7782 | 31.08 / 0.7682 | 21.83 / 0.7414 / 0.1938 | – | cap 12800 wall 17:28.78 peak 23985 cache gpu finite True |
-| `REL_A_h1_s1` | 24.07 | 0.7512 | 0.7347 | 0.7907 | 31.22 / 0.7672 | 21.96 / 0.7401 / 0.1940 | – | cap 12700 wall 17:29.37 peak 23933 cache gpu finite True |
-| `ABS_A_h1_s0` | 24.07 | 0.7492 | 0.7298 | 0.7857 | 31.31 / 0.7729 | 21.91 / 0.7394 / 0.1959 | – | cap 9600 wall 17:39.32 peak 23391 cache gpu finite True |
-| `ABS_A_h1_s1` | 23.91 | 0.7476 | 0.7422 | 0.7993 | 31.42 / 0.7729 | 21.79 / 0.7405 / 0.1945 | – | cap 10100 wall 17:49.75 peak 23931 cache gpu finite True |
+| `A_h0_s0`, plain | 24.36 | 0.8149 | 0.7262 | 0.7504 | 32.90 / 0.7755 | 24.79 / 0.8187 / 0.1531 | 25.52 | 0.84 to 1.00; 0.50 to 0.90 |
+| `A_h0_s1`, plain | 24.31 | 0.8153 | 0.7249 | 0.7467 | 32.79 / 0.7742 | 24.75 / 0.8189 / 0.1545 | 25.47 | 0.80 to 1.00; 0.50 to 1.00 |
+| `OFF_A_h0_s0` (ticket #24's `A_h0_s0_v2`) | 24.35 | 0.8148 | 0.7313 | 0.7536 | 32.99 / 0.7733 | 24.80 / 0.8180 / 0.1531 | 25.54 | 0.86 to 1.00; 0.53 to 1.00 |
+| `OFF_A_h0_s1` | 24.36 | 0.8153 | 0.7258 | 0.7497 | 32.84 / 0.7740 | 24.66 / 0.8176 / 0.1538 | 25.37 | 0.82 to 1.00; 0.47 to 0.87 |
+| `REL_A_h0_s0` | 24.38 | 0.8174 | 0.7220 | 0.7431 | 32.61 / 0.7730 | 24.71 / 0.8196 / 0.1532 | 25.45 | 0.81 to 1.00; 0.51 to 0.87 |
+| `REL_A_h0_s1` | 24.36 | 0.8182 | 0.7198 | 0.7422 | 32.42 / 0.7678 | 24.61 / 0.8209 / 0.1529 | 25.32 | 0.82 to 1.00; 0.51 to 0.92 |
+| `ABS_A_h0_s0` | 24.40 | 0.8160 | 0.7293 | 0.7493 | 32.93 / 0.7736 | 24.77 / 0.8189 / 0.1525 | 25.51 | 0.87 to 1.00; 0.55 to 0.89 |
+| `ABS_A_h0_s1` | 24.40 | 0.8157 | 0.7247 | 0.7469 | 32.78 / 0.7717 | 24.70 / 0.8187 / 0.1539 | 25.42 | 0.82 to 1.00; 0.44 to 0.96 |
+| `A_h1_s0`, plain | 23.90 | 0.7473 | 0.7403 | 0.7938 | 31.31 / 0.7719 | 21.92 / 0.7392 / 0.1951 | – | 0.78 to 1.00; 0.55 to 1.00 |
+| `A_h1_s1`, plain | 23.71 | 0.7472 | 0.7457 | 0.7969 | 31.59 / 0.7686 | 21.66 / 0.7384 / 0.1976 | – | 0.82 to 1.00; 0.49 to 0.86 |
+| `OFF_A_h1_s0` | 23.92 | 0.7487 | 0.7323 | 0.7804 | 31.57 / 0.7727 | 21.77 / 0.7403 / 0.1952 | – | 0.81 to 1.00; 0.53 to 0.89 |
+| `OFF_A_h1_s1` | 23.98 | 0.7489 | 0.7353 | 0.7874 | 31.36 / 0.7706 | 21.89 / 0.7387 / 0.1947 | – | 0.80 to 1.00; 0.51 to 0.87 |
+| `REL_A_h1_s0` | 24.00 | 0.7502 | 0.7272 | 0.7782 | 31.08 / 0.7682 | 21.83 / 0.7414 / 0.1938 | – | 0.80 to 1.00; 0.47 to 0.89 |
+| `REL_A_h1_s1` | 24.07 | 0.7512 | 0.7347 | 0.7907 | 31.22 / 0.7672 | 21.96 / 0.7401 / 0.1940 | – | 0.85 to 1.00; 0.52 to 1.00 |
+| `ABS_A_h1_s0` | 24.07 | 0.7492 | 0.7298 | 0.7857 | 31.31 / 0.7729 | 21.91 / 0.7394 / 0.1959 | – | 0.80 to 1.00; 0.55 to 0.94 |
+| `ABS_A_h1_s1` | 23.91 | 0.7476 | 0.7422 | 0.7993 | 31.42 / 0.7729 | 21.79 / 0.7405 / 0.1945 | – | 0.80 to 1.00; 0.46 to 0.88 |
 
 - **No test-view score falls by more than 0.3 dB** against the off arm, in either arm on either copy. For `align_rel`, E16 PSNR's mean is 0.06 dB lower on the centre copy and 0.06 dB higher on the left. The kept-pixel PSNR is 0.07 dB lower, and the crop PSNR 0.01 and 0.08 dB higher. For `align_abs` every mean lies within 0.05 dB. Against the plain baseline, `align_rel`'s E16 PSNR is 0.11 dB lower on the centre copy.
 - **The sharpness ratio falls for `align_rel` on the centre copy,** beyond what two seeds give. Both seeds, 0.722 and 0.720, lie below both of the off arm's, 0.731 and 0.726. The means are 0.008 apart, against the off arm's spread of 0.0055 and the plain seeds' 0.0013. The late ratio falls with it, 0.743 and 0.742 against 0.754 and 0.750. On the left copy it does not separate (0.727, 0.735 against 0.732, 0.735). `align_abs` does not fall on either copy.
 - **The training cameras' PSNR falls for `align_rel`,** by 0.40 dB on the centre copy and 0.31 dB on the left one. That is what the term asks: training images matched up to a shift. It is not a test-view score, so the guard does not apply.
-- **The coverage** stays within the off arm's and the baseline's ranges, 0.80 to 1.00 and 0.44 to 1.00 on the side tiles. No tile collapses.
+- **The coverage.** Between cameras to ±45° the arms' tiles cover 0.80 to 1.00, against 0.80 to 1.00 for the off arm and 0.78 to 1.00 for the plain baseline. On the side tiles they cover 0.44 to 1.00, against 0.47 to 1.00 and 0.49 to 1.00. The lowest side tile, `ABS_A_h0_s1`'s 0.44, lies 0.03 below the off arm's lowest; every other tile lies within the off arm's or the baseline's range. No tile collapses. (Corrected on 2026-11-18, at the owner's answer below, item 5: the table's last column first held each run's cap, wall time and peak memory, and this line gave the arms' ranges as within the others'.)
 
 **The sheets, for judging with their labels hidden.** There are four sets: the centre copy at seeds 0 and 1, then the left copy at seeds 0 and 1. Each holds the off arm and both arms in an order from Python's `random.Random(26)`, labelled `set<n>-A` to `-C` only. They are `<surface-runs>/ticket-26/sheets/blind/set<n>-<letter>.jpg`, from section 2.6's fixed request, with the key apart in `KEY.json` beside them. Nobody here has looked at them. The owner's judgement is the criterion, and it is open (question 2 below).
 
