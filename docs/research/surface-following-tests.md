@@ -2520,7 +2520,12 @@ The largest figure, `log_durations`' 2.9·10⁻⁵, is on a gradient five orders
 
 The private scene's folders, `<m15-runs>`, `<m17-runs>` and tickets #24's, #26's and #26b's folders were read and never written.
 
-**The owner's answer on step 5** (the go for step 6 or a stop): *not yet given.* **Date:** *not yet given.*
+**The owner's answer on step 5** (the go for step 6 or a stop), given in session:
+- **Finalist 3: dropped as tested** (question 1). The options left untested stay recorded: λ_nc between 0.005 and 0.05, the term from iteration 7,000 at λ_flat = 10, and an oriented start.
+- **Step 6: go, with DAViD's optional arm** (question 2). Finalist 4 uses the calibrated flattening weight, λ_flat = 1, σt-weighted. Its first step runs while finalist 2's variants hold the GPU, and its arms after them.
+- **The sheets** (question 3) await the owner's judgement with their labels hidden.
+
+**Date:** 2026-11-18.
 
 ## 7. Step 6: finalist 4, a normal prior on top of finalist 3's flattening
 
