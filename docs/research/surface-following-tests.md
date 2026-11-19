@@ -2365,6 +2365,13 @@ The private scene's folders, `<m15-runs>`, `<m17-runs>` and tickets #24's, #26's
 - **DAViD's optional arm is cleared** (2026-11-18): one arm on private scene A with the maps of `normal-model-vitl16_384.onnx`.
 - **Labelled `kitchen` sheets** (the owner's request of 2026-11-18): every `kitchen` model gets a labelled sheet from a fixed `kitchen` request, by `<scratch>/kitchen-sheets/kitchen_sheets.sh <run-dir> <label>`, run after each `kitchen` run's post-processing.
 
+**The owner's answers at the first step** (2026-11-18, in session, relayed by the orchestrating session, after the first step's report; questions 1 to 4 below):
+
+- **The start:** both prior terms from iteration 15,000 (question 1).
+- **The settings:** as fixed below, C7 summed over the three components on the unnormalized Σwn, and C8 on the plane-distance depth with its weight read from the composited normal, without a gradient (question 2).
+- **DAViD's person:** section 2.7's depth rule, from ticket #12's Depth Anything V2 maps (question 3, option (a)).
+- **The hours:** about 5.7 GPU hours cleared for both arms, with step 5's memory fallbacks cleared again (`perf.frame_cache` `"mmap"` on private scene A, `PYTORCH_CUDA_ALLOC_CONF=expandable_segments:True` on `studio`); the work stops and asks before going about an hour past the estimate (question 4).
+
 **The weights and the code, checked again at their publishers** (rows 569, 582, 583 and 830 hold for their dates; all fetched without credentials):
 
 | What | Checked | Terms | The file used |
