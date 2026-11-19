@@ -102,6 +102,11 @@ The hours are on one RTX 4090, one run at a time, as the PRD counts them; sectio
 - Its images are read by scripts only, and nothing derived from them leaves the machine. **Default** (the PRD, "How the work runs", and its branch criteria), as PRD #1 did (research document, section 1, "Machine and data").
 - Its location is given in session to the tickets that measure it, and written nowhere. **Default** (the PRD, "How the work runs"), as PRD #1 did.
 
+**The two scenarios** (**answered**, 2026-11-19, in session, after step 6's results; added beside section 4.4's criteria, which stand). The recommendation reads every finalist both by section 4.4 and under two scenarios:
+
+1. **Good camera calibration and good data** (`kitchen`, `studio`). The data should be good enough for very sharp results in both shape and colour. A finalist, or a combination of finalists, may do better than openftgs alone.
+2. **Bad camera calibration and bad data** (private scene A). A compromise is necessary: results that are less sharp or more blurry are acceptable as long as the objects' shape also improves. It is possible that no finalist improves the results if the data is too poor.
+
 **The spec items.** None changes. The prototypes exercise the items of the PRD's "Spec items", and the finalists' sections say, per finalist, how each behaved; the research document's section 8 gives what adopting each finalist would change. For every finalist: E9 (composition D-37); E10's g [P §3.2, Eq. 7], which new terms reach or don't; D-26; D-72; §1.4 "Validation data" and D-79; E16 and D-67; §2.3, which gains nothing; §2.4, whose cost rules a prototype does not measure. For finalist 1: §2.2 `ftgs-scene` v1, §1.3 Initialization with D-21, D-22, D-58 and E15, D-27 and D-66. For finalist 2: E7 and D-7's L1, with D-8 and D-9/D-89 left for the test to settle. For finalists 3 and 4: E6, D-75 and D-76; §1.3 Growth, E11 and E17; E8; finalist 4's maps are files written outside the package, so neither `ftgs-scene` nor D-51 changes. The §2.1 signatures adoption would change and the prototypes leave alone: `RenderOutput`, `render`, `LossConfig`, `total_loss`. §3.1 U-12, whose bounds check (f) and the device are held to. §0 and CLAUDE.md's guidelines rules decide what may be read.
 
 **Q-n rows the work relies on** (all on `main`; their decision issues are openftgs's): Q-7, Q-64 and Q-65, Q-106, Q-220, Q-226, Q-227 to Q-231 and Q-233 to Q-237, as the PRD's "Open questions" gives them. The PRD records no Q-n candidate: the fields, keys and signatures sections 5.3 to 5.6 sketch are proposals for the owner's spec revision, not gaps.
@@ -3064,7 +3069,9 @@ Tickets #4's, #12's, #24's, #26's, #26b's and #27's folders, `<m15-runs>`, `<m17
 **The owner's answer on step 6:**
 
 - **Finalist 4 gets a further arm at a calibrated lower weight** (question 1; 2026-11-19, in session, relayed by the orchestrating session): a calibration on the centre copy (about 1 GPU hour), then the arm on both sets (about 4 GPU hours), with MoGe-2's maps, both prior terms from iteration 15,000, λ_flat = 1 σt-weighted, and everything else as the main arm. Its form, rule and results are below.
-- **Whether the work goes on to the recommendation, or stops** (question 2): *not yet given.* **Date:** *not yet given.*
+- **After the lower-weight arm** (2026-11-19, in session, relayed by the orchestrating session), read under the two scenarios recorded in section 1 here: **finalist 4 at full weight (`PRIOR`) is the lead candidate.** It is the only finalist that improves shape on `kitchen` without a loss of colour, and on private scene A it makes scenario 2's trade, a shell that moves in part against softer renders. Its worse share behind the surface on `kitchen`'s dynamic pixels and on `studio` is its stated caveat. The lower-weight arm (`LOWP`) is not taken forward.
+- **Two combinations run before the recommendation** (same answer): finalist 1's corrected cameras with finalist 4 at full weight, on private scene A; and finalist 3's flattening with finalist 4 at a tenth of the papers' prior weights, on `kitchen` and `studio`.
+- **Whether the work goes on to the recommendation:** after the combinations (the owner's answer of 2026-11-19 on finalist 4's further runs).
 
 **The further arm at a lower weight: the calibration, fixed before its runs** (2026-11-19, at the owner's answer above). The rule and the runs below were committed before any calibration run.
 
