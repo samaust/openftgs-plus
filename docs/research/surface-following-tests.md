@@ -1604,27 +1604,27 @@ The private scene's folders, `<m15-runs>` and `<m17-runs>` were read and never w
 
 | Run | Crop PSNR | Crop SSIM₁ | Sharpness ratio | Late | Training cameras: PSNR / ratio | E16 PSNR / SSIM₁ / ꟻLIP | Kept-pixel PSNR | Coverage: between cameras to ±45°; ±60°, ±90° |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- |
-| `A_h0_s0`, plain | 24.36 | 0.8149 | 0.7262 | 0.7504 | 32.90 / 0.7755 | 24.79 / 0.8187 / 0.1531 | 25.52 | cap 10800 wall 13:09.38 peak 23895 cache None finite True |
-| `A_h0_s1`, plain | 24.31 | 0.8153 | 0.7249 | 0.7467 | 32.79 / 0.7742 | 24.75 / 0.8189 / 0.1545 | 25.47 | cap 11100 wall 13:11.67 peak 23982 cache None finite True |
-| `OFF_A_h0_s0` (ticket #24's `A_h0_s0_v2`) | 24.35 | 0.8148 | 0.7313 | 0.7536 | 32.99 / 0.7733 | 24.80 / 0.8180 / 0.1531 | 25.54 | cap 10900 wall 13:28.94 peak 23845 cache None finite True |
-| `OFF_A_h0_s1` | 24.36 | 0.8153 | 0.7258 | 0.7497 | 32.84 / 0.7740 | 24.66 / 0.8176 / 0.1538 | 25.37 | cap 10800 wall 13:11.81 peak 23936 cache gpu finite True |
-| `REL_A_h0_s0` | 24.38 | 0.8174 | 0.7220 | 0.7431 | 32.61 / 0.7730 | 24.71 / 0.8196 / 0.1532 | 25.45 | cap 14200 wall 17:24.58 peak 23902 cache gpu finite True |
-| `REL_A_h0_s1` | 24.36 | 0.8182 | 0.7198 | 0.7422 | 32.42 / 0.7678 | 24.61 / 0.8209 / 0.1529 | 25.32 | cap 14600 wall 17:52.33 peak 23920 cache gpu finite True |
-| `ABS_A_h0_s0` | 24.40 | 0.8160 | 0.7293 | 0.7493 | 32.93 / 0.7736 | 24.77 / 0.8189 / 0.1525 | 25.51 | cap 11000 wall 17:34.22 peak 23787 cache gpu finite True |
-| `ABS_A_h0_s1` | 24.40 | 0.8157 | 0.7247 | 0.7469 | 32.78 / 0.7717 | 24.70 / 0.8187 / 0.1539 | 25.42 | cap 11000 wall 18:55.59 peak 23870 cache gpu finite True |
-| `A_h1_s0`, plain | 23.90 | 0.7473 | 0.7403 | 0.7938 | 31.31 / 0.7719 | 21.92 / 0.7392 / 0.1951 | – | cap 9700 wall 13:23.93 peak 23394 cache None finite True |
-| `A_h1_s1`, plain | 23.71 | 0.7472 | 0.7457 | 0.7969 | 31.59 / 0.7686 | 21.66 / 0.7384 / 0.1976 | – | cap 9900 wall 13:32.80 peak 23970 cache None finite True |
-| `OFF_A_h1_s0` | 23.92 | 0.7487 | 0.7323 | 0.7804 | 31.57 / 0.7727 | 21.77 / 0.7403 / 0.1952 | – | cap 10000 wall 13:07.48 peak 23740 cache gpu finite True |
-| `OFF_A_h1_s1` | 23.98 | 0.7489 | 0.7353 | 0.7874 | 31.36 / 0.7706 | 21.89 / 0.7387 / 0.1947 | – | cap 10000 wall 13:01.80 peak 23961 cache gpu finite True |
-| `REL_A_h1_s0` | 24.00 | 0.7502 | 0.7272 | 0.7782 | 31.08 / 0.7682 | 21.83 / 0.7414 / 0.1938 | – | cap 12800 wall 17:28.78 peak 23985 cache gpu finite True |
-| `REL_A_h1_s1` | 24.07 | 0.7512 | 0.7347 | 0.7907 | 31.22 / 0.7672 | 21.96 / 0.7401 / 0.1940 | – | cap 12700 wall 17:29.37 peak 23933 cache gpu finite True |
-| `ABS_A_h1_s0` | 24.07 | 0.7492 | 0.7298 | 0.7857 | 31.31 / 0.7729 | 21.91 / 0.7394 / 0.1959 | – | cap 9600 wall 17:39.32 peak 23391 cache gpu finite True |
-| `ABS_A_h1_s1` | 23.91 | 0.7476 | 0.7422 | 0.7993 | 31.42 / 0.7729 | 21.79 / 0.7405 / 0.1945 | – | cap 10100 wall 17:49.75 peak 23931 cache gpu finite True |
+| `A_h0_s0`, plain | 24.36 | 0.8149 | 0.7262 | 0.7504 | 32.90 / 0.7755 | 24.79 / 0.8187 / 0.1531 | 25.52 | 0.84 to 1.00; 0.50 to 0.90 |
+| `A_h0_s1`, plain | 24.31 | 0.8153 | 0.7249 | 0.7467 | 32.79 / 0.7742 | 24.75 / 0.8189 / 0.1545 | 25.47 | 0.80 to 1.00; 0.50 to 1.00 |
+| `OFF_A_h0_s0` (ticket #24's `A_h0_s0_v2`) | 24.35 | 0.8148 | 0.7313 | 0.7536 | 32.99 / 0.7733 | 24.80 / 0.8180 / 0.1531 | 25.54 | 0.86 to 1.00; 0.53 to 1.00 |
+| `OFF_A_h0_s1` | 24.36 | 0.8153 | 0.7258 | 0.7497 | 32.84 / 0.7740 | 24.66 / 0.8176 / 0.1538 | 25.37 | 0.82 to 1.00; 0.47 to 0.87 |
+| `REL_A_h0_s0` | 24.38 | 0.8174 | 0.7220 | 0.7431 | 32.61 / 0.7730 | 24.71 / 0.8196 / 0.1532 | 25.45 | 0.81 to 1.00; 0.51 to 0.87 |
+| `REL_A_h0_s1` | 24.36 | 0.8182 | 0.7198 | 0.7422 | 32.42 / 0.7678 | 24.61 / 0.8209 / 0.1529 | 25.32 | 0.82 to 1.00; 0.51 to 0.92 |
+| `ABS_A_h0_s0` | 24.40 | 0.8160 | 0.7293 | 0.7493 | 32.93 / 0.7736 | 24.77 / 0.8189 / 0.1525 | 25.51 | 0.87 to 1.00; 0.55 to 0.89 |
+| `ABS_A_h0_s1` | 24.40 | 0.8157 | 0.7247 | 0.7469 | 32.78 / 0.7717 | 24.70 / 0.8187 / 0.1539 | 25.42 | 0.82 to 1.00; 0.44 to 0.96 |
+| `A_h1_s0`, plain | 23.90 | 0.7473 | 0.7403 | 0.7938 | 31.31 / 0.7719 | 21.92 / 0.7392 / 0.1951 | – | 0.78 to 1.00; 0.55 to 1.00 |
+| `A_h1_s1`, plain | 23.71 | 0.7472 | 0.7457 | 0.7969 | 31.59 / 0.7686 | 21.66 / 0.7384 / 0.1976 | – | 0.82 to 1.00; 0.49 to 0.86 |
+| `OFF_A_h1_s0` | 23.92 | 0.7487 | 0.7323 | 0.7804 | 31.57 / 0.7727 | 21.77 / 0.7403 / 0.1952 | – | 0.81 to 1.00; 0.53 to 0.89 |
+| `OFF_A_h1_s1` | 23.98 | 0.7489 | 0.7353 | 0.7874 | 31.36 / 0.7706 | 21.89 / 0.7387 / 0.1947 | – | 0.80 to 1.00; 0.51 to 0.87 |
+| `REL_A_h1_s0` | 24.00 | 0.7502 | 0.7272 | 0.7782 | 31.08 / 0.7682 | 21.83 / 0.7414 / 0.1938 | – | 0.80 to 1.00; 0.47 to 0.89 |
+| `REL_A_h1_s1` | 24.07 | 0.7512 | 0.7347 | 0.7907 | 31.22 / 0.7672 | 21.96 / 0.7401 / 0.1940 | – | 0.85 to 1.00; 0.52 to 1.00 |
+| `ABS_A_h1_s0` | 24.07 | 0.7492 | 0.7298 | 0.7857 | 31.31 / 0.7729 | 21.91 / 0.7394 / 0.1959 | – | 0.80 to 1.00; 0.55 to 0.94 |
+| `ABS_A_h1_s1` | 23.91 | 0.7476 | 0.7422 | 0.7993 | 31.42 / 0.7729 | 21.79 / 0.7405 / 0.1945 | – | 0.80 to 1.00; 0.46 to 0.88 |
 
 - **No test-view score falls by more than 0.3 dB** against the off arm, in either arm on either copy. For `align_rel`, E16 PSNR's mean is 0.06 dB lower on the centre copy and 0.06 dB higher on the left. The kept-pixel PSNR is 0.07 dB lower, and the crop PSNR 0.01 and 0.08 dB higher. For `align_abs` every mean lies within 0.05 dB. Against the plain baseline, `align_rel`'s E16 PSNR is 0.11 dB lower on the centre copy.
 - **The sharpness ratio falls for `align_rel` on the centre copy,** beyond what two seeds give. Both seeds, 0.722 and 0.720, lie below both of the off arm's, 0.731 and 0.726. The means are 0.008 apart, against the off arm's spread of 0.0055 and the plain seeds' 0.0013. The late ratio falls with it, 0.743 and 0.742 against 0.754 and 0.750. On the left copy it does not separate (0.727, 0.735 against 0.732, 0.735). `align_abs` does not fall on either copy.
 - **The training cameras' PSNR falls for `align_rel`,** by 0.40 dB on the centre copy and 0.31 dB on the left one. That is what the term asks: training images matched up to a shift. It is not a test-view score, so the guard does not apply.
-- **The coverage** stays within the off arm's and the baseline's ranges, 0.80 to 1.00 and 0.44 to 1.00 on the side tiles. No tile collapses.
+- **The coverage.** Between cameras to ±45° the arms' tiles cover 0.80 to 1.00, against 0.80 to 1.00 for the off arm and 0.78 to 1.00 for the plain baseline. On the side tiles they cover 0.44 to 1.00, against 0.47 to 1.00 and 0.49 to 1.00. The lowest side tile, `ABS_A_h0_s1`'s 0.44, lies 0.03 below the off arm's lowest; every other tile lies within the off arm's or the baseline's range. No tile collapses. (Corrected on 2026-11-18, at the owner's answer below, item 5: the table's last column first held each run's cap, wall time and peak memory, and this line gave the arms' ranges as within the others'.)
 
 **The sheets, for judging with their labels hidden.** There are four sets: the centre copy at seeds 0 and 1, then the left copy at seeds 0 and 1. Each holds the off arm and both arms in an order from Python's `random.Random(26)`, labelled `set<n>-A` to `-C` only. They are `<surface-runs>/ticket-26/sheets/blind/set<n>-<letter>.jpg`, from section 2.6's fixed request, with the key apart in `KEY.json` beside them. Nobody here has looked at them. The owner's judgement is the criterion, and it is open (question 2 below).
 
@@ -1724,6 +1724,15 @@ The private scene's folders, `<m15-runs>`, `<m17-runs>` and tickets #24's and #2
 2. **The off arm's own effect on `kitchen`** (SSIM₁ 0.0037 lower than plain over three seeds): **diagnose first,** before step 5's arms, in about 1 GPU hour, by more off-arm and plain `kitchen` seeds and/or a check of the frame cache's placement, to tell a low draw from a real effect. The rule it is read by is stated before the runs are looked at.
 3. **Step 5: go.** Its first step runs meanwhile; its arms wait for the result here.
 4. **On the diagnosis's result** (2026-11-18, in session, relayed by the orchestrating session, after the verdict below, undetermined): **the off arm stays the comparison for finalists 3 and 4,** with the SSIM₁ guard on `kitchen` also read against the five plain `kitchen` seeds. **No more diagnosis runs.** The go for step 5's arms stands as given in item 3.
+5. **After the staged arm** (2026-11-18, in session, relayed by the orchestrating session):
+   - **Finalist 2 is not decided yet.** First its three untested variants are tested, each as a staged arm like `align_stg`: the switch after 18,000, the paper's relative scale, window 8 px and patch side 32 px, unless the variant changes it.
+     - V1: a shift held for several iterations instead of re-chosen at every iteration, with the hold's length picked and stated, with its reason, before running.
+     - V2: SSIM and ꟻLIP also read on the shifted target.
+     - V3: a window wider than 8 px, picked and stated, with the patch and the penalty kept.
+   - **On private scene A only:** both copies at seeds 0 and 1, 4 runs per variant, 12 in all, about 3.6 GPU hours. `kitchen` and `studio` are added only for a variant that moves the named measure, and if one does, the work stops and reports rather than running them.
+   - **Each variant's term is scratch-checked** as the first step's was, and smoke-run for 300 iterations before the full runs.
+   - **Each is judged** by section 4.4's criteria against the off arm, with the plain baseline beside, as the staged arm was, with blind sheets as before (key apart), and read by section 7.2's row, with a combined recommendation for finalist 2. The owner's decision on finalist 2 stays open.
+   - **Step 4's first test-view table is corrected:** its coverage column held run metadata (the cap, wall time and peak memory), and now holds the coverage, from each run's records.
 
 The diagnosis ran first, then the staged arm, both on 2026-11-18, with this branch's code at a77b838 (`src/` and `scripts/` as at ticket #24's 163bd39 and the first step's ef7864b), the same versions and hardware as above, under the shared GPU lock with 12 CPU threads, one training at a time. Another ticket's work held the lock between commands for seconds. `$T` is now `<scratch>/ticket-26b`, holding copies of `$T`'s scripts above, and `$O` is `<surface-runs>/ticket-26b`. Every new run wrote only there.
 
@@ -1915,6 +1924,178 @@ The private scene's folders, `<m15-runs>`, `<m17-runs>` and tickets #24's, #25's
 1. **Finalist 2: dropped, as recommended,** now that both forms have run, or kept for one of the untested variants above?
 2. **The sheets** (`<surface-runs>/ticket-26b/sheets/blind`, key apart), beside the first set (`<surface-runs>/ticket-26/sheets/blind`): the owner's judgement with the labels hidden, which this ticket cannot give.
 3. **The off arm's seeds for finalists 3 and 4.** The owner's answer keeps the off arm as the comparison. The diagnosis's rule, fixed beforehand, said that an undetermined verdict means judging `kitchen`'s guards against all five off-arm seeds. The answer does not say whether finalists 3 and 4 read the off arm's three seeds, as the arms here were, or its five. Reading the five is the rule's consequence. For SSIM₁, PSNR and ꟻLIP it costs nothing, since the runs exist. For the guards' other columns, kept-pixel PSNR and the residual's shares, seeds 3 and 4 of both arms would first need `post_synth.sh`, a few GPU minutes each, which this ticket did not run. Either way, the guard is also read against the five plain seeds. Recommended: the five off-arm seeds for SSIM₁, PSNR and ꟻLIP, and seeds 0 to 2 for the other columns unless the owner clears the post-processing. This blocks nothing here; it sets how finalists 3 and 4 read `kitchen`.
+
+**The three variants: the design, fixed before any of their runs** (2026-11-18, at the owner's answer above, item 5). Each is the staged arm, `align_stg`, with one thing changed: the switch after iteration 18,000, the penalty at the paper's relative scale (0.01 / 3,072 against the patch's mean L1), the patch side 32 px, the window 8 px unless the variant changes it, weight 1. Iterations 1 to 18,000 run the off arm's code exactly, as in the staged arm. The wrapper copy (`<scratch>/ticket-26c/wrap_train.py`) takes two new forms of the term, `--align-mode hold` and `--align-mode full`; the window is the existing flag. Nothing else in it changed.
+
+| Variant | Runs | What changes from `align_stg` | The choice, and why |
+| --- | --- | --- | --- |
+| V1, `align_hold` | `HLD_…` | Each training image's shifts are chosen at its first draw in each block of 4,000 iterations from the switch (iterations 18,001 to 22,000, 22,001 to 26,000 and 26,001 to 30,000) and held for that image's later draws in the block | **The hold is per training image,** keyed by camera and time. Every iteration renders a different image, so a shift field can only be held across draws of the same image. D-26's sampler draws each of a copy's 960 training images (8 cameras × 120 frames) once per pass of 960 iterations, so each image is drawn about 4 times per block: its shifts are chosen once and held for about 3 draws, and about three quarters of the aligned iterations use a held shift. **4,000 iterations** are long enough for the model to meet the same target on several passes, so that the target stops following the render from one draw to the next. Three blocks renew the choice twice while the means' learning rate decays, and the last block starts after relocation ends at 25,000. Not run: a hold per camera across its frames, which would suit a fixed calibration error but not a moving person, and one choice per image for the whole aligned stage |
+| V2, `align_full` | `FUL_…` | The whole of E9 reads the shifted target: L1, D-8's SSIM and D-89's ꟻLIP are taken between the render and I(p + d), d the patch's shift, plus λ_img times the penalty, a constant of the choice | **The shifts are chosen as in `align_stg`,** by the aligned L1's cost, then the package's own `total_loss` runs against the shifted target. Under the inside rule every pixel's target lies inside the image, so the L1 part is the aligned L1 exactly. **A limit:** SSIM's window and ꟻLIP's filters straddle the seams between patches with different shifts, where the target is discontinuous. The unshifted terms are computed without a gradient, for the log only, so the package's logged `l1`, `one_minus_ssim` and `perceptual` stay the unshifted values, as in the other arms |
+| V3, `align_w16` | `W16_…` | The window is **16 px**, 1,089 shifts against 289; the patch side and the penalty are kept | **The window binds at 8 px on the staged arm's own renders.** Rendered at training cameras' poses (`STG_A_h0_s0` at `cam1` and `STG_A_h1_s0` at `cam2`, frames 0, 30, 60, 90 and 119) against their training images, 4.1 % to 14.1 % of the patches take a shift on the 8 px window's edge. With the window at 16 px, 4.3 % to 14.8 % shift beyond 8 px, the mean shift rises from 1.2 to 3.0 px to 1.7 to 3.9 px, and the aligned L1 lies 3.4 % to 16.9 % below the plain L1 instead of 3.1 % to 15.7 %. On the person, section 2.2 here's epipolar residual has its 90th percentile at 7.0 to 7.6 px over the seven pairs, at the old window's edge; 16 px doubles it. The patch's target is then 64 × 64 |
+
+**The scratch check** (`check_v.py`, on the CPU and on the GPU). It passes:
+
+- **V1, through the wrapper's own function.** In one block, an image's first draw chooses its shifts. A later draw reuses them after the render has changed, at the cost the held shifts give, 0.30 to 0.32 above a fresh choice on random images. Another image chooses its own, and the next block chooses anew. With a block of one iteration every draw chooses, and the value equals `align_stg`'s term exactly.
+- **V2, through the wrapper's own function, against the package's `total_loss` with SSIM and ꟻLIP.** The loss equals `total_loss` against the shifted target plus λ_img times the penalty, with the same gradient. The logged aligned L1 equals the search's value within 2·10⁻⁸. At window 0 the loss is the package's own, value equal and gradient within 2·10⁻⁷ of its largest element on the GPU, the rounding of SSIM's convolution there, and exactly equal on the CPU with contiguous inputs, as training images are. For a render that is the image shifted by 2 to 5 px, 1 − SSIM falls from 0.72 to 1.10 against the unshifted image to 0.06 to 0.13 against the shifted target, and ꟻLIP from 0.55 to 0.67 to 0.09 to 0.14. On random images of 1280 × 736 and 301 × 247.
+- **V3, at window 16.** A render that is the image shifted by k pixels costs k times the penalty at k = 1, 4, 8, 9, 12 and 16 down, 16 up, 16 right and 12 left, and k√2 times it on the diagonals (5, 5) and (11, 11), for every patch whose target at the true shift lies inside the image. At k = 20 no patch costs k times the penalty and no shift exceeds 16. The batched search makes the plain loop's choice per patch on random and shifted pairs, its costs within 2·10⁻⁶ relative.
+- **Time and memory,** on one training image of private scene A (1280 × 736), as the median of 30 synchronized calls after 5 warm-up calls, with the backward, a one-line note: the term at window 8 takes 9.1 ms and at window 16 32.7 ms, the same 70 MiB extra at peak. V2's whole loss takes 27.3 ms against the package's 12.2 ms, at 495 MiB extra at peak against the package's 469 MiB. The baseline's runs on private scene A peak at 23,394 to 23,982 MiB of the card's 24,564 MiB, so V2's 26 MiB more fits.
+
+**The runs, as planned.** A 300-iteration smoke run of each variant and of the off arm on the centre copy at seed 0, with the switch at 200, compared row by row up to iteration 200. Then the 12 runs, one of each variant first (the centre copy at seed 0), so that a failure after the switch shows early, then the other nine. They are measured, scored and sheeted by the same copied scripts against the off arm, with the plain baseline and `align_stg` beside. The blind sheets hold the off arm and the three variants for each copy and seed, in an order from `random.Random(2603)`, labelled `set<n>-A` to `-D`, with the key apart. **Estimate:** about 14, 16 and 20 minutes per run for V1, V2 and V3 (V1 searches on about a quarter of the aligned iterations, V2 adds 15 ms and V3 24 ms per aligned iteration), 3.3 hours for the 12, with 0.3 for post-processing and the smoke runs: about 3.7 GPU hours, against the 3.6 cleared and the 4.5 to stop at.
+
+**Read this first: V2, `align_full`, moves the named measure by section 4.4's rule, and upward, on the left copy.** Its two seeds, 0.1462 and 0.1490, both lie above both of the off arm's, 0.1411 and 0.1337. Their mean is 0.0102 higher, 0.0002 over the 0.01 margin. More of the near side's opacity lies more than 5 cm from the init points, which is the shell growing, not shrinking. On the centre copy it does not move. Against the plain baseline the same runs count as lower by 0.0103, but that is the script's own effect: the off arm lies 0.021 below plain on that copy (above). V1 and V3 do not move the measure on either copy. The owner's answer (item 5 above) adds `kitchen` and `studio` only for a variant that moves the named measure and, if one does, stops the work to report rather than run them. So they were not run, and whether V2 goes on to them is the owner's (question 3 below). A rise is not section 7.2's adopt condition.
+
+**What ran** (2026-11-18 to 2026-11-19). The four smoke runs ran at c8e2d83 and the 12 runs at 87e8718, the commit that holds the design above. Its commit time is the queue's start to the second, so the design was committed before any full run and after the smoke runs, which use the same wrapper copy. The code was the shared `.venv`'s (as in the first step above), on one RTX 4090 under the shared lock, with 16 CPU threads for training and post-processing and 2 for the tables and sheets. Scripts read tensors, JSON and images and wrote numbers and files. No image, render or sheet of private scene A was looked at.
+
+- **The smoke runs,** 300 iterations on the centre copy at seed 0 with the switch at 200, took 17 to 19 s each, and each wrapper count was 300. Every variant's logged rows at iterations 100 and 200 match the off arm's smoke run within 2·10⁻⁷ in every loss, with the same primitive count, and carry no alignment keys. The keys appear at 300, on that still-blurred render: 99.7 % to 99.8 % of pixels moved, by 9.6 px (V1, V2) and 17.4 px (V3, 89 % of patches beyond 8 px). V1's log has its reuse share (0 at the first draw) and V2's has the shifted target's 1 − SSIM and ꟻLIP.
+- **The 12 runs** ran in one queue, from 20:34 to 00:03, 3 hours 28 minutes with their post-processing. With the smoke runs that is about 3.5 GPU hours, and the probe and the check above add minutes, against the 3.6 cleared and the 4.5 to stop at. The blind sheets were made afterwards on the CPU from renders already made.
+- **Every run's wrappers** ran 30,000 times each, and each record holds window 8 px (V3: 16 px), patch 32 px, penalty 0.01 / 3,072, start 18,000, and the mode, `hold` (with 4,000) or `full`. No row up to iteration 18,000 carries the alignment keys, every row from 18,100 on does, 120 rows each, and every logged value is finite.
+- **V1's hold, as counted by the wrapper:** 960 training images, 2,880 choices (each image once per block, in each of the three blocks) and 9,120 reuses, so 76 % of the aligned iterations used a held shift, the design's "about three quarters".
+- **Times:** V1 13 min 28 s to 13 min 39 s, V2 16 min 3 s to 16 min 23 s, V3 19 min 35 s to 19 min 42 s, against the estimate's 14, 16 and 20 minutes. D-51's `auto` put the frame cache on the GPU in every run. GPU memory peaked at 23,294 to 23,970 MiB.
+
+**The variants, as they acted.** The log's alignment figures from the switch on, four runs each (pixels moved / mean shift / aligned L1 lower than the plain L1 by), with the staged arm's from the table above:
+
+| Iteration | `align_stg` | V1, `align_hold` | V2, `align_full` | V3, `align_w16` (patches beyond 8 px) |
+| --- | --- | --- | --- | --- |
+| 18,100 | 0.60 to 0.61 / 2.2 to 2.4 px / 10 % | 0.60 to 0.61 / 2.2 to 2.4 px / 10 % (none reused) | 0.61 to 0.62 / 2.3 to 2.4 px / 11 % | 0.60 to 0.61 / 3.1 to 3.3 px / 11 % (11 % to 12 %) |
+| 20,000 | 0.57 to 0.59 / 2.2 px / 10 % to 11 % | 0.58 to 0.60 / 2.2 to 2.3 px / 6 % to 7 % (all reused) | 0.68 to 0.70 / 2.9 to 3.0 px / 21 % to 23 % | 0.58 to 0.61 / 3.0 to 3.4 px / 11 % to 13 % (11 % to 13 %) |
+| 25,000 | 0.54 to 0.56 / 1.9 to 2.0 px / 9 % to 11 % | 0.56 to 0.58 / 2.0 to 2.1 px / 6 % to 7 % (all reused) | 0.71 to 0.73 / 3.1 to 3.2 px / 31 % to 33 % | 0.55 to 0.56 / 2.6 to 2.7 px / 11 % to 12 % (9 % to 10 %) |
+| 30,000 | 0.50 to 0.51 / 1.7 to 1.8 px / 8 % to 10 % | 0.53 / 1.9 px / 5.5 % to 7 % (all reused) | 0.71 to 0.72 / 3.1 to 3.3 px / 35 % to 37 % | 0.51 / 2.4 to 2.5 px / 10 % to 12 % (8 % to 9 %) |
+
+- **V1 held what it chose.** After each image's first draw in a block, every logged window reuses its shifts. Held shifts lower the L1 by 5.5 % to 7 % against the fresh choice's 10 %. The pixels moved and the shift stay where the staged arm's are, a little higher at the end (1.9 against 1.7 to 1.8 px).
+- **V3 used the wider window.** 11 % to 13 % of patches took a shift beyond 8 px after the switch and 8 % to 9 % at the end, as the probe above found on the staged arm's renders. The mean shift is about 1 px larger than the staged arm's throughout, and the L1 lies 1 to 2 points lower.
+- **V2 ran away.** Where the other forms' shifts shrink as training goes on, V2's grow, from 2.4 to 3.2 px, over 71 % of pixels, and its aligned L1 ends 35 % to 37 % below the plain L1. The model stops fitting the unshifted image. Its logged unshifted 1 − SSIM rises from 0.072 to 0.074 at the switch to 0.075 to 0.079 at 30,000, where the staged arm's falls to 0.057 (`STG_A_h0_s0`), while its 1 − SSIM against the shifted target falls to 0.048 to 0.050. ꟻLIP goes the same way: unshifted 0.080 to 0.082, shifted 0.057, the staged arm's 0.066. When all three terms read the shifted target, nothing in the loss pins the render to the image, and the search finds larger shifts as the render drifts.
+- **Growth's cap** is reached within 200 iterations of the off arm's in every run: 10,700 to 11,000 on the centre copy (the off arm's 10,800 and 10,900) and 9,800 to 10,100 on the left (10,000). Growth stops at 15,000, before the switch, so no variant could change it.
+
+**The named measure, the near-side far-5 cm share,** with the tail and the other shell measures, as in the tables above. The off arm's, the plain baseline's and the staged arm's rows are repeated from them:
+
+| Run | Near side: far-5 cm / beyond 25 cm | Near side: far-10 cm | Under two frames: near / whole | Whole model: far-5 cm | Far side: far-5 cm | Cap reached at |
+| --- | --- | --- | --- | --- | --- | --- |
+| `A_h0_s0`, plain | 0.1401 / 0.0349 | 0.0634 | 0.5856 / 0.452 | 0.224 | 0.535 | 10,800 |
+| `A_h0_s1`, plain | 0.1409 / 0.0267 | 0.0583 | 0.5945 / 0.459 | 0.229 | 0.541 | 11,100 |
+| `OFF_A_h0_s0` | 0.1308 / 0.0461 | 0.0754 | 0.5857 / 0.454 | 0.218 | 0.537 | 10,900 |
+| `OFF_A_h0_s1` | 0.1380 / 0.0333 | 0.0644 | 0.5836 / 0.451 | 0.225 | 0.536 | 10,800 |
+| `STG_A_h0_s0` | 0.1290 / 0.0398 | 0.0744 | 0.5718 / 0.442 | 0.219 | 0.544 | 10,700 |
+| `STG_A_h0_s1` | 0.1404 / 0.0387 | 0.0712 | 0.5795 / 0.447 | 0.226 | 0.533 | 10,900 |
+| `HLD_A_h0_s0` | 0.1398 / 0.0425 | 0.0791 | 0.5864 / 0.456 | 0.223 | 0.532 | 10,700 |
+| `HLD_A_h0_s1` | 0.1357 / 0.0358 | 0.0734 | 0.5871 / 0.454 | 0.224 | 0.542 | 10,700 |
+| `FUL_A_h0_s0` | 0.1403 / 0.0378 | 0.0737 | 0.5852 / 0.447 | 0.231 | 0.529 | 10,900 |
+| `FUL_A_h0_s1` | 0.1347 / 0.0360 | 0.0750 | 0.5849 / 0.449 | 0.226 | 0.529 | 11,000 |
+| `W16_A_h0_s0` | 0.1311 / 0.0355 | 0.0694 | 0.5823 / 0.452 | 0.217 | 0.533 | 10,900 |
+| `W16_A_h0_s1` | 0.1567 / 0.0311 | 0.0654 | 0.5910 / 0.459 | 0.239 | 0.536 | 11,000 |
+| `A_h1_s0`, plain | 0.1632 / 0.0438 | 0.0746 | 0.5854 / 0.449 | 0.246 | 0.541 | 9,700 |
+| `A_h1_s1`, plain | 0.1526 / 0.0366 | 0.0658 | 0.5882 / 0.448 | 0.239 | 0.540 | 9,900 |
+| `OFF_A_h1_s0` | 0.1411 / 0.0379 | 0.0662 | 0.5808 / 0.445 | 0.227 | 0.536 | 10,000 |
+| `OFF_A_h1_s1` | 0.1337 / 0.0264 | 0.0561 | 0.5893 / 0.449 | 0.225 | 0.540 | 10,000 |
+| `STG_A_h1_s0` | 0.1355 / 0.0336 | 0.0641 | 0.5798 / 0.442 | 0.227 | 0.541 | 9,900 |
+| `STG_A_h1_s1` | 0.1369 / 0.0320 | 0.0595 | 0.5862 / 0.448 | 0.227 | 0.539 | 10,000 |
+| `HLD_A_h1_s0` | 0.1368 / 0.0367 | 0.0604 | 0.5801 / 0.443 | 0.229 | 0.544 | 9,900 |
+| `HLD_A_h1_s1` | 0.1365 / 0.0345 | 0.0610 | 0.5788 / 0.442 | 0.226 | 0.536 | 10,100 |
+| `FUL_A_h1_s0` | 0.1462 / 0.0349 | 0.0701 | 0.5870 / 0.446 | 0.236 | 0.533 | 9,800 |
+| `FUL_A_h1_s1` | 0.1490 / 0.0419 | 0.0661 | 0.5857 / 0.445 | 0.238 | 0.530 | 9,900 |
+| `W16_A_h1_s0` | 0.1317 / 0.0268 | 0.0616 | 0.5810 / 0.444 | 0.221 | 0.541 | 9,800 |
+| `W16_A_h1_s1` | 0.1305 / 0.0291 | 0.0561 | 0.5880 / 0.449 | 0.222 | 0.540 | 10,100 |
+
+**Judged by section 4.4's rule against the off arm** (both of the variant's seeds beyond both of the off arm's, the means more than 0.01 apart; 0.021 for the tail), with the plain baseline beside:
+
+| Copy and measure | V1, `align_hold` | V2, `align_full` | V3, `align_w16` | Against the plain baseline |
+| --- | --- | --- | --- | --- |
+| Centre, named measure | not moved (0.140, 0.136 against 0.131, 0.138; mean 0.003 higher) | not moved (0.140, 0.135; mean 0.003 higher) | not moved (0.131, 0.157; mean 0.010 higher, the seeds 0.026 apart) | none moved (V1 0.003 lower, V2 0.003 lower, V3 0.003 higher) |
+| Centre, tail | not moved (mean 0.000) | not moved (mean 0.003 lower) | not moved (mean 0.006 lower) | none moved |
+| Left, named measure | not moved (0.137, 0.137 against 0.141, 0.134; mean 0.001 lower) | **higher** by 0.0102 (0.146, 0.149) | not moved (0.132, 0.131: both below both, but the mean only 0.006 lower) | all **lower**: V1 by 0.021, V2 by 0.010, V3 by 0.027 (against 0.163, 0.153); the off arm's own fall is 0.021 |
+| Left, tail | not moved (mean 0.004 higher) | not moved (mean 0.006 higher) | not moved (mean 0.004 lower) | none moved |
+| Under two frames, near side (reported, not the criterion) | not moved on either copy (mean 0.002 higher, 0.006 lower) | not moved (0.000, 0.001 higher) | not moved (0.002 higher, 0.001 lower) | none moved |
+
+- **Only V2 moves the named measure,** on the left copy and the wrong way, by 0.0002 over the margin, with the tail not moved. On the centre copy its mean is 0.003 higher too, inside the margin.
+- **V3's left copy** leans the hoped way: both seeds below both of the off arm's, as `align_stg`'s under-two-frames share did on the centre copy, but the mean only 0.006 lower, inside the 0.01 margin, so not moved. On the centre copy its seed 1, 0.157, is the highest of the centre copy's 12 rows, and its two seeds' 0.026 apart is the widest pair there.
+- **V1 moves nothing,** within 0.006 of the off arm's mean on every row.
+
+**The test-view scores, the sharpness ratio and the tiles' coverage,** as in the tables above. The off arm's and the staged arm's rows are repeated from them:
+
+| Run | Crop PSNR | Crop SSIM₁ | Sharpness ratio | Late | Training cameras: PSNR / ratio | E16 PSNR / SSIM₁ / ꟻLIP | Kept-pixel PSNR | Coverage: between cameras to ±45°; ±60°, ±90° |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| `OFF_A_h0_s0` | 24.35 | 0.8148 | 0.7313 | 0.7536 | 32.99 / 0.7733 | 24.80 / 0.8180 / 0.1531 | 25.54 | 0.86 to 1.00; 0.53 to 1.00 |
+| `OFF_A_h0_s1` | 24.36 | 0.8153 | 0.7258 | 0.7497 | 32.84 / 0.7740 | 24.66 / 0.8176 / 0.1538 | 25.37 | 0.82 to 1.00; 0.47 to 0.87 |
+| `STG_A_h0_s0` | 24.30 | 0.8151 | 0.7285 | 0.7438 | 32.59 / 0.7674 | 24.75 / 0.8190 / 0.1527 | 25.48 | 0.84 to 1.00; 0.56 to 0.90 |
+| `STG_A_h0_s1` | 24.30 | 0.8161 | 0.7240 | 0.7443 | 32.69 / 0.7674 | 24.75 / 0.8194 / 0.1543 | 25.48 | 0.82 to 1.00; 0.49 to 0.88 |
+| `HLD_A_h0_s0` | 24.29 | 0.8164 | 0.7171 | 0.7419 | 32.54 / 0.7672 | 24.73 / 0.8191 / 0.1548 | 25.46 | 0.83 to 1.00; 0.51 to 0.92 |
+| `HLD_A_h0_s1` | 24.29 | 0.8158 | 0.7197 | 0.7473 | 32.45 / 0.7696 | 24.58 / 0.8185 / 0.1545 | 25.29 | 0.79 to 1.00; 0.46 to 0.87 |
+| `FUL_A_h0_s0` | 23.73 | 0.8097 | 0.7000 | 0.7116 | 29.61 / 0.7541 | 24.08 / 0.8157 / 0.1569 | 24.70 | 0.82 to 1.00; 0.57 to 1.00 |
+| `FUL_A_h0_s1` | 23.77 | 0.8110 | 0.6995 | 0.7116 | 29.52 / 0.7573 | 24.28 / 0.8174 / 0.1560 | 24.93 | 0.83 to 1.00; 0.52 to 0.87 |
+| `W16_A_h0_s0` | 24.29 | 0.8142 | 0.7250 | 0.7458 | 32.84 / 0.7705 | 24.80 / 0.8182 / 0.1528 | 25.54 | 0.84 to 1.00; 0.49 to 0.86 |
+| `W16_A_h0_s1` | 24.39 | 0.8161 | 0.7266 | 0.7447 | 32.52 / 0.7696 | 24.78 / 0.8194 / 0.1531 | 25.51 | 0.80 to 1.00; 0.46 to 0.91 |
+| `OFF_A_h1_s0` | 23.92 | 0.7487 | 0.7323 | 0.7804 | 31.57 / 0.7727 | 21.77 / 0.7403 / 0.1952 | – | 0.81 to 1.00; 0.53 to 0.89 |
+| `OFF_A_h1_s1` | 23.98 | 0.7489 | 0.7353 | 0.7874 | 31.36 / 0.7706 | 21.89 / 0.7387 / 0.1947 | – | 0.80 to 1.00; 0.51 to 0.87 |
+| `STG_A_h1_s0` | 23.90 | 0.7490 | 0.7346 | 0.7904 | 31.49 / 0.7729 | 21.80 / 0.7400 / 0.1953 | – | 0.82 to 1.00; 0.55 to 0.98 |
+| `STG_A_h1_s1` | 23.94 | 0.7494 | 0.7339 | 0.7861 | 31.24 / 0.7677 | 21.86 / 0.7404 / 0.1949 | – | 0.81 to 1.00; 0.49 to 0.92 |
+| `HLD_A_h1_s0` | 23.83 | 0.7479 | 0.7301 | 0.7816 | 31.30 / 0.7684 | 21.63 / 0.7389 / 0.1960 | – | 0.80 to 1.00; 0.51 to 0.88 |
+| `HLD_A_h1_s1` | 23.90 | 0.7493 | 0.7365 | 0.7942 | 31.30 / 0.7664 | 21.52 / 0.7400 / 0.1969 | – | 0.83 to 1.00; 0.51 to 0.98 |
+| `FUL_A_h1_s0` | 24.11 | 0.7576 | 0.7036 | 0.7490 | 28.23 / 0.7587 | 21.88 / 0.7463 / 0.1913 | – | 0.80 to 1.00; 0.54 to 0.90 |
+| `FUL_A_h1_s1` | 24.14 | 0.7583 | 0.7041 | 0.7446 | 28.52 / 0.7588 | 22.25 / 0.7453 / 0.1891 | – | 0.83 to 1.00; 0.53 to 0.90 |
+| `W16_A_h1_s0` | 23.82 | 0.7498 | 0.7274 | 0.7800 | 31.18 / 0.7692 | 21.70 / 0.7411 / 0.1948 | – | 0.80 to 1.00; 0.49 to 0.87 |
+| `W16_A_h1_s1` | 23.82 | 0.7480 | 0.7323 | 0.7758 | 31.37 / 0.7677 | 21.72 / 0.7393 / 0.1961 | – | 0.84 to 1.00; 0.46 to 0.90 |
+
+- **V2 harms, by section 4.4's criteria.**
+  - **On the centre copy its test-view scores fall by more than 0.3 dB:** crop PSNR by 0.61 dB, E16 PSNR by 0.55 dB and kept-pixel PSNR by 0.64 dB, both seeds below both of the off arm's in each.
+  - **The sharpness ratio falls beyond two seeds on both copies:** 0.700 and 0.700 against 0.731 and 0.726 (a mean 0.029 lower, the off arm's spread 0.0055), and 0.704 and 0.704 against 0.732 and 0.735 (0.030 lower, spread 0.0030). The late ratio falls by 0.040 and 0.037.
+  - **On the left copy its test-view scores rise:** crop PSNR by 0.17 dB, E16 PSNR by 0.24 dB, SSIM₁ by 0.006 and ꟻLIP by 0.005 lower. That copy's test view is a generated camera (decision 4), and section 4.4 counts only falls. With the sharpness ratio down on the same views, it reads as a softer render that matches that camera better. With the named measure rising, not falling, it is not a pass by section 4.4.
+  - **The training cameras' PSNR falls by 3.4 and 3.1 dB,** the runaway above: the model fits the shifted targets, not the images.
+- **V1's sharpness ratio falls beyond two seeds on the centre copy.** 0.717 and 0.720 lie below both of the off arm's 0.731 and 0.726, a mean 0.010 lower against the spread of 0.0055, and below both of the plain baseline's 0.726 and 0.725 as well. On the left copy it holds (0.0005 lower). No test-view score falls by more than 0.3 dB: the largest fall is E16 PSNR on the left copy, 0.26 dB, both seeds below both. The training cameras' PSNR falls by 0.42 and 0.16 dB.
+- **The late ratio,** reported beside the criterion, falls on the centre copy for V1 and V3 as it did for `align_stg`: both seeds below both of the off arm's 0.754 and 0.750 (V1 0.742 and 0.747, V3 0.746 and 0.745), means 0.007 and 0.006 lower against the off arm's spread of 0.004. On the left copy V1's is higher, and V3's two seeds lie below both of the off arm's but within their spread of 0.007.
+- **Against the plain baseline,** no variant but V2 falls by more than 0.3 dB in any test-view score; V2's centre-copy falls are 0.58 to 0.68 dB against it too.
+- **V3 harms nothing by the criteria.** The sharpness ratio's mean is 0.003 lower on the centre copy, inside the spread. On the left copy it is 0.004 lower against a spread of 0.0030, on the line: seed 1, 0.73229, lies 0.00004 above the off arm's seed 0, so not both below both. No test-view score falls by more than 0.3 dB. The largest fall is crop PSNR on the left copy, 0.13 dB. The training cameras' PSNR falls by 0.24 and 0.19 dB, as the staged arm's did.
+- **The coverage** stays within 0.01 of the off arm's and the baseline's lowest values: the variants' lowest are 0.79 to 0.84 between cameras and 0.46 to 0.57 at ±60° and ±90°, against 0.78 and 0.47, and within what the earlier arms showed (`ABS_A_h0_s1`'s 0.44). No tile collapses, and every rendered value is finite.
+
+**The sheets, for judging with their labels hidden.** Four sets: the centre copy at seeds 0 and 1, then the left copy at seeds 0 and 1. Each holds the off arm and the three variants in an order from Python's `random.Random(2603)`, labelled `set<n>-A` to `-D` only. They are `<surface-runs>/ticket-26c/sheets/blind/set<n>-<letter>.jpg`, from section 2.6's fixed request, with the key apart in `KEY.json` beside them. Nobody here has looked at them, and the owner's judgement of them is open (question 2 below).
+
+**The reading by section 7.2's row for finalist 2,** for each variant, with its measure as the owner renamed it (section 2.6 here):
+
+| Criterion | V1, `align_hold` | V2, `align_full` | V3, `align_w16` |
+| --- | --- | --- | --- |
+| Adopt: the named measure moves, with no harm by the other criteria | **Not met.** It does not move | **Not met.** It moves the wrong way, up, on the left copy, and the variant harms | **Not met.** It does not move. The left copy leans lower, inside the margin |
+| Drop: the share does not move | **Met** | **Not met as written:** the share moves, but up. The row's drop reasons still apply, and the harm settles it | **Met** |
+| The sharpness ratio | Falls beyond two seeds on the centre copy | Falls beyond two seeds on both copies | Holds. The left copy is on the line |
+| Test-view scores, harm at more than 0.3 dB | None | Centre copy: crop, E16 and kept-pixel PSNR fall by 0.55 to 0.64 dB. Left copy: they rise | None |
+| What it tests | Whether a target that stops following the render lets alignment reshape the model | Whether SSIM and ꟻLIP, read on the shifted target, let it act | Whether the 8 px window cut off the disagreement |
+| The answer | No: a held shift lowers the loss less and moves nothing | No: the loss drifts with the shifts, and the render softens | No: 8 % to 13 % of patches use more than 8 px, and the share does not move |
+
+**The combined recommendation for finalist 2: drop it, all six arms.** `align_rel`, `align_abs`, `align_stg` and the three variants all leave the near-side far-5 cm share where the off arm has it, except V2, which raises it on one copy while softening the render.
+
+- **By the row's reason, the shell is not a rigid shift of a few pixels.** Every variant removes one reason the earlier drops were weak evidence:
+  - V1 lets the model meet a fixed target several times.
+  - V2 lets SSIM and ꟻLIP tolerate the shift.
+  - V3 lets shifts reach the person's epipolar residual and twice it.
+- **Read by 7.2's row:**
+  - V1 and V3 meet the drop condition as written.
+  - V2 meets neither condition. Its rise of 0.0002 over the margin on one copy, with its harm on the centre copy and its softer renders on both, is not a reason to keep the finalist.
+- **What stays untested** is narrow:
+  - a hold per camera across its frames;
+  - the switch at 22,500 (the other reading of AligNeRF's staging, above);
+  - V2 with an anchor that keeps the render on the unshifted image;
+  - combinations of the variants.
+
+  Each is a smaller step from an arm that moved nothing the hoped way.
+- **Rows E11, E22 and E27** keep their own evidence, as above.
+- **The decision is the owner's** (question 1 below).
+
+**The variants' commands** (the same conventions as above; `$T` is `<scratch>/ticket-26c`, `$O` is `<surface-runs>/ticket-26c`, `$I` is `<surface-runs>/ticket-24/init`):
+
+| Command | Device | Time | Note |
+| --- | --- | --- | --- |
+| Requests at `cam1` and `cam2`'s poses and times (frames 0, 30, 60, 90 and 119), `$O/probe/req_A_h<c>.json`, and `ftgs render` of `STG_A_h0_s0` and `STG_A_h1_s0` at them into `$O/probe/render_stg_h<c>.safetensors`, as the first step's probe made them; then `python $T/probe_w.py $O/probe/req_A_h<c>.json $O/probe/render_stg_h<c>.safetensors $O/probe/probe_h<c>.json`, with `--time` on the centre copy, whose output holds the timings | GPU | minutes | The window's use on the staged arm's renders, in the design above |
+| `python $T/check_v.py --device cpu` and `--device cuda` | CPU; GPU | minutes | The scratch check above, through the wrapper's own functions |
+| `bash $T/queue.sh smoke`, i.e. `ALIGN_START=200 bash $T/run_train.sh smoke_A_h0_<off, v1, v2 or v3> <mode> $X/scene_h0/scene.json $I/ref_h0_s4.safetensors 0 --config $O/smoke/cfg300.json` | GPU | 17 to 19 s each | The four smoke runs |
+| `bash $T/queue.sh`, i.e. for each run `bash $T/run_train.sh <run> <v1, v2 or v3> $X/scene_h<c>/scene.json $I/ref_h<c>_s4.safetensors <seed>`, then `bash $T/post_a.sh <run> h<c>`. The run is `python $T/wrap_train.py --term align=1 --align-window <8 or 16> --align-patch 32 --align-penalty 3.2552083333333335e-06 --align-start 18000` plus `--align-mode hold --align-hold 4000` (V1) or `--align-mode full` (V2), `--stats … -- <scene> --init <init> --out $O/runs/<run> --seed <seed>` | GPU, then CPU | 13 min 28 s to 19 min 42 s per run; about 30 s post-processing | The 12 runs, one per variant on the centre copy at seed 0 first, then the other nine; post-processing as above |
+| `python $T/tables.py` | CPU, 2 threads | seconds | The tables here, against the off arm with the plain baseline and `align_stg` beside |
+| `python $T/facts.py` | CPU, 2 threads | seconds | The smoke runs' rows against the off arm's, the wrappers' records, V1's hold counts, the logs' alignment keys and times |
+| `bash $T/blind.sh` | CPU, 2 threads | seconds | The 16 sheets with their labels hidden, and their key |
+
+The private scene's folders and the folders of tickets #24, #25, #26 and #26's first follow-up were read and never written (rows 877, 878).
+
+**The questions for the owner after the variants.**
+
+1. **Finalist 2: dropped, as recommended,** now that the staged arm's three variants have run, or kept for one of the narrower forms above? This decides whether section 7.2's combined arm has a disagreement side from finalist 2.
+2. **The sheets** (`<surface-runs>/ticket-26c/sheets/blind`, key apart), beside the first two sets (`<surface-runs>/ticket-26/sheets/blind` and `<surface-runs>/ticket-26b/sheets/blind`): the owner's judgement with the labels hidden, which this ticket cannot give.
+3. **V2 on `kitchen` and `studio`.** By the owner's answer they wait, since V2 moved the named measure. Recommended: not run. It moved the measure up, by 0.0002 over the margin on one copy, and harmed on private scene A, so neither outcome on openftgs-synth would make it an adoption. About 1.7 GPU hours with post-processing (three `kitchen` seeds and one `studio`, at the staged arm's times and V2's 15 ms more per aligned iteration) if the owner wants them.
 
 ## 6. Step 5: finalist 3, surface terms without a prior
 
