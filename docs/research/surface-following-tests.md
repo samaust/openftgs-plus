@@ -1401,6 +1401,24 @@ What the control shows:
 
 The private scene's folders, `<m15-runs>` and `<m17-runs>` were read and never written. The scene is named in no output file; the corrected manifests, which hold the copies' own metadata, and the runs' METRICS.json, which hold their manifests' paths, stay in `<surface-runs>`.
 
+**Sheets on `kitchen`** (added on 2026-11-18 at the owner's request of that day, PRD #16; for steps 3 to 5). Every `kitchen` model trained by then has a labelled sheet of novel views from the side, `<surface-runs>/kitchen-sheets/sheets/<run>.jpg`, with its coverage numbers in `<run>.coverage.json` beside it, and each finalist and seed a side-by-side sheet in `<surface-runs>/kitchen-sheets/compare/`. They are made from one fixed request, `<surface-runs>/kitchen-sheets/requests/kitchen_side_request.json` (27 items; SHA-256 `5560b8a317157d825b53561a519f755498f286feb78bd82298f88e0e856fd27c`), built by section 2.6's rule from M15's manifest (row T16.2). The choices `kitchen` needed:
+
+- **The centre camera** is `cam00`, the test view (M17's split; `docs/prd/validation-runs.md`). P is the point nearest to all 20 optical axes, which pass it within 1.4 to 8.4 cm, not within 2·10⁻⁷ as on private scene A. The training cameras lie 3° to 65° round from `cam00`, all on its +x side, so the poses at negative yaw (`sL…`) are beyond the rig, and `sR30` to `sR60` lie among training cameras.
+- **The yaws** are section 2.6's nine, −90° to 90°. Ticket #5's script was copied with one change: the turn is applied to the manifest's own `world_to_camera`, because `kitchen`'s rotations are orthonormal only to 10⁻⁷. Yaw 0 is then `cam00` exactly, and the other poses agree with the original's to 2.4·10⁻⁷.
+- **The times** are frames 33, 114 and 262 of the 300 (1.1 s, 3.8 s and 8.733 s). In each third of the clip, each is the frame with the largest share of dynamic pixels in `cam00`'s ground-truth masks, among the frames whose dynamic points stay at least 80 % inside all nine poses' images. The points are the masked pixels, back-projected by the ground truth's depth (row T16.2). At those frames that share is 0.81 to 1.00 per pose. Frames 0, 150 and 299 kept 0.46 of them at frame 150, and frames 0 and 299 are near the clip's least dynamic share (`<surface-runs>/kitchen-sheets/requests/kitchen_side_request_framing.json`).
+- **No poses between cameras.** Section 2.6's four were copied from the notes on private scene A, which have no `kitchen` counterpart. In their place, the ground truth's image of `cam00` at each frame is a last column, `gt`.
+- **The rest is section 2.6's:** a black background, the model's full SH degree, tiles at 0.4 scale. The labels are shown, since `kitchen` is synthetic.
+- **Finalist 1's control** is rendered at both poses at which this section scores it. The exact pose uses the fixed request (sheets `K_<turned or corrected>_s<n>`). Each run's own manifest's pose uses the same rule on ticket #25's turned or corrected manifest: `kitchen_side_request_turned.json` (SHA-256 `d4de5ea450f2130a8fd596e2f18fe93f639f359550ae12c2ee6485c214ae1f3a`) and `kitchen_side_request_corrected.json` (`5d133c796cc35412553a703b083618e756e5c8d410881d090f9309cc76e7b5cc`); those sheets are `…_ownpose` and have no `gt` column, which belongs to the exact pose. The plain baseline at seeds 0 and 1 is the exact-camera reference. The side-by-side sheets `finalist1_kitchen_s<0 or 1>.jpg` stack, top to bottom: corrected at the exact pose and at its own pose, turned likewise, then the plain baseline.
+
+| Command | Device | Time | Note |
+| --- | --- | --- | --- |
+| `python $T/make_side_request.py $K/scene.json $O/requests/kitchen_side_request.json --centre cam00 --frames 33,114,262`, and the same on ticket #25's `turned` and `corrected` manifests | CPU | under 1 s | The fixed request and finalist 1's own-pose requests; ticket #5's script, copied, with yaw 0 exact |
+| `python $T/sweep_frames.py $K/scene.json $G/kitchen scripts/gt_depth.py …`; `python $T/framing_kitchen.py $K/scene.json $G/kitchen $O/requests/kitchen_side_request.json --gt-depth-script scripts/gt_depth.py --out …_framing.json` | CPU | about 1 min | The frame rule's figures over the 300 frames, and the chosen request's framing |
+| `bash $T/kitchen_sheets.sh <run-dir> <run> [turned or corrected]`: `ftgs render <run-dir>/checkpoint --request <request> --out $O/renders/<run>.safetensors` under the shared GPU lock, then `python $T/sheet_gt.py <renders> <request> $O/sheets/<run>.jpg --label <run> --stats $O/sheets/<run>.coverage.json --gt $G/kitchen` | GPU, then CPU | 6.7 to 8.8 s per render, apart from the wait for the lock | One render per lock; ticket #5's `side_sheet.py`, copied, with the `gt` column added; the renders file is deleted once its sheet is made |
+| `python $T/compare_sheets.py $O/compare/finalist<1, 2 or 3>_kitchen_s<n>.jpg --title … <sheets>` | CPU | seconds | The side-by-side sheets, from the per-run sheets at 0.6 scale |
+
+`$T` is `<scratch>/kitchen-sheets`, `$O` is `<surface-runs>/kitchen-sheets`, `$K` is `<m15-runs>/kitchen` and `$G` is `$OPENFTGS_DATASETS/synth/ground_truth`. Each command ran with three CPU threads, with this branch's code at 96659a0 and the shared `.venv`. The plan for the models not trained yet (finalist 4's, and any `kitchen` runs of finalist 2's variants) is `$T/PLAN.md`, applying `$T/kitchen_sheets.sh` to each. Section 7 here records those sheets.
+
 **The owner's answer on step 3** (the go for step 4 or a stop), given in session:
 - **Finalist 1** (question 2): option (a). Finalist 1 is dropped. The corrected manifests stay on file, and finalists 2 to 4 train on the manifest's cameras.
 - **The left copy's second seed** (question 1): run, at seed 1 for the baseline and `F1m`; its result is above ("The left copy's second seed"). It moved the named measure on the left copy by the rule, after the answer was given. Asked again with that result in hand, the owner confirmed the drop (2026-11-17, in session): finalist 1 stays dropped, and finalists 2 to 4 train on the manifest's cameras.
@@ -1717,6 +1735,12 @@ The private scene's folders, `<m15-runs>` and `<m17-runs>` were read and never w
 | `python $T/tables.py` | CPU | seconds | The tables of this section |
 
 The private scene's folders, `<m15-runs>`, `<m17-runs>` and tickets #24's and #25's folders were read and never written.
+
+**Sheets on `kitchen`** (added on 2026-11-18 at the owner's request of that day). This step's `kitchen` models have labelled sheets in `<surface-runs>/kitchen-sheets/sheets/`: `OFF_kitchen_s0` to `s4`, `PLAIN_kitchen_s0` to `s4`, `REL_`, `ABS_` and `STG_kitchen_s0` to `s2`, the staged arm's included although it is described below. They are made from the fixed request of section 4 here's "Sheets on `kitchen`" (SHA-256 `5560b8a317157d825b53561a519f755498f286feb78bd82298f88e0e856fd27c`): `cam00` turned by section 2.6's nine yaws, at frames 33, 114 and 262, with the ground truth's `cam00` image as a last column. The side-by-side sheets `<surface-runs>/kitchen-sheets/compare/finalist2_kitchen_s<0, 1 or 2>.jpg` stack, top to bottom: `align_rel`, `align_abs`, `align_stg`, the off arm, the plain baseline. Seeds 3 and 4 have no arm, so they have only per-run sheets.
+
+| Command | Device | Time | Note |
+| --- | --- | --- | --- |
+| `bash $T/kitchen_sheets.sh <run-dir> <run>`, per run; then `python $T/compare_sheets.py $O/compare/finalist2_kitchen_s<n>.jpg --title … <sheets>` | GPU (one render under the lock), then CPU | 6.7 to 8.8 s per render, apart from the wait for the lock | As in section 4 here's table, with the same `$T` and `$O` |
 
 **The owner's answer on step 4** (2026-11-18, in session, relayed by the orchestrating session):
 
@@ -2341,6 +2365,12 @@ The largest figure, `log_durations`' 2.9·10⁻⁵, is on a gradient five orders
 | `python $T/tables27.py` | CPU | seconds | The tables of this section, with the five-seed reads on `kitchen` |
 
 The private scene's folders, `<m15-runs>`, `<m17-runs>` and tickets #24's, #26's and #26b's folders were read and never written.
+
+**Sheets on `kitchen`** (added on 2026-11-18 at the owner's request of that day). This step's `kitchen` models, `FLAT_` and `FLATNC_kitchen_s0` to `s2`, have labelled sheets in `<surface-runs>/kitchen-sheets/sheets/`, beside the off arm's and the plain baseline's of section 5 here. They are made from the fixed request of section 4 here's "Sheets on `kitchen`" (SHA-256 `5560b8a317157d825b53561a519f755498f286feb78bd82298f88e0e856fd27c`): `cam00` turned by section 2.6's nine yaws, at frames 33, 114 and 262, with the ground truth's `cam00` image as a last column. The side-by-side sheets `<surface-runs>/kitchen-sheets/compare/finalist3_kitchen_s<0, 1 or 2>.jpg` stack, top to bottom: `FLAT`, `FLATNC`, the off arm, the plain baseline.
+
+| Command | Device | Time | Note |
+| --- | --- | --- | --- |
+| `bash $T/kitchen_sheets.sh <run-dir> <run>`, per run; then `python $T/compare_sheets.py $O/compare/finalist3_kitchen_s<n>.jpg --title … <sheets>` | GPU (one render under the lock), then CPU | 6.7 to 8.8 s per render, apart from the wait for the lock | As in section 4 here's table, with the same `$T` and `$O` |
 
 **The owner's answer on step 5** (the go for step 6 or a stop), given in session:
 - **Finalist 3: dropped as tested** (question 1). The options left untested stay recorded: λ_nc between 0.005 and 0.05, the term from iteration 7,000 at λ_flat = 10, and an oriented start.
