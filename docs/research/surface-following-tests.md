@@ -3016,7 +3016,7 @@ The prior keeps the flattening and adds to it on `kitchen`, where flattening alo
   - C7's total-variation term;
   - the combined arm, with finalist 2's term;
   - more than one seed on `studio`.
-- **Recommended: not adopted alone, and not dropped.** The row's third column sends it to the combined arm, but that arm has a partner only if a term on the disagreement side exists. Finalist 2 was dropped as tested, and its variants are ticket #26c's to report. So finalist 4 waits:
+- **Recommended: not adopted alone, and not dropped.** The row's third column sends it to the combined arm, but that arm has a partner only if a term on the disagreement side exists. Finalist 2 was dropped as tested, and is now dropped with its variants (the owner, 2026-11-19; section 5 here, the owner's answers, item 7). So finalist 4 waits:
   - for such a term, should one come out of ticket #26c or a later step;
   - or for a further arm of its own at a lower, calibrated weight.
   Dropping it outright would leave out the one surface effect any finalist has shown on `kitchen`, the halved depth error.
@@ -3061,7 +3061,29 @@ The prior keeps the flattening and adds to it on `kitchen`, where flattening alo
 
 Tickets #4's, #12's, #24's, #26's, #26b's and #27's folders, `<m15-runs>`, `<m17-runs>` and the private scene's folders were read and never written.
 
-**The owner's answer on step 6** (whether the work goes on to the recommendation, or stops): *not yet given.* **Date:** *not yet given.*
+**The owner's answer on step 6:**
+
+- **Finalist 4 gets a further arm at a calibrated lower weight** (question 1; 2026-11-19, in session, relayed by the orchestrating session): a calibration on the centre copy (about 1 GPU hour), then the arm on both sets (about 4 GPU hours), with MoGe-2's maps, both prior terms from iteration 15,000, λ_flat = 1 σt-weighted, and everything else as the main arm. Its form, rule and results are below.
+- **Whether the work goes on to the recommendation, or stops** (question 2): *not yet given.* **Date:** *not yet given.*
+
+**The further arm at a lower weight: the calibration, fixed before its runs** (2026-11-19, at the owner's answer above). The rule and the runs below were committed before any calibration run.
+
+- **What is scaled.** Both prior weights together by one factor f, λ₇ = 0.1·f and λ₈ = 0.015·f, with γ = 0.005, the plane-distance depth, C7 and C8 as the main arm has them. Flattening stays at λ_flat = 1, σt-weighted, from iteration 1; the prior starts at iteration 15,000. The candidates are **f = 1/3, 1/10 and 1/30** (λ₇ = 0.0333, 0.01, 0.00333; λ₈ = 0.005, 0.0015, 0.0005), fixed here; none is added after the results.
+- **The runs,** as section 6 here's stage 2: the centre copy of private scene A, seed 0, from `ref_h0_s4`, through this follow-up's wrapper copy (`<scratch>/ticket-28b`, ticket #28's with its paths changed), MoGe-2's full maps with `--prior-axes x,y,z`, stopped at iteration 23,000 by `--stop-at`, so that the prior acts for 8,000 iterations, with `--checkpoint-every 7000 --keep-checkpoints 3`.
+  - `C3_f0.33`, `C3_f0.1` and `C3_f0.033`, the three candidates.
+  - `C3_f1`, the papers' weights to the same stop: not a candidate, but the check that this stop sees the main arm's softening at all.
+  - `C3_off`, every weight 0 to the same stop, the sharpness guard's reference. No weight-0 run to 23,000 exists: section 6 here's `C1_off` stopped at 15,000.
+  - The flattening-only run to 23,000 is section 6 here's `C2_flat_only`, reused (λ_flat = 1 alone, the same copy, seed, init and stop). The wrapper copy's weight-0 path was checked first: its 300-iteration smoke run on `kitchen` at every weight 0 logged totals of 0.445250, 0.390724 and 0.345167 at iterations 100, 200 and 300, ticket #27's to every digit logged.
+- **What is read,** at 23,000: the last-1,000 L1 mean (iterations 22,001 to 23,000, from `train_log.jsonl`); the test view's crop PSNR and sharpness ratio (`score_a.py`, all 120 frames, the late frames beside); and, reported but not used to choose, L₇, L₈ and the share of pixels C8's weight passes at the end, the scale ratios (`ratio_stats.py`, at 7,000, 14,000 and the stop), the named measure and its tail, and the near side's under-two-frames share. As in section 6 here, the named measure is not used to choose: choosing a weight by the measure the arm is then judged on would decide the test in its calibration.
+- **The guards, one-sided, against harm:**
+  - **L1** no more than 1.5 % above `C2_flat_only`'s (0.012007), section 6 here's guard, against the flattening the arm keeps.
+  - **Crop PSNR** no more than 0.3 dB below `C2_flat_only`'s (24.25), section 4.4's harm guard.
+  - **Sharpness ratio** no more than **0.010** below `C3_off`'s at the same stop. The owner's aim is a ratio within the off arm's two-seed spread; with one seed a side, the spread itself (0.0055 on the centre copy at 30,000) would turn away a harmless weight often. Over the 15 kept seed pairs of one configuration at 30,000 (both copies; the plain baseline, the off arm, `align_abs`, `align_rel`, `FLAT`, `FLATNC`, `PRIOR` and `DAVID`), two seeds' sharpness ratios differ by 0.0048 in root mean square (0.0001 to 0.0124). The guard is two such differences, which a harmless run passes about 95 times in 100; the main arm's fall of 0.035 is seven.
+- **The rule:** f is the **largest of the three candidates that passes all three guards,** the strongest prior that does no harm by them, as section 6 here chose λ_nc.
+  - If `C3_f1` passes the sharpness guard as well, this stop does not see the softening the arm is calibrated against, and the calibration stops and reports before the arm.
+  - If no candidate passes, the calibration stops and reports before the arm.
+- **The arm, at the chosen f:** `LOWP_…`, the main arm's eight runs with `--prior-c7 0.1·f --prior-c8 0.015·f` and nothing else changed: the centre and left copies at seeds 0 and 1 from `ref_h0_s4` and `ref_h1_s4`, `kitchen` at seeds 0 to 2 and `studio` at seed 0 from M17's init files, 30,000 iterations, 14 CPU threads, the memory fallbacks of step 5 as the main arm had them. Read by section 4.4's criteria against the off arm, with `PRIOR` and `FLAT` beside, and by section 7.2's row, with the main arm's measures, scores, blind sheets for private scene A, and a labelled `kitchen` sheet and side-by-side per `kitchen` run.
+- **The hours, estimated** from section 6 here's stage 2 (10 min to 23,000 without the device, 14.5 to 14.8 min with it from 15,000) and the main arm's times: the calibration about 1.2 GPU hours with its scores and ratios (five runs, about 70 min); the arm about 3.9 hours with its post-processing; about 5.1 hours in all.
 
 ## 8. The recommendation
 
