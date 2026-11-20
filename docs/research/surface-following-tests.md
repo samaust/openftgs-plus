@@ -1136,7 +1136,7 @@ What these runs give the criteria (section 4.4):
 - **One reference init points file per copy.** Fixed and recorded above.
 - **The sharpness ratio and its spread.** Defined above, at the owner's answer, with its spread between the centre copy's two seeds beside every near-side measure's.
 - **Placeholder pixels.** Left out only where `cam0` is the test view, by the loose rule, checked against the stored mask first.
-- **The owner's go or stop.** Below, not yet given.
+- **The owner's go or stop.** Below, "The owner's answer on step 2".
 
 **What is open, for the owner.**
 
@@ -1365,7 +1365,7 @@ What the control shows:
 - **The near-side far-5 cm share against both reference files,** by section 4.4's rule. Done, against the ticket's two files per arm and the owner's two more: neither arm is lower against both of its files.
 - **The other criteria of section 4.4.** The sharpness ratio, the coverage and the test-view scores at both poses: done (above). The sheets with their labels hidden: made and keyed, not judged (question 3).
 - **The control on `kitchen`.** Done, with the tool's corrections at the fit's floor on the exact cameras.
-- **The reading by section 7.2's row for finalist 1.** Below. The owner's answer: not yet given.
+- **The reading by section 7.2's row for finalist 1.** Below. The owner's answer: below, "The owner's answer on step 3".
 - **Sources, commands, files changed, privacy:** rows 861, 862 and 863; the commands below; only this document and the source log change; nothing names private scene A or shows its images.
 
 **The reading by section 7.2's row for finalist 1.**
@@ -1722,7 +1722,7 @@ The private scene's folders, `<m15-runs>` and `<m17-runs>` were read and never w
   - the sheets, keyed but not judged (question 2);
   - the test-view scores against the 0.3 dB guard;
   - on openftgs-synth, the residual's shares and SSIM₁ against the off arm.
-- **The reading by section 7.2's row:** above. The owner's go or stop for step 5: below, not yet given.
+- **The reading by section 7.2's row:** above. The owner's go or stop for step 5: below, "The owner's answer on step 4".
 - **Sources, commands, files changed, privacy:**
   - sources: rows 865 to 867;
   - commands: below;
@@ -2638,7 +2638,7 @@ The largest figure, `log_durations`' 2.9·10⁻⁵, is on a gradient five orders
 - **On openftgs-synth, the share behind the surface and the guards:** above. Arm 1 does no harm and does not lower the share; arm 2 raises it by 0.006, beyond the guard.
 - **The ratio distribution at the end of each arm:** above, row A1's table.
 - **Section 5.5's open choices:** answered or stated as open, above.
-- **The reading by section 7.2's row, and the owner's answer:** the reading above; the owner's answer below, not yet given, with the flattening weight for finalist 4 to be recorded there.
+- **The reading by section 7.2's row, and the owner's answer:** the reading above; the owner's answer below, "The owner's answer on step 5", which records the flattening weight for finalist 4.
 - **Sources, commands, files changed, privacy:**
   - sources: rows 871 to 876;
   - commands: below;
@@ -3046,7 +3046,7 @@ The prior keeps the flattening and adds to it on `kitchen`, where flattening alo
   - the sheets, keyed and awaiting the owner's judgement;
   - on openftgs-synth, the share behind and the guards (above).
 - **DAViD's arm, with the pixels without a prior left out:** 4 runs, on the person by section 2.7's rule.
-- **The reading by section 7.2's row:** above; the owner's answer below, not yet given.
+- **The reading by section 7.2's row:** above; the owner's answer below, "The owner's answer on step 6".
 - **Sources, commands, files changed, privacy:**
   - sources: rows 882 to 889;
   - commands: in the tables of this section;
@@ -3435,7 +3435,7 @@ Tickets #19's, #24's to #28b's folders, `<m15-runs>`, `<m17-runs>` and the priva
 2. **A control for arm A, if the owner wants `F1F4` against `F1m` attributed:** the wrapper at every weight 0 on the corrected cameras from `CM`, four runs, about 0.9 GPU hours. It would separate the prior's effect from the script's own. It is not needed for the reading against `PRIOR`, which decides. Recommended: not run.
 3. **The sheets:** `<surface-runs>/combinations/sheets/blind` (key apart) and the labelled side-by-sides `combination_f3f4p10_kitchen_s<n>.jpg`, for the owner's judgement.
 
-**The owner's answer on the combinations:** *not yet given.* **Date:** *not yet given.*
+**The owner's answer on the combinations** (in session, relayed by the orchestrating session; section 8 here records it): neither combination, `F1F4` nor `F3F4p10`, is taken forward, and the recommendation, ticket #29, goes ahead. **Date:** 2026-11-19.
 
 ## 8. The recommendation
 
@@ -3449,7 +3449,7 @@ Written on 2026-11-19 from sections 1 to 7 here as merged at 29daf7c, read by th
 - **Finalist 2: dropped, all six arms** (section 5 here, 2026-11-19).
 - **Finalist 3: dropped as tested** (section 6 here, 2026-11-18). Its calibrated flattening, λ_flat = 1, σt-weighted, is the base of every finalist 4 arm.
 - **Finalist 4 at the papers' weights (`PRIOR`) is the lead candidate,** and the lower-weight arm (`LOWP`) is not taken forward (section 7 here, "The owner's answer on step 6", 2026-11-19).
-- **The combinations, and the go for this section** (2026-11-19, in session): neither `F1F4` nor `F3F4p10` is taken forward, and this section goes ahead. Both answers were relayed to this ticket by the orchestrating session. Section 7 here's answer line on the combinations was not filled in when this section was written.
+- **The combinations, and the go for this section** (2026-11-19, in session): neither `F1F4` nor `F3F4p10` is taken forward, and this section goes ahead. Both answers were relayed to this ticket by the orchestrating session.
 
 **In short.**
 
@@ -3508,7 +3508,7 @@ Written on 2026-11-19 from sections 1 to 7 here as merged at 29daf7c, read by th
   - the owner's judgement of the sheets, labels hidden, no worse;
   - on private scene A, a third seed that keeps the left copy's fall, or the owner's acceptance of a partial move under scenario 2.
 - **What would turn it into a drop:** more seeds that take away `kitchen`'s halved depth error, sheets judged worse, or `studio`'s share behind the surface worse again at its new seeds.
-- **No spec proposal is drafted.** No adoption is recommended, so this ticket drafts no wording and opens no issue. If the owner adopts `PRIOR` at review 2 regardless, the revision's content is sketched already, and its wording would be drafted then:
+- **No spec proposal is drafted.** No adoption is recommended, so this ticket drafts no wording and opens no issue. At this PRD's review 2 the owner accepted no adoption (below, "The owner's answers at this PRD's review 2"). Should `PRIOR` be adopted later, the revision's content is sketched already, and its wording would be drafted then:
   - finalist 4's column of the research document's section 8, with its fields `loss.lambda_normal_prior`, `loss.lambda_depth_normal_prior` and `loss.normal_prior_confidence`;
   - finalist 3's flattening weight, since `PRIOR` carries L_flat: `loss.lambda_flat` in the research document's section 8;
   - the prior's start and depth, which section 5.6's fields do not give: the tested arm started both terms at iteration 15,000 and read the plane-distance depth. Section 5.5's `loss.geometry_from` and `loss.geometry_depth` are sketched for the consistency term, so whether they extend to the prior is a gap for the revision;
@@ -3582,7 +3582,7 @@ Written on 2026-11-19 from sections 1 to 7 here as merged at 29daf7c, read by th
    If the owner wants a disagreement-side term to pair with `PRIOR`, rows E11, E22 and E27 are the candidates step 1 brought back, as a later PRD.
 5. **Keep the corrected manifests on file** (section 4 here). Using them for later arms is the owner's call.
 
-**The owner's answers at review 2** (in session, relayed by the orchestrating session):
+**The owner's answers at this PRD's review 2** (in session, relayed by the orchestrating session):
 - **The recommendation is accepted** as this section gives it: no finalist adopted and no spec change proposed; finalists 1, 2 and 3 dropped; finalist 4 at the papers' weights (`PRIOR`) a lead candidate for further tests; the three next steps recorded, none run under this PRD.
 - **DAViD's arm is not taken forward.**
 - **The branch:** the stale answer lines are tidied, the branch is reviewed against `main`, and it then goes to the owner for the merge.
@@ -3713,4 +3713,4 @@ The four items of section 7 here's table (MoGe-2's weights, MoGe's code, DAViD's
 
 - **No incident.** No row is an Incident row, and no row of 832 to 893 says it was written after the fact. By the orchestrating session's account, relayed to this ticket, no ticket reported an incident or a forbidden read.
 - **No `tdd`.** No §3 test belongs to this PRD, and only the document and the source log changed, apart from the research document's one pointer line. So the `tdd` skill was not used, and each ticket's acceptance criteria stood in.
-- **What this ticket could not do.** Ticket #29's text asks for an issue proposing spec wording for each recommended adoption, and for review 2's answers. No adoption is recommended (section 8 here), and the orchestrating session asked that no issue be opened. Review 2's answers are not yet given.
+- **What this ticket could not do.** Ticket #29's text asks for an issue proposing spec wording for each recommended adoption, and for the answers of this PRD's review 2. No adoption is recommended (section 8 here), and the orchestrating session asked that no issue be opened. The answers of this PRD's review 2 are recorded in section 8 here (2026-11-19).
