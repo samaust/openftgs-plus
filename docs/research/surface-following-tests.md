@@ -3583,7 +3583,7 @@ Written on 2026-11-19 from sections 1 to 7 here as merged at 29daf7c, read by th
 5. **Keep the corrected manifests on file** (section 4 here). Using them for later arms is the owner's call.
 
 **The owner's answers at this PRD's review 2** (in session, relayed by the orchestrating session):
-- **The recommendation is accepted** as this section gives it: no finalist adopted and no spec change proposed; finalists 1, 2 and 3 dropped; finalist 4 at the papers' weights (`PRIOR`) a lead candidate for further tests; the three next steps recorded, none run under this PRD.
+- **The recommendation is accepted** as this section gives it: no finalist adopted and no spec change proposed; finalists 1, 2 and 3 dropped; finalist 4 at the papers' weights (`PRIOR`) a lead candidate for further tests; the five next steps recorded ("Next steps, recommended and not run", above), none run under this PRD.
 - **DAViD's arm is not taken forward.**
 - **The branch:** the stale answer lines are tidied, the branch is reviewed against `main`, and it then goes to the owner for the merge.
 
