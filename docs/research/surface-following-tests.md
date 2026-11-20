@@ -3267,6 +3267,93 @@ Tickets #24's, #26's, #27's and #28's folders, `<m15-runs>`, `<m17-runs>` and th
   - *Colour is at least as good* when no image guard is crossed against either the plain baseline's five seeds or the off arm's (SSIM₁ 0.002, a test-view score 0.3 dB) and the kept-pixel PSNR does not fall by more than 0.3 dB. It is better when a score rises beyond those margins.
   - `studio`'s one seed is read beside `kitchen` and not counted by the rule.
 
+**Arm A, run** on 2026-11-19 from 18:05 to 19:41, after the designs' commit (49a7d10), with this branch's code (`src/`, `scripts/` and `tests/` as `main`'s at 02e3686), the shared `.venv`'s versions as in the first step, the RTX 4090 alone under the lock and 14 CPU threads, one training at a time.
+- **Before the runs.** The wrapper copy's weight-0 smoke run on `kitchen` logged a total of 0.345167 at iteration 300, ticket #27's to every digit logged.
+- **The runs.** Each of the four ran its wrappers 30,000 times. D-51's `auto` put the frame cache on the GPU, and no run needed the fallback. Peaks were 23,625 to 23,967 MiB in `nvidia-smi`, and each run took 22 min 40 s to 22 min 47 s. The cap fell at 10,200, 10,500, 9,400 and 9,700, all before the prior's start.
+- **Writes and privacy.** Every run wrote only under `<surface-runs>/combinations`. Scripts read tensors, JSON, images, maps and masks and wrote numbers and files. No image, render, map or sheet of private scene A was looked at (row T16.4).
+
+**The named measure, against the five files** (each cell 5 cm / beyond 25 cm; the near side cut along the centre copy's manifest's `cam0`; every run measured anew by the same script, so the off arm's and `PRIOR`'s `kept` column and `F1m`'s five reproduce sections 4 and 7 here's figures):
+
+| Run | `kept` | `MM` | `CM` | `MC` | `CC` |
+| --- | --- | --- | --- | --- | --- |
+| `OFF_A_h0_s0` | 0.1308 / 0.0461 | 0.1293 / 0.0395 | 0.1344 / 0.0389 | 0.1630 / 0.0525 | 0.1642 / 0.0532 |
+| `OFF_A_h0_s1` | 0.1380 / 0.0333 | 0.1309 / 0.0303 | 0.1295 / 0.0300 | 0.1592 / 0.0402 | 0.1646 / 0.0396 |
+| `PRIOR_A_h0_s0` | 0.1279 / 0.0301 | 0.1163 / 0.0271 | 0.1210 / 0.0258 | 0.1513 / 0.0377 | 0.1500 / 0.0373 |
+| `PRIOR_A_h0_s1` | 0.1360 / 0.0388 | 0.1352 / 0.0370 | 0.1376 / 0.0344 | 0.1599 / 0.0457 | 0.1648 / 0.0442 |
+| `F1m_h0_s0` | 0.1347 / 0.0344 | 0.1316 / 0.0307 | 0.1288 / 0.0303 | 0.1594 / 0.0427 | 0.1525 / 0.0433 |
+| `F1m_h0_s1` | 0.1481 / 0.0276 | 0.1456 / 0.0246 | 0.1448 / 0.0232 | 0.1742 / 0.0359 | 0.1702 / 0.0355 |
+| `F1F4_A_h0_s0` | 0.1407 / 0.0293 | 0.1284 / 0.0267 | 0.1248 / 0.0263 | 0.1516 / 0.0366 | 0.1480 / 0.0366 |
+| `F1F4_A_h0_s1` | 0.1309 / 0.0330 | 0.1282 / 0.0346 | 0.1246 / 0.0335 | 0.1562 / 0.0423 | 0.1529 / 0.0423 |
+| `OFF_A_h1_s0` | 0.1411 / 0.0379 | 0.1358 / 0.0387 | 0.1311 / 0.0383 | 0.1547 / 0.0435 | 0.1536 / 0.0379 |
+| `OFF_A_h1_s1` | 0.1337 / 0.0264 | 0.1262 / 0.0269 | 0.1344 / 0.0266 | 0.1527 / 0.0326 | 0.1525 / 0.0287 |
+| `PRIOR_A_h1_s0` | 0.1213 / 0.0269 | 0.1134 / 0.0271 | 0.1216 / 0.0274 | 0.1407 / 0.0385 | 0.1393 / 0.0307 |
+| `PRIOR_A_h1_s1` | 0.1307 / 0.0276 | 0.1217 / 0.0282 | 0.1297 / 0.0282 | 0.1447 / 0.0358 | 0.1488 / 0.0307 |
+| `F1m_h1_s0` | 0.1333 / 0.0381 | 0.1302 / 0.0386 | 0.1277 / 0.0390 | 0.1561 / 0.0490 | 0.1475 / 0.0405 |
+| `F1m_h1_s1` | 0.1398 / 0.0389 | 0.1269 / 0.0391 | 0.1322 / 0.0389 | 0.1553 / 0.0493 | 0.1450 / 0.0416 |
+| `F1F4_A_h1_s0` | 0.1295 / 0.0315 | 0.1163 / 0.0317 | 0.1231 / 0.0316 | 0.1414 / 0.0353 | 0.1394 / 0.0313 |
+| `F1F4_A_h1_s1` | 0.1315 / 0.0338 | 0.1184 / 0.0336 | 0.1260 / 0.0334 | 0.1479 / 0.0416 | 0.1414 / 0.0377 |
+
+**Judged by section 4.4's rule** (both seeds beyond both, the means more than 0.01 apart; lower by the design only when lower against `kept`, `MM` and `CM` all three):
+
+| Copy | `F1F4` against the off arm | against `PRIOR` | against `F1m` |
+| --- | --- | --- | --- |
+| Centre, named measure | **not lower**: not moved against `kept` (mean +0.001), `MM` (−0.002) and `CM` (−0.007); lower against `CC` alone, by 0.014 | **not lower**: not moved against any of the five files (means −0.007 to +0.004) | **not lower**: lower against `MM` (0.010), `CM` (0.012) and `MC` (0.013), not against `kept` (−0.006; seed 0 at 0.141 above `F1m`'s 0.135) |
+| Left, named measure | **not lower**: lower against `MM` (0.014) and `CC` (0.013), not against `kept` (−0.007) or `CM` (−0.008) | **not lower**: not moved against any file (means −0.004 to +0.005) | **not lower**: lower against `MM` and `MC` (0.011), not against `kept` (−0.006) or `CM` (−0.005) |
+| Either copy, tail | not moved | not moved (the left copy's means 0.005 higher) | not moved |
+| Under two frames, near side | **higher** by 0.029 and 0.024 | not moved (+0.007, −0.005) | **higher** by 0.022 and 0.026 |
+
+- **The corrected cameras add nothing to finalist 4 on the shell.** Against `PRIOR` no file moves on either copy, and the two arms' seeds interleave everywhere. This is the comparison the design named as deciding.
+- **Against the off arm the combination is not lower by the design's rule on either copy.** It is lower against two of the five files on the left copy and one on the centre copy. `PRIOR` alone was lower than the off arm on the left copy against `kept` (by 0.011, section 7 here) and against `MM` (by 0.014, above). So by this measure the combination does not reach what `PRIOR` reached alone.
+- **Against `F1m`, finalist 4 lowers the share against two or three of the five files on each copy,** by 0.010 to 0.013, but against `kept` on neither. This comparison also carries the wrapper's own effect (the design's confounds), so it is read, not attributed.
+- **The rise in short-lived primitives near the camera is `PRIOR`'s,** 0.02 to 0.03 above the off arm and `F1m`, and not moved against `PRIOR`.
+
+**Row A1 and the prior terms.**
+- **The scale ratios** at 30,000 (`ratio_stats.py`, medians of min/mid and min/max). Whole model: 7·10⁻⁵ to 0.0002 and 2·10⁻⁵ to 6·10⁻⁵. Near side: 0.0011 to 0.0033 and 0.0005 to 0.0014, with 0.63 to 0.67 below 0.01. The shell: under 2·10⁻⁶, with 0.80 to 0.89 below 0.01. These are `PRIOR`'s and `FLAT`'s figures.
+- **The terms.** L₇ falls from 0.65 to 0.67 at iteration 15,100 to 0.135 at 30,000, and C8's weight then passes 79 % of the cut's pixels (`PRIOR`: 0.14 and 78 % to 79 %). The prior is 0.020 of a total of about 0.07 at the end, as in `PRIOR`. On the corrected cameras the primitives turn to the maps exactly as on the manifest's.
+- **L1 at 30,000** is 0.0117 to 0.0118, between `PRIOR`'s 0.0118 to 0.0122 and the off arm's 0.0104 to 0.0107.
+
+**The test-view scores, the sharpness ratio and the tiles' coverage.** The combination is scored at both poses, the others as sections 4 and 7 here scored them (the off arm and `PRIOR` at the manifest's pose only). Kept-pixel PSNR is Q-233's, on the centre copy only.
+
+| Run | Pose | Crop PSNR / SSIM | Sharpness ratio (late) | Training views: PSNR / sharpness | E16 PSNR / SSIM₁ / ꟻLIP | Kept-pixel PSNR | Tiles with alpha ≥ 0.5: front; side |
+| --- | --- | --- | --- | --- | --- | --- | --- |
+| `F1F4_A_h0_s0` | manifest | 24.29 / 0.8221 | 0.6752 (0.7040) | 32.63 / 0.7468 | 24.45 / 0.8137 / 0.1522 | 25.13 | 0.93 to 1.00; 1.00 |
+| | corrected | 24.50 / 0.8277 | 0.6753 (0.7047) | | 24.72 / 0.8223 / 0.1485 | 25.45 | |
+| `F1F4_A_h0_s1` | manifest | 24.30 / 0.8226 | 0.6780 (0.7045) | 32.28 / 0.7444 | 24.35 / 0.8131 / 0.1529 | 25.03 | 0.94 to 1.00; 0.98 to 1.00 |
+| | corrected | 24.52 / 0.8285 | 0.6784 (0.7052) | | 24.61 / 0.8216 / 0.1494 | 25.33 | |
+| `F1F4_A_h1_s0` | manifest | 23.50 / 0.7498 | 0.7008 (0.7581) | 30.81 / 0.7486 | 21.54 / 0.7383 / 0.1938 | – | 0.82 to 1.00; 0.76 to 1.00 |
+| | corrected | 24.76 / 0.7876 | 0.7006 (0.7578) | | 22.03 / 0.7671 / 0.1843 | – | |
+| `F1F4_A_h1_s1` | manifest | 23.34 / 0.7472 | 0.6990 (0.7556) | 31.23 / 0.7473 | 21.35 / 0.7363 / 0.1949 | – | 0.95 to 1.00; 0.99 to 1.00 |
+| | corrected | 24.61 / 0.7856 | 0.6989 (0.7553) | | 21.79 / 0.7650 / 0.1852 | – | |
+
+Every rendered value is finite. The means, against the three references:
+
+| Copy, measure (the combination's pose) | Against the off arm | against `PRIOR` | against `F1m` at the same pose |
+| --- | --- | --- | --- |
+| Centre, crop PSNR (corrected) | +0.15 dB | +0.14 dB | +0.01 dB |
+| Centre, E16 PSNR (corrected) | −0.07 dB | −0.23 dB | +0.02 dB |
+| Centre, kept-pixel PSNR (corrected) | −0.07 dB | −0.26 dB | +0.02 dB |
+| Centre, E16 PSNR / kept-pixel PSNR (manifest) | **−0.33 / −0.38 dB** | **−0.49 / −0.56 dB** | 0.00 / 0.00 dB |
+| Centre, sharpness ratio | −0.052 | −0.016 | −0.034 |
+| Left, crop PSNR (corrected) | +0.74 dB | +0.63 dB | −0.07 dB |
+| Left, E16 PSNR (corrected) | +0.08 dB | −0.07 dB | −0.17 dB |
+| Left, crop PSNR / E16 PSNR (manifest) | **−0.53 / −0.38 dB** | **−0.64 / −0.54 dB** | −0.14 / −0.18 dB |
+| Left, sharpness ratio | −0.034 | +0.001 | −0.038 |
+| Either copy, crop SSIM (corrected) | +0.013, +0.038 | +0.007, +0.031 | +0.006, +0.007 |
+
+- **At the corrected pose no score falls by 0.3 dB** against any reference: the guard the design reads is not crossed. The nearest values are the centre copy's kept-pixel and E16 PSNR, 0.26 and 0.23 dB below `PRIOR`'s. Crop PSNR and SSIM rise with the corrected cameras, as `F1m`'s did, by 0.6 to 0.7 dB on the left copy.
+- **At the manifest's pose the guard is crossed** on both copies, by 0.33 to 0.64 dB, as it was for `F1m` (section 4 here). This is the pose's mismatch: against `F1m` at the same pose the combination is within 0.2 dB.
+- **The renders are softer.** The sharpness ratio is 0.677 on the centre copy, 0.016 below `PRIOR`'s and 0.052 below the off arm's: the corrected cameras' own fall (`F1m`, section 4 here) adds to the prior's. On the left copy it is `PRIOR`'s, 0.700. The training views lose 0.44 to 0.46 dB of PSNR against the off arm, and 0.80 to 0.85 dB against `F1m`.
+- **The side views fill**, as with `PRIOR`: the side tiles reach 0.76 to 1.00 of alpha ≥ 0.5, against the off arm's and `F1m`'s 0.45 to 1.00.
+
+**The sheets.** Four blind sets, the centre copy at seeds 0 and 1, then the left copy at seeds 0 and 1. Each holds the off arm, `PRIOR`, `F1m` and `F1F4`, in an order from `random.Random(2904)`, labelled by set and letter only, in `<surface-runs>/combinations/sheets/blind`, with `KEY.json` apart. They await the owner's judgement with their labels hidden.
+
+**Arm A, read by section 4.4.** The named measure does not move against `PRIOR` and is not lower than the off arm's by the design's rule on either copy; the tail does not move. The renders are softer than `PRIOR`'s on the centre copy. At the corrected pose no score crosses the 0.3 dB guard, and the crop scores rise; at the manifest's pose the guard is crossed, as for `F1m`. By section 7.2's rows, the combination meets neither adopt clause: finalist 1's (the share lower against both reference files) and finalist 4's (beyond finalist 3's arms, with the renders sharp) are both unmet.
+
+**Arm A, read under scenario 2.**
+- *Is it a better trade than `PRIOR`?* **No.** By the design's test the shape does not improve: its named measure is not lower than `PRIOR`'s on either copy. What the corrected cameras add is in the images at their own pose: crop PSNR and SSIM up, by 0.6 dB and 0.03 on the left copy. They also cost 0.016 more sharpness on the centre copy, and up to 0.26 dB of the centre copy's E16 and kept-pixel PSNR.
+- *Against the off arm,* the whole trade is softer renders for a shell that moves against two of five files on the left copy and one on the centre copy, less than `PRIOR` alone showed.
+- *How thin this is.* Two seeds a side and the init's sample carried, as the design stated.
+
 ## 8. The recommendation
 
 *Ticket #29's section.* Per finalist that ran: adopt, drop, or test in combination; a finalist the owner stopped before its step says so. Where it recommends adopting, the spec change's wording proposed for the owner, on an issue of its own.
