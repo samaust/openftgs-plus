@@ -3009,7 +3009,7 @@ The prior keeps the flattening and adds to it on `kitchen`, where flattening alo
 - **Adopt when** "it moves the named measure beyond finalist 3's two arms, with the renders sharp and no harm on openftgs-synth". **Not met.**
   - The named measure is lower than `FLAT`'s on the left copy and than `FLATNC`'s on the centre copy, never beyond both on one copy.
   - The renders turn softer by 0.035.
-  - `studio`'s share behind the surface rises beyond its guard on its one seed.
+  - The share behind the surface is worse by section 4.4's rule on `kitchen`'s dynamic pixels (+0.009 at the means, every seed beyond the off arm's) and on `studio`'s one seed (+0.009).
 - **Drop when** "it adds nothing to finalist 3's flattening". **Not met in full.** Against `FLAT` it lowers the left copy's named measure by 0.016 by the rule, and on `kitchen` it halves the expected depth's error and the share in front where flattening alone moved neither. It adds something, and not what the adopt clause asks.
 - **The row's third column,** "if its measure moves and the renders turn soft: H2's prediction for it, the loss settling between the cameras' versions of the person: the combined arm". **This is the outcome:** a measure that moves in part, with renders that turn soft.
   - The first step found the cameras' normals of the person no further apart than an estimator's on exact cameras. So the softening is not shown to come from the cameras' versions; the prior's own spread and its size beside the rendering loss (0.39 times the rest at the end) explain it as well.
@@ -3207,7 +3207,7 @@ Tickets #24's, #26's, #27's and #28's folders, `<m15-runs>`, `<m17-runs>` and th
 1. **Finalist 4:** dropped in the form tested (recommended); or kept waiting for a partner term; or one more arm at 1/10, which the calibration narrowly turned away (about 4 GPU hours).
 2. **The sheets** (`<surface-runs>/ticket-28b/sheets/blind`, key apart; the labelled `kitchen` side-by-sides `finalist4low_kitchen_s<n>.jpg`): the owner's judgement with the labels hidden.
 
-**The owner's answer on the lower-weight arm:** *not yet given.* **Date:** *not yet given.*
+**The owner's answer on the lower-weight arm:** given in "The owner's answer on step 6" above, its second item: finalist 4 at full weight (`PRIOR`) is the lead candidate, and the lower-weight arm (`LOWP`) is not taken forward. **Date:** 2026-11-19.
 
 **Two combinations, before the recommendation** (2026-11-19, at the owner's answer on step 6 above). Two arms, each fixed below before its first full run, and read both by section 4.4's criteria and under the scenario of section 1 here ("The two scenarios") that the owner gave it. Arm A, `F1F4`, is scenario 2's, on private scene A. Arm B, `F3F4p10`, is scenario 1's, on openftgs-synth. Every finalist 4 arm already carries finalist 3's flattening, so `F3F4p10` differs from `PRIOR` and `LOWP` in the prior's weight alone. Its name keeps the owner's wording: finalist 3's flattening with finalist 4 at a tenth of the papers' weights.
 
