@@ -3433,6 +3433,148 @@ Tickets #19's, #24's to #28b's folders, `<m15-runs>`, `<m17-runs>` and the priva
 
 *Ticket #29's section.* Per finalist that ran: adopt, drop, or test in combination; a finalist the owner stopped before its step says so. Where it recommends adopting, the spec change's wording proposed for the owner, on an issue of its own.
 
+Written on 2026-11-19 from sections 1 to 7 here as merged at 29daf7c, read by the research document's section 4.4 ("How a result would be read") and section 7.2's table, and under section 1 here's two scenarios. Nothing was trained, run or measured for it, and it opened no source outside this repository, so it adds no source-log row. All four finalists ran; the owner stopped none before its step.
+
+**The owner's decisions this section rests on.**
+
+- **Finalist 1: dropped** (section 4 here, 2026-11-17), confirmed after the left copy's second seed. The corrected manifests stay on file.
+- **Finalist 2: dropped, all six arms** (section 5 here, 2026-11-19).
+- **Finalist 3: dropped as tested** (section 6 here, 2026-11-18). Its calibrated flattening, λ_flat = 1, σt-weighted, is the base of every finalist 4 arm.
+- **Finalist 4 at the papers' weights (`PRIOR`) is the lead candidate,** and the lower-weight arm (`LOWP`) is not taken forward (section 7 here, "The owner's answer on step 6", 2026-11-19).
+- **The combinations, and the go for this section** (2026-11-19, in session): neither `F1F4` nor `F3F4p10` is taken forward, and this section goes ahead. Both answers were relayed to this ticket by the orchestrating session. Section 7 here's answer line on the combinations was not filled in when this section was written.
+
+**In short.**
+
+- **No finalist is recommended for adoption now, and no spec change is proposed.** No finalist met section 7.2's adopt clause, in any arm or combination run.
+- **Finalists 1, 2 and 3: drop,** as the owner has decided. Each is tied to its result below.
+- **Finalist 4, `PRIOR`: a lead candidate for further tests, not a recommendation to adopt.**
+  - It is the only arm of the PRD that improves shape where the cameras agree with colour held: `kitchen`'s depth error is halved and its image scores hold.
+  - On private scene A it makes scenario 2's trade in part: the shell moves on one copy, and the renders turn softer.
+  - Section 7.2's adopt clause is unmet on all three of its counts. Scenario 1's own test, as section 7 here fixed it for arm B, is unmet in its shape half: the share behind the surface is worse on `kitchen`'s dynamic pixels.
+- **The combined arm H2 calls for** has no partner on the person's side, since finalist 2 is dropped. The one combination with a term on the disagreement side, `F1F4` (the background's part), added nothing to `PRIOR`. It is not recommended as a next step.
+
+**A recommendation per finalist.** In each row, "Section 7.2's row" is the reading by section 4.4's criteria. Scenario 1 is `kitchen` and `studio`; scenario 2 is private scene A (section 1 here).
+
+| Finalist | Recommended | Section 7.2's row | Scenario 1: good cameras and data | Scenario 2: bad cameras and data |
+| --- | --- | --- | --- | --- |
+| 1. The cameras corrected once | **Drop** (the owner, 2026-11-17). Keep the corrected manifests on file as a better manifest, as section 7.2's drop column leaves to the owner | **Adopt: unmet** on all three counts (section 4 here). Check (c)'s "every pair" is not met. On the centre copy the named measure is not lower against both reference files. At the manifest's pose the scores fall by 0.31 to 0.63 dB, and the sharpness ratio falls by 0.015 on the centre copy. **Drop: met on the centre copy only,** by its second branch, "the share does not move". On the left copy `F1m`'s share is lower against both of its files by the rule, by 0.019 to 0.023, on two seeds a side | **Nothing to correct.** On `kitchen`'s exact cameras the tool's corrections stay at the fit's floor. On cameras turned by 0.1° to 0.4° it takes most of the error back and leaves about 0.1°. Those runs fall 0.005 to 0.008 short in SSIM₁, and 0.020 to 0.029 in the share behind the surface, of the runs on exact cameras (read, not attributed) | **The background improves, and the shell moves on one copy.** The background's residual halves on held-out frames, and the crop PSNR at the corrected pose rises by 0.8 to 0.95 dB on the left copy. The person's 4.0 % between pairs only becomes 3.0 % and 3.8 %. With finalist 4, `F1F4`, the corrected cameras add nothing to `PRIOR`'s shell on either copy, against any of the five files |
+| 2. The alignment-tolerant pixel loss | **Drop, all six arms** (the owner, 2026-11-19) | **Adopt: unmet** in every form (section 5 here). `align_rel`, `align_abs`, `align_stg`, V1 and V3 leave the named measure where the off arm has it, which is the drop clause's case. V2 (`align_full`) is the only form that moves it, and it moves it up: by 0.0102 on the left copy, 0.0002 over the margin. V2 harms on all three scenes | **No gain, and V2 harms.** Where the cameras agree the term finds little to shift. `align_rel`, `align_abs` and `align_stg` do no harm on `kitchen`; `align_abs` and `align_stg` each have a one-seed dynamic-region PSNR flag on `studio`. V2 fails SSIM₁ on `kitchen` at every seed and two guards on `studio` | **No shape gain, so the softening it brings is not a trade.** `align_rel`, V1 and V2 soften the renders, and V2 lowers the centre copy's test-view scores by 0.55 to 0.64 dB |
+| 3. Surface terms without a prior | **Drop as tested** (the owner, 2026-11-18). Its flattening stays as finalist 4's base | **Adopt: unmet** (section 6 here). Neither arm lowers the named measure, and arm 2 (`FLATNC`) raises it on the centre copy by 0.011. **Drop: met, in part for its last word.** Flattening survives growth and makes the shell flat (0.86 to 0.88 of the shell's primitives have min/max below 0.01) without moving it. The consistency term barely acts at the weight the guard allows. At 2DGS's weight, on one calibration seed, it softens the renders | **Flattening alone: no gain and no harm.** The share behind the surface does not fall. **With the consistency term,** the expected depth's error falls (169 to 203 mm against 206 to 247 mm), the share behind the surface rises by 0.006 on all pixels and 0.010 on dynamic pixels, beyond the guard, and SSIM₁ holds | **No shape gain.** Flattening keeps the renders sharp (the left copy's ratio is 0.010 higher), and the consistency term lowers them slightly |
+| 4. A normal prior on top of finalist 3's flattening | **`PRIOR`: lead candidate, not adopted now** (the owner, 2026-11-19). `LOWP`, `F3F4p10` and `F1F4`: not taken forward (the owner, 2026-11-19). `DAVID`: not taken forward, recommended here, since the owner gave it no answer of its own | **Adopt: unmet for `PRIOR`** on all three counts (section 7 here). It is lower than `FLAT` on the left copy and than `FLATNC` on the centre copy, never beyond both on one copy. The renders turn softer by 0.035. The share behind the surface is worse on `kitchen`'s dynamic pixels and on `studio`. **Drop: unmet,** since it adds to flattening. **The row's third column applies,** a measure that moves in part as the renders soften, which points to the combined arm. `LOWP` meets the drop clause | **`PRIOR`: the best shape of the PRD, with colour held, and one shape guard crossed.** See below | **`PRIOR`: a partial, thin move for softer renders,** which scenario 2 allows. See below |
+
+**Finalist 4 at the papers' weights, `PRIOR`: what the evidence supports.**
+
+- **Under scenario 1 (`kitchen`, `studio`).**
+  - **Shape.** `kitchen`'s expected depth error falls from 206 to 247 mm to 109 to 123 mm, and on the dynamic objects from 44 to 73 mm to 16 to 17 mm. The share in front of the surface falls from 0.041 to 0.017, and the far shares by a third.
+  - **Colour holds.** Against the off arm's five seeds, SSIM₁ is 0.0010 higher, PSNR 0.28 dB higher and ꟻLIP unchanged; the kept-pixel PSNR is 0.51 dB higher against the off arm's seeds 0 to 2. Against the plain baseline's five seeds, SSIM₁ is 0.0010 lower, inside the 0.002 guard.
+  - **The share behind the surface does not fall,** which a surface term was expected to make it do (section 4.4). On `kitchen`'s dynamic pixels it is worse by section 4.4's rule: +0.009, every seed beyond the off arm's. On `studio`'s one seed it is +0.009 as well, and the expected depth's error there rises from 172 to 189 mm. `studio`'s PSNR is 0.34 dB higher.
+  - **Scenario 1's test, applied to `PRIOR`.** Section 7 here fixed it for arm B and did not apply it to `PRIOR`. Colour is at least as good: no image guard is crossed against either reference, and the kept-pixel PSNR rises. Shape is better by the depth error's half of the test: its range lies below the off arm's and the plain baseline's (251 to 448 mm). Shape is not better by the share-behind half: the dynamic share is worse than the off arm's by 0.009, beyond 0.005. So `PRIOR` does not pass that test as written. The owner named this share as `PRIOR`'s stated caveat (section 7 here).
+- **Under scenario 2 (private scene A).** Softer renders are acceptable there if the shape improves.
+  - **The renders turn softer.** The sharpness ratio falls by 0.036 on the centre copy and 0.035 on the left copy, and the training views lose 0.5 to 0.9 dB of PSNR.
+  - **The test view does not get worse.** Crop PSNR is 0.02 and 0.11 dB higher, E16 PSNR 0.17 and 0.15 dB higher, and the kept-pixel PSNR 0.19 dB higher. The side tiles fill: 0.75 to 1.00 of alpha ≥ 0.5, against the off arm's 0.47 to 1.00.
+  - **The shape gain is partial and thin.**
+    - The named measure is lower than the off arm's on the left copy against the kept file, by 0.011, and not on the centre copy.
+    - By the three-file rule fixed for the combinations, it is not lower on either copy. On the left copy it is lower against `kept` and `MM` but not against `CM` (−0.007).
+    - The tail beyond 25 cm never moved, in any arm. By section 2.6 here's reading, a fall in the 5 cm share that the tail does not share is a change in the method's habit, not a disagreement removed.
+    - Four of the twelve comparisons on the named measure moved, all lower, where two seeds a side give about one in six by chance.
+    - The near side's under-two-frames share rises by 0.02 to 0.03.
+- **Two readings of the same figures.**
+  - **Ticket #28, after the lower-weight arm,** recommended "drop in the form tested", reading by section 7.2's row, in which the softening counts against it (section 7 here).
+  - **The owner then named `PRIOR` the lead candidate,** under the two scenarios: scenario 2 accepts the softening, and on `kitchen` the shape gain comes with colour held.
+  - This section follows the owner's decision and records ticket #28's reading beside it. The two differ in how they weigh the same figures, not in the figures.
+- **What the evidence supports:** a lead candidate for further tests, not a recommendation to adopt. The caveats:
+  - **The share behind the surface:** worse on `kitchen`'s dynamic pixels (+0.009) and on `studio` (+0.009). This is the result a surface term was expected to reverse.
+  - **One seed on `studio`.** Two plain trainings of `studio` already lie 0.34 dB apart (section 3 here).
+  - **The off arm's undetermined effect.** `PRIOR` is compared with the off arm through the script, whose own effect on `kitchen`'s SSIM₁ came out undetermined (d = −0.00208, p = 0.056; section 5 here). Against the five plain seeds `PRIOR`'s SSIM₁ is 0.0010 lower, inside the guard. An adopted form would run inside the package, without the script.
+  - **The sheets have not been judged by the owner.** These are the blind sets of private scene A (`<surface-runs>/ticket-28/sheets/blind`, `<surface-runs>/ticket-28b/sheets/blind`, `<surface-runs>/combinations/sheets/blind`) and the labelled `kitchen` side-by-sides. Section 4.4 makes "the owner judges its sheets no worse" a criterion, and it has not been read for any finalist.
+  - **Thin evidence on private scene A:** two seeds per copy, four comparisons of twelve, and the tail unmoved.
+  - **No sharpness ratio on `kitchen`.** It is measured on private scene A only, so colour on `kitchen` rests on SSIM₁, PSNR, ꟻLIP and the kept-pixel PSNR.
+  - **Growth under the prior was not exercised.** Every run reached the cap by iteration 11,000, before the prior's start at 15,000.
+  - **The prototype is not the adopted form.**
+    - Its terms go through Q-226's device, a second pass: on private scene A a run took 22 min 44 s to 23 min 6 s, against the off arm's 13 min.
+    - The terms do not enter E10's g (section 5.2). As channels of the colour pass they would, unless the revision says otherwise.
+    - Check (f) passed for a depth channel; normals as channels of the colour pass stay open (section 2.6 here).
+  - **The prior's own error.** It is 13.7° on `kitchen`'s dynamic objects, about twice its spread between cameras. An error the cameras share does not cancel: the prior can shape a surface but cannot place it (section 7 here).
+- **What would turn it into a recommendation to adopt:**
+  - more seeds on `studio` showing the share behind the surface no worse than the off arm's by more than 0.005, or the owner accepting that share as the scenario's cost;
+  - the owner's judgement of the sheets, labels hidden, no worse;
+  - on private scene A, a third seed that keeps the left copy's fall, or the owner's acceptance of a partial move under scenario 2.
+- **What would turn it into a drop:** more seeds that take away `kitchen`'s halved depth error, sheets judged worse, or `studio`'s share behind the surface worse again at its new seeds.
+- **No spec proposal is drafted.** No adoption is recommended, so this ticket drafts no wording and opens no issue. If the owner adopts `PRIOR` at review 2 regardless, the revision's content is sketched already, and its wording would be drafted then:
+  - finalist 4's column of the research document's section 8, with its fields `loss.lambda_normal_prior`, `loss.lambda_depth_normal_prior` and `loss.normal_prior_confidence`;
+  - finalist 3's flattening fields, since `PRIOR` carries L_flat: `loss.lambda_flat`, with the start and the depth of section 5.5's `loss.geometry_from` and `loss.geometry_depth`;
+  - the `normal` key for training images in `ftgs-scene`, with `metadata.normal_source`;
+  - row E13's known masks, which review 2 of PRD #1 assigned to the first revision that touches the same places (the research document, section 7.7).
+
+**Where H1 and H2 stand** (the research document's section 7.5, after the tests).
+
+- **H1 is tested, and not supported as a remedy for the shell.** Four surface forms ran on top of the default configuration, and no surface term lowered the named measure on both copies.
+  - **Flattening** shapes the shell flat and leaves it in place.
+  - **Depth–normal consistency** barely acts at the weight the guard allows, and raises the measure on the centre copy.
+  - **The normal prior at the papers' weights** lowers the measure on one copy against the kept file, with softer renders. At a thirtieth of those weights it does nothing.
+  - **Where the cameras agree,** the prior's surface effect shows: `kitchen`'s depth error is halved. The share behind the surface does not fall.
+  - **The normal half of H1 meets no camera disagreement of its own.** The cameras' normals of the person are no further apart than an estimator's on exact cameras (6.7° and 7.1°, against 6.9°; section 7 here), so the prior does not inherit the 4 % that the depth priors inherit.
+- **H2's premise holds. H2 by removal is not supported, and its person's part is not tested by any removal.**
+  - **Finalist 1 removed the background's part.** The named measure moved on the left copy only, on two seeds, and the tail did not move. With finalist 4 it added nothing to `PRIOR`.
+  - **Finalist 2 never lowered the measure,** in six forms. By section 7.2's row, the shell is not a reconciliation of shifts of a few pixels rigid over a patch.
+  - **The person's part was not removed.** Finalist 1's turns left the person's 4.0 % between pairs at 3.0 % and 3.8 %. Finalist 2's shifts did not remove it either.
+  - **Check (a):** the under-two-frames share is the method's habit on moving content. In metres, the far share is as high on openftgs-synth's agreeing cameras as on private scene A. Only the tail beyond 25 cm separates the scenes (0.035 to 0.047 against 0.001), and no arm moved the tail.
+  - **H2's prediction for a surface constraint alone,** the shell traded for blur, is partly seen. The consistency term softened the renders at the papers' weight, and the prior softened them as the measure moved in part. The softening is not shown to come from the cameras' versions of the person, since their normals agree to the estimator's floor.
+- **The combined arm.** One form ran, `F1F4`, with the background's correction, and it added nothing. No person-side partner exists, so H2's combination with that side is untested.
+
+**What stays untested,** by finalist, as each section here lists it.
+
+- **Finalist 1:**
+  - a baseline retrained from fresh inits, to separate the init's sample (section 4 here, question 4, not taken up);
+  - a fit that reaches section 2.7's scale a, which the turns do not reach;
+  - `F1F4`'s weight-0 control on the corrected cameras (about 0.9 GPU hours; not run).
+  - A fit of the nine cameras as one set is not the plan's (review 2).
+- **Finalist 2:**
+  - a hold per camera across its frames;
+  - the switch at 22,500;
+  - V2 with an anchor that keeps the render on the unshifted image;
+  - combinations of the variants.
+  - Rows E11, E22 and E27, which came back at step 1 (section 2.6 here), keep their own evidence.
+- **Finalist 3:**
+  - λ_nc between 0.005 and 0.05, and any weight above 0.005 at 30,000 iterations on both sets;
+  - the consistency term from 7,000 at λ_flat = 10;
+  - an oriented start;
+  - PGSR's image-edge weight and its multi-view terms;
+  - λ_flat as s_min/S;
+  - L_nc on expected depth (one calibration run).
+- **Finalist 4:**
+  - a weight between a thirtieth and the papers' on private scene A at 30,000 iterations (a tenth was turned away by the calibration, narrowly, and ran on openftgs-synth only, where it harmed);
+  - a start before the cap, so that growth acts under the prior;
+  - row C7's total-variation term;
+  - more than one seed on `studio`;
+  - DAViD's segmentation model for its person;
+  - the alternatives to the settings fixed in section 7 here's open choice 2 (C7 on the normalized N̂ or as a mean over components, C8 on expected depth, the depth map's normal in C8's weight);
+  - normals as channels of the colour pass, and whether the terms should reach E10's g.
+- **Across them:** the adopted forms' cost (B-1, B-6), measured for none; the sharpness ratio on openftgs-synth; and the owner's judgement of every blind set.
+
+**Next steps, recommended and not run.** Each is the owner's call, with its hours cleared at its go.
+
+1. **The owner's judgement of the sheets, labels hidden.** This is the one criterion of section 4.4 not yet read for any finalist, and it costs no GPU time.
+   - The blind sets are those of sections 4 to 7 here: tickets #25, #26 (three sets), #27, #28 and #28's follow-up, and the combinations.
+   - The labelled `kitchen` side-by-sides go beside them.
+   - It comes first, because a judgement against `PRIOR` would settle the rest.
+2. **Firm `PRIOR` up, through the same script and against the same off arm:**
+   - `studio` at two more seeds, `PRIOR` and the off arm, about 2 GPU hours with post-processing, on the share behind the surface;
+   - a third seed of `PRIOR` and the off arm on both copies of private scene A, about 1.3 GPU hours, on the named measure and the tail;
+   - a CPU read, on the existing `kitchen` checkpoints, of where the extra weight behind the dynamic surface lies.
+3. **If those hold and the owner wants it adopted:**
+   - a spec revision drafted from the research document's sections 5.5, 5.6 and 8, as above, and proposed to the owner on an issue ("Editing the spec" in `docs/agents/guidelines.md`);
+   - then an implementation issue, which measures B-1 and B-6 and checks the adopted form (channels of the colour pass, and E10's g) against the prototype's figures.
+4. **Not recommended now:**
+   - a combined arm with a person-side term, which has no candidate;
+   - further forms of finalists 1 to 3;
+   - `LOWP` at a tenth on private scene A, since a tenth harmed on openftgs-synth.
+
+   If the owner wants a disagreement-side term to pair with `PRIOR`, rows E11, E22 and E27 are the candidates step 1 brought back, as a later PRD.
+5. **Keep the corrected manifests on file** (section 4 here). Using them for later arms is the owner's call.
+
+**The owner's answers at review 2:** *not yet given.* **Date:** *not yet given.*
+
 ## 9. The sources
 
 *Ticket #29's section.* The clean-room record in full, completing the opening's: the source-log rows of every ticket of the PRD, what was read only as documentation, what was not opened, and any incident.
