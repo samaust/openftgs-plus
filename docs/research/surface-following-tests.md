@@ -26,7 +26,15 @@ The nine sections here are the nine the PRD fixes ("How the work runs"). Section
 
 **Local paths** are written as placeholders: `$OPENFTGS_DATASETS` (openftgs-synth is at `$OPENFTGS_DATASETS/synth`); `<m17-runs>`, as `docs/prd/validation-runs.md` uses it; `<surface-runs>`, the folder outside the repository that holds this work's run directories, checkpoints, prior maps, sheets and large JSON, one subfolder per ticket (section 1 here, "Machine and data"); `<scratch>`, the PRD's gitignored scratch folder `.scratch/surface-following-tests/`, for scripts, scratch environments and downloads; `<private-scene-A>`, private scene A's location, which is written nowhere. Prototype scripts are not committed: the section that used one records its commands, the versions and a one-line note on each run.
 
-**Clean-room record.** Section 9 gives it in full, and ticket #29 completes this paragraph. The rules are CLAUDE.md's guidelines rules, which replace spec §0 on sources for this fork, with the PRD's "What the run must license-check and log before using it": FreeTimeGS++ is read as its arXiv paper only, its project page and code unopened (source-log row 767); any repository of SparseCam4D or SSA-3DGS is opened at its license file first; MoGe-2's and DAViD's weights have their terms checked again at the publisher before use, and the MoGe code's license file is read before its code; the ONNX runtime goes into a scratch environment only. Every source opened gets a row in `docs/prd/source-log.md`, written when it is opened, under a temporary ID of the form `T<ticket>.<k>` on the ticket's branch, numbered at its merge and cited by number. Reads of this repository and of its own tracker need no row (the owner's answer of 2026-11-16, PRD #16). Ticket #17 opened no source outside them and added no row.
+**Clean-room record.** Section 9 here gives it in full. The rules are CLAUDE.md's guidelines rules, which replace spec §0 on sources for this fork, with the PRD's "What the run must license-check and log before using it": FreeTimeGS++ is read as its arXiv paper only, its project page and code unopened (source-log row 767); any repository of SparseCam4D or SSA-3DGS is opened at its license file first; MoGe-2's and DAViD's weights have their terms checked again at the publisher before use, and the MoGe code's license file is read before its code; the ONNX runtime goes into a scratch environment only. Every source opened gets a row in `docs/prd/source-log.md`, written when it is opened, under a temporary ID of the form `T<ticket>.<k>` on the ticket's branch, numbered at its merge and cited by number. Reads of this repository and of its own tracker need no row (the owner's answer of 2026-11-16, PRD #16). Ticket #17 opened no source outside them and added no row.
+
+- **The rows.** Every page, license file, model card, weights file, data file, opened search result and general-knowledge claim behind this document has a row: rows 832 to 893, 62 in all. Section 9 here gives them by ticket; tickets #17, #23 and #29 added none.
+- **Source code.** Third-party source code was read only under MIT: MoGe's code, whose bundled DINOv2 part is Apache-2.0 (row 883), and DAViD's runtime code (row 884). gsplat 1.5.3 ran, and no source file of it was opened (rows 832, 875).
+- **Documentation only.** SparseCam4D's repository was read at its license file and README only (row 837). The ONNX runtime, whose binary compiles in an MPL-2.0 part, ran as a program in a scratch environment, its source unread (row 885).
+- **FreeTimeGS.** FreeTimeGS++ was read whole from arXiv, under the owner's ruling, and its code address and project page were left unopened (rows 833, 834). No other row records a hit left unopened, and no row records EasyVolcap.
+- **Weights.** Two weights files were downloaded by anonymous requests: MoGe-2's normal model and DAViD's, both MIT at their publishers (rows 882, 884). RoMa's and DINOv2's weights ran from the existing cache.
+- **Incidents.** No row is an Incident row.
+- **Private scene A.** The rows call it by its alias. Its images were read only by local scripts and by the two estimators, offline on this machine (rows 843, 888, 889). Section 9 here says how the name and location were checked.
 
 ## 1. Scope and the owner's decisions
 
@@ -3578,3 +3586,125 @@ Written on 2026-11-19 from sections 1 to 7 here as merged at 29daf7c, read by th
 ## 9. The sources
 
 *Ticket #29's section.* The clean-room record in full, completing the opening's: the source-log rows of every ticket of the PRD, what was read only as documentation, what was not opened, and any incident.
+
+**Every source behind this document has a row in `docs/prd/source-log.md`: rows 832 to 893, 62 in all. No row is an Incident row.**
+
+- One row records links deliberately left unopened, FreeTimeGS++'s code address and project page (row 834).
+- Third-party source code was read in two places, both under MIT: MoGe's code, whose bundled DINOv2 part is Apache-2.0 (row 883), and DAViD's runtime code (row 884).
+- gsplat 1.5.3 ran throughout, and no gsplat source file was opened (rows 832, 875).
+- The techniques' settings come from their arXiv papers, re-read where a setting was missing.
+- The opening's "Clean-room record" is the short form of this section.
+
+Written on 2026-11-19 by ticket #29 from three things that can be audited: the source log as merged at 29daf7c, the integration branch's commits and merge messages, and sections 1 to 7 here. Where a statement rests on none of them, it says whose account it is. Ticket #29 opened no source outside this repository and added no row.
+
+**The rules.**
+
+- **CLAUDE.md's guidelines rules,** which replace spec §0 on sources for this fork, and the PRD's "What the run must license-check and log before using it", which the opening summarizes:
+  - each project's license file is read before anything else of it;
+  - source code only under a permissive license that allows commercial use;
+  - a copyleft, non-commercial or missing license means documentation only;
+  - code that implements or extends FreeTimeGS, and EasyVolcap, are never opened;
+  - gsplat is read at 1.5.3 only;
+  - weights' terms come from their publisher.
+- **The owner's rulings,** recorded in section 1 here:
+  - FreeTimeGS++ may be read whole, and papers that cite FreeTimeGS and describe their authors' reproduction of it may be read and cited (2026-11-16);
+  - the fourth nine-camera model's link may be followed (2026-11-16);
+  - private scene A's image content may be given as numbers (2026-11-16);
+  - reads of this repository's own tracker need no row (2026-11-16).
+- **The brief to the tickets** (the orchestrating session's), in which the PRD's rules are carried out:
+  - packages and weights go into scratch environments only, never the shared `.venv`;
+  - private scene A's images are read by scripts only;
+  - every GPU command runs under one shared lock.
+
+**The rows, by ticket.** Each row names its ticket in its own text, and the table follows those tags. Each ticket logged under temporary IDs on its branch, numbered at its merge; most merge messages carry the mapping, and the later ones point to the renumbering script's output.
+
+| Rows | Ticket, and section here | What |
+| --- | --- | --- |
+| 832 | #21, section 2.4 | Check (f)'s probe: the package's `render()` and test helpers with gsplat 1.5.3 and PyTorch, and Q-226's device copied from PRD #1's ticket #3 (row 511). No gsplat source file opened |
+| 833–838 | #22, section 2.5 | FreeTimeGS++ read whole from arXiv (833), its code address and project page not opened (834); SparseCam4D's paper, its project page for its links, and its repository's license file and README (835 to 837); SSA-3DGS's paper (838) |
+| 839–843 | #20, section 2.3 | PRD #1's outputs and scratch scripts, the two seeds' checkpoints, `kitchen`'s frames and ground truth with the dense matcher, and private scene A's images read by scripts |
+| 844–849 | #18, section 2.1 | openftgs-synth's card and ground truth, the owner's notes, the kept checkpoints with the fourth nine-camera model, PRD #1's ticket-5 scripts, and the stride-1 init with the matcher's runtime packages (849) |
+| 850–853 | #19, section 2.2 | The held-out copies' manifests and images, ticket #4's matches and crops, and general knowledge for the camera fit (853) |
+| 854–860 | #24, section 3 | The owner's scorer and notes, read as text; M17's run files; the copies' manifests, inits and the owner's scoring requests; the kept runs and score files; the ground truth; the fixed side request |
+| 861–864 | #25, section 4 | The corrected manifests, the inits with both pairings, the `kitchen` control, and the left copy's second seed (864) |
+| 865–870 | #26, section 5 | AligNeRF re-read on arXiv (865, 868), the baseline's renders at training cameras, the arms' inputs, the off arm's diagnosis (869) and the staged arm (870) |
+| 871–876 | #27, section 6 | PGSR, 2D Gaussian Splatting, Gaussian Opacity Fields and RaDe-GS re-read on arXiv (871 to 874), the first step (875), the calibration and the arms (876) |
+| 877–878 | #26, section 5, the three variants | Their inputs, and the files read back for their tables and sheets |
+| 879–881 | The labelled `kitchen` sheets, at the owner's request of 2026-11-18 (section 4, "Sheets on `kitchen`") | openftgs-synth's card, `kitchen`'s ground truth for the fixed request, and the run folders of tickets #24 to #27 |
+| 882–889 | #28, section 7 | MoGe-2's weights (882), MoGe's code (883), DAViD's model and runtime (884), the ONNX runtime (885), DN-Splatter and VCR-GauS re-read on arXiv (886, 887), the first step (888), the arms (889) |
+| 890–891 | #26, section 5, V2 on openftgs-synth | Its inputs, and the files read back |
+| 892 | #28, section 7, the lower-weight arm | Its inputs |
+| 893 | The two combinations, at the owner's answer on step 6 (section 7) | Their inputs |
+
+- **Tickets #17, #23 and #29 added no row.** They read this repository, its tracker and the document's own sections.
+- **One row is "No source read: general knowledge":** row 853, the multi-view geometry and library calls of ticket #19's fit.
+- **Most rows are this project's own files or data.** They cover private scene A's manifests, images and checkpoints; the owner's notes, tools and requests; M15's and M17's run files; PRD #1's and this PRD's outputs and scratch scripts; and openftgs-synth's CC0-1.0 data. The rows for third-party sources are 833 to 838, 865, 868, 871 to 874 and 882 to 887.
+
+**Source code, and under which license.**
+
+- **MoGe's code,** `microsoft/MoGe` at 74fbce0: MIT, with the bundled DINOv2 code under `moge/model/modules/dinov2` Apache-2.0 (Meta AI).
+  - Its `LICENSE` was read first, then the README's "License" and a few named files: the model, its modules' imports and `pyproject.toml`.
+  - The code was used unchanged from the scratch directory and never committed (row 883).
+- **DAViD's runtime code,** `microsoft/DAViD` at 20a3eb6: MIT, by the README's "Model License", `LICENSE-MIT.txt` and each file's header. The three runtime files' preprocessing was taken for the scratch script (row 884).
+- **gsplat 1.5.3 and PyTorch** ran as installed in the shared `.venv`, through the package and through run-time wrappers of gsplat's two stage functions. Rows 832 and 875 say no gsplat source file was opened, and no row records `gsplat/contrib/dynamic` or a newer branch.
+- **Packages installed outside the shared `.venv`.**
+  - The vendored RoMa's runtime packages, torchvision 0.29.2+cu132, einops 0.8.2 and loguru 0.8.0, were copied unchanged from PRD #1's ticket #4 scratch folder into ticket #18's (row 849; licenses as row 612 records). Tickets #18, #24 and #25's inits ran with them (rows 849, 860, 862).
+  - The ONNX runtime 1.32.0, protobuf 7.36.2 and flatbuffers 25.12.19 went into ticket #28's scratch folder, with `--no-deps --target` (row 885).
+  - No row records a write to the shared `.venv`. This ticket checked its freeze against the baseline's (empty diff, 2026-11-19).
+- **The owner's tools for private scene A** were read as text, neither run nor imported (rows 845, 854). The sharpness ratio was computed anew by a scratch script, which matches the score files (section 3 here).
+- **This project's own code:**
+  - the package and `scripts/`, which need no row;
+  - PRD #1's scratch scripts, copied and never edited (rows 839, 848, 852, 855);
+  - this PRD's own scratch scripts, none committed.
+
+**Read only as documentation, or used only as a program.**
+
+| What | Why | Row |
+| --- | --- | --- |
+| SparseCam4D's repository, `inspatio/sparse-cam4d` at a1d1961 | Apache-2.0, read for its license file and README only, through GitHub's public API; the technique is taken from its paper. The 4d-gaussian-splatting and 4DGaussians codebases its README builds on were not checked or opened | 837 |
+| The ONNX runtime's binary | MIT, with Eigen (MPL-2.0) compiled in and Mbed TLS taken under Apache-2.0. Its license, metadata and third-party notices were read inside the wheel, since GitHub's API answered 404 for the repository. It was used as a program in a scratch environment, its source unread | 885 |
+| tqdm, which MoGe's `pyproject.toml` lists | MPL-2.0: not opened or installed | 883 |
+| The papers | Read on arXiv, as allowed sources: FreeTimeGS++, SparseCam4D, SSA-3DGS, AligNeRF, PGSR, 2D Gaussian Splatting, Gaussian Opacity Fields, RaDe-GS, DN-Splatter and VCR-GauS. FreeTimeGS++ was read whole, its section 3.2 on its authors' reproduction of FreeTimeGS and its appendices included, under the owner's ruling | 833, 835, 838, 865, 868, 871 to 874, 886, 887 |
+| openftgs-synth 0.1.1 | CC0-1.0: its `DATASET_CARD.md` and data files, as CLAUDE.md allows; its generator is not read | 844, 847, 859, 863, 879, 880 |
+
+**Not opened.**
+
+| What | Why | Where recorded |
+| --- | --- | --- |
+| FreeTimeGS++'s code address and project page | Code that reproduces and extends FreeTimeGS; neither link was followed or searched for | Row 834, as row 767 for the same paper |
+| SSA-3DGS's code | One web search for it found no code repository, and no result was opened | Row 838; section 2.5 here |
+| SparseCam4D's code beyond its license file and README | Not needed: the technique is taken from its paper | Row 837 |
+| DAViD's segmentation model | Offered as option (b) for its person's mask, not chosen; not downloaded | Section 7 here, open choice 3 |
+
+A search of rows 832 to 893 by this ticket finds no row that records EasyVolcap, `gsplat/contrib/dynamic` or a repository-indexing tool.
+
+**Weights, and their licenses.** Each publisher's terms were read again before use, by anonymous requests, as rows 882 and 884 record.
+
+| Weights | Terms, by the publisher | How they were used | Rows |
+| --- | --- | --- | --- |
+| MoGe-2, `Ruicheng/moge-2-vitl-normal`, `model.pt` at cb0e8bb | MIT; base model `facebook/dinov2-large`; not gated; the commit unchanged since rows 583 and 830 | Downloaded into `<scratch>/ticket-28/weights` (Q-7), SHA-256 `280741fd…cc1a01` equal to the publisher's ETag; loaded with `weights_only=True`, offline | 882 |
+| DAViD, `normal-model-vitl16_384.onnx`, at 20a3eb6 | MIT ("DAViD models and runtime code are licensed under the MIT License"); human subjects only | Downloaded from the README's link (Q-7), SHA-256 `759cdfe0…e461d3`, its MD5 equal to the host's; run by the ONNX runtime on the CPU, offline | 884 |
+| RoMa's `roma_outdoor.pth` and the DINOv2 ViT-L/14 weights it loads | MIT and Apache-2.0 (rows 282, 283) | From torch.hub's existing cache, through the package's matcher builder (D-58, Q-106); nothing downloaded | 842, 849, 851, 860, 862, 863 |
+| Depth Anything V2 Small | Apache-2.0 (rows 519, 520, 607) | Not run again: ticket #12's maps reused for DAViD's person mask | 889 (row 618 for the file) |
+
+The runtime packages' licenses:
+
+- the ONNX runtime 1.32.0, MIT; protobuf 7.36.2, BSD-3-Clause; flatbuffers 25.12.19, Apache-2.0 (row 885);
+- torchvision 0.29.2+cu132, BSD-3-Clause; einops 0.8.2, MIT; loguru 0.8.0, MIT (row 612).
+
+All pass section 4.9's bar as PRD #1 found them (section 7 here). Weights and maps stayed in `<scratch>` and `<surface-runs>`. The integration branch's commits change only this document, the research document's section 6 and the source log, so no weights file or map was committed (checked by this ticket on 2026-11-19, `git diff --name-only` from `main`'s 02e3686 to 29daf7c).
+
+**Private scene A.**
+
+- **The rows and this document** call it by its alias.
+- **This ticket's check** (2026-11-19) covered the integration branch's added lines and the messages of its 117 commits, from 02e3686 to 29daf7c. It searched them for the scene's name and its location, as given to this ticket in session, and for home-directory paths, and found none. Its generator, which this ticket was never told, was not searched for.
+- **Its images.** By each section's own account and the rows (843, 851, 862, 888, 889):
+  - its images were read by scripts only, and went only to the package and to the two estimators, running offline on this machine;
+  - no image, render, map or sheet of it was looked at.
+- **Row 850** records that a first inspection printed the opening of each manifest's `metadata` value to the session once, and that nothing of it was kept.
+
+**What went differently.**
+
+- **No incident.** No row is an Incident row. By the orchestrating session's account, relayed to this ticket, no ticket reported an incident or a forbidden read.
+- **No `tdd`.** No §3 test belongs to this PRD, and only the document and the source log changed, apart from the research document's one pointer line. So the `tdd` skill was not used, and each ticket's acceptance criteria stood in.
+- **What this ticket could not do.** Ticket #29's text asks for an issue proposing spec wording for each recommended adoption, and for review 2's answers. No adoption is recommended (section 8 here), and the orchestrating session asked that no issue be opened. Review 2's answers are not yet given.
