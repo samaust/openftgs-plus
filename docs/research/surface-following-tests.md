@@ -1263,7 +1263,7 @@ The baseline's caps fell at 10,800, 11,100 and 9,700 (section 3 here).
 | Arm, against | `kept` | `MM` | `CM` | `MC` | `CC` | Its two references from the same matches |
 | --- | --- | --- | --- | --- | --- | --- |
 | `F1m` against the baseline | not moved (seeds 0.135, 0.148; mean 0.001 above) | not moved (0.003 above) | not moved (0.002 above) | not moved (0.006 above) | not moved (0.001 below) | `MM` and `CM`: **not lower** |
-| `F1c` against the baseline | **lower** by 0.015 | **lower** by 0.015 | **lower** by 0.0100 (0.01005) | not moved: seed 0 at 0.160 above the baseline's 0.154 (mean 0.008 below) | not moved: 0.160 above 0.153 (mean 0.010 below) | `MC` and `CC`: **not lower** |
+| `F1c` against the baseline | **lower** by 0.015 | **lower** by 0.015 | **lower** by 0.0100 (0.010048, beyond the rule's 0.01) | not moved: seed 0 at 0.160 above the baseline's 0.154 (mean 0.008 below) | not moved: 0.160 above 0.153 (mean 0.010 below) | `MC` and `CC`: **not lower** |
 | `F1c` against `F1m` (the pairing) | **lower** by 0.016 | **lower** by 0.018 | not moved (mean 0.012 below) | not moved (0.014 below) | not moved (0.009 below) | – |
 
 - **Neither arm counts as lower.** `F1m`, the correction with the baseline's pairs, does not move the named measure against any file: its seeds straddle the baseline's (0.135 and 0.148 against 0.140 and 0.141 on the kept file). `F1c` is lower against the kept file, `MM` and `CM`, by 0.010 to 0.015, but not against `MC` and `CC`, its two files from the same matches, where its seed 0 lies above the baseline's seed 1.
